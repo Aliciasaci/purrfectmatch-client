@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'composants/bottom_navigation_bar.dart';
+import 'composants/swipe_card.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 30,
               width: 30,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 8), // Espace entre l'image et le titre
             Text(
               widget.title,
               textAlign: TextAlign.center,
@@ -51,7 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         centerTitle: true,
       ),
-      body: Center(),
+      body: Center(
+        child: SwipeCardsWidget(),
+      ),
       bottomNavigationBar: CustomBottomNavigationBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
