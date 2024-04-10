@@ -50,9 +50,6 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
               content: Text("Superliked ${_names[i]}"),
               duration: Duration(milliseconds: 500),
             ));
-          },
-          onSlideUpdate: (SlideRegion? region) async {
-            print("Region $region");
           }));
     }
 
@@ -67,8 +64,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            height: 520,
-            width: 350,
+            height: 600,
+            width: 360,
             child: SwipeCards(
               matchEngine: _matchEngine!,
               itemBuilder: (BuildContext context, int index) {
@@ -76,9 +73,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   borderRadius: BorderRadius.circular(20),
                   child: Image.network(
                     _imageUrls[index],
-                    fit: BoxFit.fill,
-                    width: 350,
-                    height: 520,
+                    fit: BoxFit.cover,
+                    height: 600,
                   ),
                 );
               },
@@ -101,53 +97,53 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Ink(
-                decoration: ShapeDecoration(
-                  color: Colors.red.withOpacity(0.8),
-                  shape: CircleBorder(),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
                 ),
                 child: IconButton(
                   onPressed: () {
                     _matchEngine!.currentItem?.nope();
                   },
                   icon: Icon(Icons.close),
-                  iconSize: 30,
-                  color: Colors.white,
+                  iconSize: 40,
+                  color: Colors.red.withOpacity(0.8),
                   tooltip: 'Passer',
                 ),
               ),
-              Ink(
-                decoration: ShapeDecoration(
-                  color: Colors.orange.withOpacity(0.8),
-                  shape: CircleBorder(),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
                 ),
                 child: IconButton(
                   onPressed: () {
                     _matchEngine!.currentItem?.superLike();
                   },
                   icon: Icon(Icons.visibility),
-                  iconSize: 30,
-                  color: Colors.white,
+                  iconSize: 40,
+                  color: Colors.orange.withOpacity(0.8),
                   tooltip: 'Voir',
                 ),
               ),
-              Ink(
-                decoration: ShapeDecoration(
-                  color: Colors.green.withOpacity(0.8),
-                  shape: CircleBorder(),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
                 ),
                 child: IconButton(
                   onPressed: () {
                     _matchEngine!.currentItem?.like();
                   },
                   icon: Icon(Icons.favorite),
-                  iconSize: 30,
-                  color: Colors.white,
+                  iconSize: 40,
+                  color: Colors.green.withOpacity(0.8),
                   tooltip: 'Favoris',
                 ),
               ),
             ],
-          ),
+          )
         ],
       ),
     );
