@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'composants/bottom_navigation_bar.dart';
+import 'composants/swipe_card.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'PurrfectMatch',
-      theme: ThemeData(scaffoldBackgroundColor: Colors.amber[100]),
+      theme: ThemeData(scaffoldBackgroundColor: Colors.transparent), // Définir la couleur de fond du scaffold sur transparent
       home: const MyHomePage(title: ''),
     );
   }
@@ -32,29 +33,43 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Image(
-              image: AssetImage('assets/logo.png'),
-              height: 30,
-              width: 30,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              widget.title,
-              textAlign: TextAlign.center,
-            ),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
         ),
-        centerTitle: true,
       ),
-      body: Center(),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Image(
+                image: AssetImage('assets/logo.png'),
+                height: 30,
+                width: 30,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                widget.title,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+        body: Center(
+          child: SwipeCardsWidget(),
+        ),
+        bottomNavigationBar: CustomBottomNavigationBar(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onItemTapped,
+        ),
+        backgroundColor: Colors.transparent,
       ),
     );
   }
