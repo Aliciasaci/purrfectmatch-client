@@ -3,6 +3,7 @@ import 'package:purrfectmatch/composants/profile_menu_widget.dart';
 import 'package:purrfectmatch/constants/color.dart';
 import 'package:purrfectmatch/constants/image_strings.dart';
 import 'package:purrfectmatch/constants/text_strings.dart';
+import 'package:purrfectmatch/screens/profile/edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,7 +17,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(userProfileTitle),
+        title: Text(userProfileTitle, style: Theme.of(context).textTheme.headlineSmall),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -39,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 35,
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color: Colors.white),
                         child: const Icon(
-                          Icons.camera_alt,
+                          Icons.edit,
                           color: Colors.black,
                           size: 20,
                         ),
@@ -55,7 +57,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(
                   width: 200,
                   child: ElevatedButton(
-                    onPressed: () { },
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: darkYellowColor, side: BorderSide.none, shape: const StadiumBorder()
                     ),
