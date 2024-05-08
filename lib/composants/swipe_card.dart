@@ -33,9 +33,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     for (int i = 0; i < _names.length; i++) {
       _swipeItems.add(SwipeItem(
           content: Content(text: _names[i], image: _imageUrls[i]),
-          likeAction: () {
+          likeAction: () { // like l'animal
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Liked ${_names[i]}"),
+              content: Text("like ${_names[i]}"),
               duration: Duration(milliseconds: 500),
             ));
           },
@@ -45,9 +45,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
               duration: Duration(milliseconds: 500),
             ));
           },
-          superlikeAction: () {
+          superlikeAction: () { // si super like alors voir l'animal
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Superliked ${_names[i]}"),
+              content: Text("Voir ${_names[i]}"),
               duration: Duration(milliseconds: 500),
             ));
           }));

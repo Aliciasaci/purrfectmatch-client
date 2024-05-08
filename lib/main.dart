@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'PurrfectMatch',
-      theme: ThemeData(scaffoldBackgroundColor: Colors.transparent), // Définir la couleur de fond du scaffold sur transparent
+      theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
       home: const MyHomePage(title: ''),
     );
   }
