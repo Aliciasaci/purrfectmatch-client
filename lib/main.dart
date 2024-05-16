@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'composants/bottom_navigation_bar.dart';
 import 'composants/swipe_card.dart';
 import 'composants/form_add_annonce.dart';
+import 'composants/form_add_cat.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<Widget> _widgetOptions = <Widget>[
     SwipeCardsWidget(),
     AddAnnonce(),
+    AddCat(),
   ];
 
   @override
