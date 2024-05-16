@@ -4,6 +4,7 @@ import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/modals/content.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
+  const SwipeCardsWidget({super.key});
   @override
   _SwipeCardsWidgetState createState() => _SwipeCardsWidgetState();
 }
@@ -80,7 +81,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
               },
               onStackFinished: () {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("Stack Finished"),
+                  content: const Text("Stack Finished"),
                   duration: Duration(milliseconds: 500),
                 ));
               },
@@ -98,7 +99,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
@@ -106,14 +107,14 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   onPressed: () {
                     _matchEngine!.currentItem?.nope();
                   },
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                   iconSize: 40,
                   color: Colors.red.withOpacity(0.8),
                   tooltip: 'Passer',
                 ),
               ),
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
@@ -121,14 +122,14 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   onPressed: () {
                     _matchEngine!.currentItem?.superLike();
                   },
-                  icon: Icon(Icons.visibility),
+                  icon: const Icon(Icons.visibility),
                   iconSize: 40,
                   color: Colors.orange.withOpacity(0.8),
                   tooltip: 'Voir',
                 ),
               ),
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
@@ -136,7 +137,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   onPressed: () {
                     _matchEngine!.currentItem?.like();
                   },
-                  icon: Icon(Icons.favorite),
+                  icon: const Icon(Icons.favorite),
                   iconSize: 40,
                   color: Colors.green.withOpacity(0.8),
                   tooltip: 'Favoris',

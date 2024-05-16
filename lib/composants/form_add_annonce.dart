@@ -8,7 +8,11 @@ class AddAnnonce extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white, // Fond blanc
+      margin: EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: Colors.white, // Couleur de fond du conteneur
+        borderRadius: BorderRadius.circular(20), // Rayon des bords arrondis
+      ),
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(40),
