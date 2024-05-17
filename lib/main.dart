@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'composants/bottom_navigation_bar.dart';
 import 'composants/swipe_card.dart';
+import 'composants/form_add_annonce.dart';
+import 'composants/form_add_cat.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'PurrfectMatch',
-      theme: ThemeData(scaffoldBackgroundColor: Colors.transparent), // Définir la couleur de fond du scaffold sur transparent
+      theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
       home: const MyHomePage(title: ''),
     );
   }
@@ -30,6 +32,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
+
+  //liste des widgets pour chaque onglet
+  static const List<Widget> _widgetOptions = <Widget>[
+    SwipeCardsWidget(),
+    AddAnnonce(),
+    AddCat(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
           elevation: 0,
         ),
         body: Center(
-          child: SwipeCardsWidget(),
+          child: _widgetOptions.elementAt(_selectedIndex),
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
           selectedIndex: _selectedIndex,

@@ -47,7 +47,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
             ),
             BottomNavigationBarItem(
               icon: _buildIcon(Icons.pets, 1, Colors.pink),
-              label: 'Adopter',
+              label: 'Faire adopter',
             ),
             BottomNavigationBarItem(
               icon: IconButton(
