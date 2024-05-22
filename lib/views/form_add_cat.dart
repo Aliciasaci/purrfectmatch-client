@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:purrfectmatch/services/api_service.dart';
+import '../models/cat.dart';
 
 class AddCat extends StatefulWidget {
   const AddCat({super.key});
@@ -50,6 +51,33 @@ class _AddCatState extends State<AddCat> {
     }
   }
 
+  Future<void> _sendData() async {
+    Cat cat = Cat(
+      name: _nameController.text,
+      birthDate: _birthDateController.text,
+      lastVaccineDate: _lastVaccineDateController.text,
+      lastVaccineName: _lastVaccineNameController.text,
+      color: _colorController.text,
+      behavior: _behaviorController.text,
+      race: _raceController.text,
+      description: _descriptionController.text,
+      gender: _selectedValue ?? '',
+      sterilized: _sterilized,
+      reserved: _reserved,
+    );
+
+    try {
+      await ApiService().createCat(cat);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Données envoyées avec succès')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de l\'envoi des données: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,7 +115,7 @@ class _AddCatState extends State<AddCat> {
                   buildSwitchTile("Réservé", _reserved, (value) => setState(() => _reserved = value)),
                   const SizedBox(height: 15),
                   ElevatedButton(
-                    onPressed: () => print('Formulaire envoyé'),
+                    onPressed: _sendData,
                     child: const Text('Envoyer'),
                   ),
                   const SizedBox(height: 15),
