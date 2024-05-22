@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'composants/bottom_navigation_bar.dart';
-import 'composants/swipe_card.dart';
-import 'composants/form_add_annonce.dart';
-import 'composants/form_add_cat.dart';
+import 'views/bottom_navigation_bar.dart';
+import 'views/swipe_card.dart';
+import 'views/form_add_annonce.dart';
+import 'views/form_add_cat.dart';
 
 void main() {
   runApp(const MyApp());
