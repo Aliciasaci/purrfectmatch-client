@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'services/auth_service.dart';
 import 'views/bottom_navigation_bar.dart';
 import 'views/swipe_card.dart';
 import 'views/form_add_annonce.dart';
 import 'views/form_add_cat.dart';
+import 'views/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'PurrfectMatch',
       theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
-      home: const MyHomePage(title: ''),
+      home: AuthService.authToken == null ? const LoginPage() : const MyHomePage(title: 'PurrfectMatch'),
     );
   }
 }
@@ -33,12 +35,26 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
-  //liste des widgets pour chaque onglet
+  // List of widgets for each tab
   static const List<Widget> _widgetOptions = <Widget>[
     SwipeCardsWidget(),
     AddAnnonce(),
     AddCat(),
   ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  void _logout() {
+    AuthService().logout();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +86,13 @@ class _MyHomePageState extends State<MyHomePage> {
           centerTitle: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: _logout,
+              tooltip: 'Logout',
+            ),
+          ],
         ),
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),
@@ -81,11 +104,5 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.transparent,
       ),
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 }
