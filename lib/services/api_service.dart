@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/cat.dart';
 import '../models/annonce.dart';
 import 'package:file_picker/file_picker.dart';
+import './auth_service.dart';
 
 class ApiService {
   static const String baseUrl = 'http://10.0.2.2:8080';
@@ -51,7 +52,7 @@ class ApiService {
     }
   }
 
-  Future<Annonce> fetchAnnonce(String id) async {
+  Future<Annonce> fetchAnnonces(String id) async {
     final response = await http.get(Uri.parse('$baseUrl/annonces/$id'));
 
     if (response.statusCode == 200) {
@@ -61,22 +62,24 @@ class ApiService {
     }
   }
 
-  Future<void> createAnnonce(Annonce annonce) async {
+  Future<Annonce> createAnnonce(Annonce annonce) async {
+    final token = AuthService.authToken;
     final response = await http.post(
       Uri.parse('$baseUrl/annonces'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(annonce.toJson()),
     );
 
-    print(response.statusCode);
-
     if (response.statusCode == 201) {
-      print("ici");
-      return;
+      print(jsonDecode(response.body));
+      return Annonce.fromJson(jsonDecode(response.body));
     } else if (response.statusCode == 400) {
       throw Exception('Champs manquants ou invalides dans la requête');
+    } else if (response.statusCode == 401) {
+      throw Exception('Non autorisé. Veuillez vérifier vos informations d\'authentification');
     } else if (response.statusCode == 500) {
       throw Exception('Erreur interne du serveur');
     } else {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:purrfectmatch/services/api_service.dart';
-import './form_add_cat.dart';
 import '../models/annonce.dart';
+import './annonce_detail_page.dart';
+import './form_add_cat.dart';
 
 class AddAnnonce extends StatefulWidget {
   const AddAnnonce({super.key});
@@ -42,11 +43,18 @@ class _AddAnnonceState extends State<AddAnnonce> {
     );
 
     try {
-      await ApiService().createAnnonce(annonce);
+      final createdAnnonce = await ApiService().createAnnonce(annonce);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Annonce créée avec succès')),
       );
-      Navigator.pop(context); // Retourner à l'écran précédent après la création
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnnonceDetailPage(annonce: createdAnnonce),
+        ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur lors de la création de l\'annonce: $e')),

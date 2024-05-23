@@ -1,4 +1,3 @@
-// models/annonce.dart
 class Annonce {
   final String title;
   final String description;
@@ -24,5 +23,10 @@ class Annonce {
       'description': description,
       'catId': catId,
     };
+  }
+
+  @override
+  String toString() {
+    return 'Annonce{title: $title, description: $description, catId: $catId}';
   }
 }
