@@ -26,11 +26,11 @@ class _AddCatState extends State<AddCat> {
   bool _sterilized = false;
   bool _reserved = false;
   final List<String> _options = ['male', 'femelle'];
+  PlatformFile? _selectedFile;
 
   @override
   void dispose() {
     _nameController.dispose();
-    _sexeController.dispose();
     _birthDateController.dispose();
     _lastVaccineDateController.dispose();
     _lastVaccineNameController.dispose();
@@ -53,10 +53,21 @@ class _AddCatState extends State<AddCat> {
     }
   }
 
+  Future<void> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      setState(() {
+        _selectedFile = result.files.first;
+      });
+    } else {
+      // User canceled the picker
+    }
+  }
+
   Future<void> _sendData() async {
     Cat cat = Cat(
       name: _nameController.text,
-      sexe : _sexeController.text,
       birthDate: _birthDateController.text,
       lastVaccineDate: _lastVaccineDateController.text,
       lastVaccineName: _lastVaccineNameController.text,
@@ -64,13 +75,14 @@ class _AddCatState extends State<AddCat> {
       behavior: _behaviorController.text,
       race: _raceController.text,
       description: _descriptionController.text,
-      gender: _selectedValue ?? '',
+      sexe: _selectedValue ?? '',
       sterilized: _sterilized,
       reserved: _reserved,
+      uploaded_file: _selectedFile != null ? _selectedFile!.name : '',
     );
 
     try {
-      await ApiService().createCat(cat);
+      await ApiService().createCat(cat, _selectedFile);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Données envoyées avec succès')),
       );
@@ -84,56 +96,79 @@ class _AddCatState extends State<AddCat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        margin: EdgeInsets.all(20.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: SingleChildScrollView(
-            child: Form(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Créer un profil de chat',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+        title: const Text('Ajouter un chat'),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+          ),
+        ),
+        child: Center(
+          child: Container(
+            margin: EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(40),
+              child: SingleChildScrollView(
+                child: Form(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Créer un profil de chat',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      buildTextFormField(_nameController, "Nom*"),
+                      SizedBox(height: 10),
+                      buildTextFormFieldWithDatepicker(_birthDateController, "Date de Naissance*", context),
+                      SizedBox(height: 10),
+                      buildTextFormFieldWithDatepicker(_lastVaccineDateController, "Date du dernier vaccin", context),
+                      SizedBox(height: 10),
+                      buildTextFormField(_lastVaccineNameController, "Nom du dernier vaccin"),
+                      SizedBox(height: 10),
+                      buildTextFormField(_colorController, "Couleur*"),
+                      SizedBox(height: 10),
+                      buildTextFormField(_behaviorController, "Comportement*"),
+                      SizedBox(height: 10),
+                      buildTextFormField(_raceController, "Race*"),
+                      SizedBox(height: 10),
+                      buildDescriptionFormField(_descriptionController),
+                      SizedBox(height: 10),
+                      buildSexeDropdown(),
+                      SizedBox(height: 10),
+                      buildSwitchTile("Stérilisé*", _sterilized, (value) => setState(() => _sterilized = value)),
+                      buildSwitchTile("Réservé*", _reserved, (value) => setState(() => _reserved = value)),
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: _pickFile,
+                        child: Text(_selectedFile == null ? 'Sélectionnez une photo' : 'Photo sélectionnée: ${_selectedFile!.name}'),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: _sendData,
+                        child: const Text('Envoyer'),
+                      ),
+                      const SizedBox(height: 15),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  buildTextFormField(_nameController, "Nom*"),
-                  SizedBox(height: 10),
-                  buildTextFormFieldWithDatepicker(_sexeController, "Sexe*", context),
-                  SizedBox(height: 10),
-                  buildTextFormFieldWithDatepicker(_birthDateController, "Date de Naissance*", context),
-                  SizedBox(height: 10),
-                  buildTextFormFieldWithDatepicker(_lastVaccineDateController, "Date du dernier vaccin", context),
-                  SizedBox(height: 10),
-                  buildTextFormField(_lastVaccineNameController, "Nom du dernier vaccin"),
-                  SizedBox(height: 10),
-                  buildTextFormField(_colorController, "Couleur*"),
-                  SizedBox(height: 10),
-                  buildTextFormField(_behaviorController, "Comportement*"),
-                  SizedBox(height: 10),
-                  buildTextFormField(_raceController, "Race*"),
-                  SizedBox(height: 10),
-                  buildDescriptionFormField(_descriptionController),
-                  SizedBox(height: 10),
-                  buildGenderDropdown(),
-                  SizedBox(height: 10),
-                  buildSwitchTile("Stérilisé*", _sterilized, (value) => setState(() => _sterilized = value)),
-                  buildSwitchTile("Réservé*", _reserved, (value) => setState(() => _reserved = value)),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: _sendData,
-                    child: const Text('Envoyer'),
-                  ),
-                  const SizedBox(height: 15),
-                ],
+                ),
               ),
             ),
           ),
@@ -170,7 +205,7 @@ class _AddCatState extends State<AddCat> {
     ),
   );
 
-  Widget buildGenderDropdown() => DropdownButton<String>(
+  Widget buildSexeDropdown() => DropdownButton<String>(
     value: _selectedValue,
     hint: const Text('Sélectionnez un genre'),
     items: _options.map((String value) {

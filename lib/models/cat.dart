@@ -1,6 +1,5 @@
 class Cat {
   final String name;
-  final String sexe;
   final String birthDate;
   final String lastVaccineDate;
   final String lastVaccineName;
@@ -8,13 +7,13 @@ class Cat {
   final String behavior;
   final String race;
   final String description;
-  final String gender;
+  final String sexe;
   final bool sterilized;
   final bool reserved;
+  final String uploaded_file;
 
   Cat({
     required this.name,
-    required this.sexe,
     required this.birthDate,
     required this.lastVaccineDate,
     required this.lastVaccineName,
@@ -22,15 +21,15 @@ class Cat {
     required this.behavior,
     required this.race,
     required this.description,
-    required this.gender,
+    required this.sexe,
     required this.sterilized,
     required this.reserved,
+    required this.uploaded_file,
   });
 
   factory Cat.fromJson(Map<String, dynamic> json) {
     return Cat(
       name: json['name'],
-      sexe: json['sexe'],
       birthDate: json['birthDate'],
       lastVaccineDate: json['lastVaccineDate'],
       lastVaccineName: json['lastVaccineName'],
@@ -38,16 +37,16 @@ class Cat {
       behavior: json['behavior'],
       race: json['race'],
       description: json['description'],
-      gender: json['gender'],
+      sexe: json['sexe'],
       sterilized: json['sterilized'],
       reserved: json['reserved'],
+      uploaded_file: json['uploaded_file']
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'sexe' : sexe,
       'birthDate': birthDate,
       'lastVaccineDate': lastVaccineDate,
       'lastVaccineName': lastVaccineName,
@@ -55,9 +54,10 @@ class Cat {
       'behavior': behavior,
       'race': race,
       'description': description,
-      'gender': gender,
+      'sexe': sexe,
       'sterilized': sterilized,
       'reserved': reserved,
+      'uploaded_file' : uploaded_file
     };
   }
 }
