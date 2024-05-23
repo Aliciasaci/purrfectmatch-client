@@ -14,6 +14,7 @@ class AddCat extends StatefulWidget {
 
 class _AddCatState extends State<AddCat> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _sexeController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
   final TextEditingController _lastVaccineDateController = TextEditingController();
   final TextEditingController _lastVaccineNameController = TextEditingController();
@@ -29,6 +30,7 @@ class _AddCatState extends State<AddCat> {
   @override
   void dispose() {
     _nameController.dispose();
+    _sexeController.dispose();
     _birthDateController.dispose();
     _lastVaccineDateController.dispose();
     _lastVaccineNameController.dispose();
@@ -54,6 +56,7 @@ class _AddCatState extends State<AddCat> {
   Future<void> _sendData() async {
     Cat cat = Cat(
       name: _nameController.text,
+      sexe : _sexeController.text,
       birthDate: _birthDateController.text,
       lastVaccineDate: _lastVaccineDateController.text,
       lastVaccineName: _lastVaccineNameController.text,
@@ -102,17 +105,28 @@ class _AddCatState extends State<AddCat> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  buildTextFormField(_nameController, "Nom"),
-                  buildTextFormFieldWithDatepicker(_birthDateController, "Date de Naissance", context),
+                  buildTextFormField(_nameController, "Nom*"),
+                  SizedBox(height: 10),
+                  buildTextFormFieldWithDatepicker(_sexeController, "Sexe*", context),
+                  SizedBox(height: 10),
+                  buildTextFormFieldWithDatepicker(_birthDateController, "Date de Naissance*", context),
+                  SizedBox(height: 10),
                   buildTextFormFieldWithDatepicker(_lastVaccineDateController, "Date du dernier vaccin", context),
+                  SizedBox(height: 10),
                   buildTextFormField(_lastVaccineNameController, "Nom du dernier vaccin"),
-                  buildTextFormField(_colorController, "Couleur"),
-                  buildTextFormField(_behaviorController, "Comportement"),
-                  buildTextFormField(_raceController, "Race"),
+                  SizedBox(height: 10),
+                  buildTextFormField(_colorController, "Couleur*"),
+                  SizedBox(height: 10),
+                  buildTextFormField(_behaviorController, "Comportement*"),
+                  SizedBox(height: 10),
+                  buildTextFormField(_raceController, "Race*"),
+                  SizedBox(height: 10),
                   buildDescriptionFormField(_descriptionController),
+                  SizedBox(height: 10),
                   buildGenderDropdown(),
-                  buildSwitchTile("Stérilisé", _sterilized, (value) => setState(() => _sterilized = value)),
-                  buildSwitchTile("Réservé", _reserved, (value) => setState(() => _reserved = value)),
+                  SizedBox(height: 10),
+                  buildSwitchTile("Stérilisé*", _sterilized, (value) => setState(() => _sterilized = value)),
+                  buildSwitchTile("Réservé*", _reserved, (value) => setState(() => _reserved = value)),
                   const SizedBox(height: 15),
                   ElevatedButton(
                     onPressed: _sendData,

@@ -1,5 +1,6 @@
 class Cat {
   final String name;
+  final String sexe;
   final String birthDate;
   final String lastVaccineDate;
   final String lastVaccineName;
@@ -13,6 +14,7 @@ class Cat {
 
   Cat({
     required this.name,
+    required this.sexe,
     required this.birthDate,
     required this.lastVaccineDate,
     required this.lastVaccineName,
@@ -28,6 +30,7 @@ class Cat {
   factory Cat.fromJson(Map<String, dynamic> json) {
     return Cat(
       name: json['name'],
+      sexe: json['sexe'],
       birthDate: json['birthDate'],
       lastVaccineDate: json['lastVaccineDate'],
       lastVaccineName: json['lastVaccineName'],
@@ -44,6 +47,7 @@ class Cat {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
+      'sexe' : sexe,
       'birthDate': birthDate,
       'lastVaccineDate': lastVaccineDate,
       'lastVaccineName': lastVaccineName,
