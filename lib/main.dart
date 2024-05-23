@@ -17,9 +17,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'PurrfectMatch',
+      title: '',
       theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
-      home: AuthService.authToken == null ? const LoginPage() : const MyHomePage(title: 'PurrfectMatch'),
+      home: AuthService.authToken == null ? const LoginPage() : const MyHomePage(title: ''),
     );
   }
 }
@@ -68,22 +68,27 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          centerTitle: true,
+          title: Stack(
             children: [
-              const Image(
-                image: AssetImage('assets/logo.png'),
-                height: 30,
-                width: 30,
+              Center(
+                child: const Image(
+                  image: AssetImage('assets/logo.png'),
+                  height: 30,
+                  width: 30,
+                ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                widget.title,
-                textAlign: TextAlign.center,
+              Center(
+                child: Text(
+                  widget.title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ],
           ),
-          centerTitle: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
           actions: [

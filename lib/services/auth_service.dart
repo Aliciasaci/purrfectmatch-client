@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/user.dart';
 
 class AuthService {
   static const String baseUrl = 'http://10.0.2.2:8080';
   static String? authToken;
 
-  Future<User> login(String email, String password) async {
+  Future<void> login(String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/login'),
@@ -16,25 +15,37 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        print("Login Success: ${response.body}");
-
-        // Store the token in the global variable
+        if (responseBody['token'] == null) {
+          throw Exception('Le token est absent dans la réponse');
+        }
+        // Stocker le token dans la variable globale
         authToken = responseBody['token'];
-
-        return User.fromJson(responseBody);
+      } else if (response.statusCode == 401) {
+        throw AuthException("Connexion refusée. Coordonnées invalides.");
+      } else if (response.statusCode == 404) {
+        throw AuthException("Connexion refusée. Utilisateur introuvable.");
       } else {
-        print("Login Failed: Status Code ${response.statusCode}, Body: ${response.body}");
-        throw Exception('Failed to login with status code ${response.statusCode}');
+        throw AuthException('Échec de la connexion avec le code d\'état ${response.statusCode}');
       }
     } catch (e) {
-      print("Exception occurred: $e");
-      throw Exception('Failed to send login request');
+      if (e is AuthException) {
+        rethrow;
+      } else {
+        throw Exception('Échec de l\'envoi de la requête de connexion');
+      }
     }
   }
 
   void logout() {
     authToken = null;
-    print("User logged out, token cleared.");
+    print("Utilisateur déconnecté, token effacé.");
   }
 }
 
+class AuthException implements Exception {
+  final String message;
+  AuthException(this.message);
+
+  @override
+  String toString() => message;
+}
