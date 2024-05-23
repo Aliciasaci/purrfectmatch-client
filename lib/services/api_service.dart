@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/cat.dart';
+import '../models/annonce.dart';
 import 'package:file_picker/file_picker.dart';
 
 class ApiService {
@@ -47,6 +48,39 @@ class ApiService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to create cat profile');
+    }
+  }
+
+  Future<Annonce> fetchAnnonce(String id) async {
+    final response = await http.get(Uri.parse('$baseUrl/annonces/$id'));
+
+    if (response.statusCode == 200) {
+      return Annonce.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load annonce');
+    }
+  }
+
+  Future<void> createAnnonce(Annonce annonce) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/annonces'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(annonce.toJson()),
+    );
+
+    print(response.statusCode);
+
+    if (response.statusCode == 201) {
+      print("ici");
+      return;
+    } else if (response.statusCode == 400) {
+      throw Exception('Champs manquants ou invalides dans la requête');
+    } else if (response.statusCode == 500) {
+      throw Exception('Erreur interne du serveur');
+    } else {
+      throw Exception('Échec de la création de l\'annonce');
     }
   }
 }

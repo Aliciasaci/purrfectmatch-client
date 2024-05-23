@@ -1,19 +1,20 @@
+// models/annonce.dart
 class Annonce {
   final String title;
-  final String? description;
-  final String UserID;
+  final String description;
+  final String catId;
 
   Annonce({
     required this.title,
-    this.description,
-    required this.UserID,
+    required this.description,
+    required this.catId,
   });
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
     return Annonce(
       title: json['title'],
       description: json['description'],
-      UserID : json['userID'],
+      catId: json['catId'],
     );
   }
 
@@ -21,7 +22,7 @@ class Annonce {
     return {
       'title': title,
       'description': description,
-      'userID': UserID,
+      'catId': catId,
     };
   }
 }
