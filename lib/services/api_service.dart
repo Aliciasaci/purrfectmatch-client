@@ -73,9 +73,13 @@ class ApiService {
       body: jsonEncode(annonce.toJson()),
     );
 
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
     if (response.statusCode == 201) {
-      print(jsonDecode(response.body));
-      return Annonce.fromJson(jsonDecode(response.body));
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      print(responseData);
+      return Annonce.fromJson(responseData);
     } else if (response.statusCode == 400) {
       throw Exception('Champs manquants ou invalides dans la requête');
     } else if (response.statusCode == 401) {
@@ -86,4 +90,5 @@ class ApiService {
       throw Exception('Échec de la création de l\'annonce');
     }
   }
+
 }

@@ -38,17 +38,17 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.annonce.title,
+                    widget.annonce.Title,
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    widget.annonce.description,
+                    widget.annonce.Description,
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'ID du chat: ${widget.annonce.catId}',
+                    'ID du chat: ${widget.annonce.CatID}',
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 10),

@@ -25,11 +25,11 @@ class _AddAnnonceState extends State<AddAnnonce> {
   }
 
   Future<void> _sendData() async {
-    final String title = _titleController.text;
-    final String description = _descriptionController.text;
-    final String catId = _catIdController.text;
+    final String Title = _titleController.text;
+    final String Description = _descriptionController.text;
+    final String CatID = _catIdController.text;
 
-    if (title.isEmpty || description.isEmpty || catId.isEmpty) {
+    if (Title.isEmpty || Description.isEmpty || CatID.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez remplir tous les champs')),
       );
@@ -37,13 +37,16 @@ class _AddAnnonceState extends State<AddAnnonce> {
     }
 
     Annonce annonce = Annonce(
-      title: title,
-      description: description,
-      catId: catId,
+      Title: Title,
+      Description: Description,
+      CatID: CatID,
     );
+
+    print('Sending annonce: ${annonce.toString()}');
 
     try {
       final createdAnnonce = await ApiService().createAnnonce(annonce);
+      print('Received annonce: ${createdAnnonce.toString()}');
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Annonce créée avec succès')),
