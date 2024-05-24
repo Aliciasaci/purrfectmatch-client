@@ -60,7 +60,7 @@ class _CatProfileState extends State<CatProfile> {
             const SizedBox(height: 10),
             Text('Description: ${catData!.description}', style: TextStyle(fontSize: 20)),
             const SizedBox(height: 10),
-            Text('Genre: ${catData!.gender}', style: TextStyle(fontSize: 20)),
+            Text('Genre: ${catData!.sexe}', style: TextStyle(fontSize: 20)),
             const SizedBox(height: 10),
             Text('Stérilisé: ${catData!.sterilized ? 'Oui' : 'Non'}', style: TextStyle(fontSize: 20)),
             const SizedBox(height: 10),

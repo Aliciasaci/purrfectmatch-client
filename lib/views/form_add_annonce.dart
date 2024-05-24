@@ -1,89 +1,146 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:purrfectmatch/services/api_service.dart';
+import '../models/annonce.dart';
+import './annonce_detail_page.dart';
+import './form_add_cat.dart';
 
-
-class AddAnnonce extends StatelessWidget {
+class AddAnnonce extends StatefulWidget {
   const AddAnnonce({super.key});
 
   @override
+  _AddAnnonceState createState() => _AddAnnonceState();
+}
+
+class _AddAnnonceState extends State<AddAnnonce> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _catIdController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _catIdController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _sendData() async {
+    final String Title = _titleController.text;
+    final String Description = _descriptionController.text;
+    final String CatID = _catIdController.text;
+
+    if (Title.isEmpty || Description.isEmpty || CatID.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez remplir tous les champs')),
+      );
+      return;
+    }
+
+    Annonce annonce = Annonce(
+      Title: Title,
+      Description: Description,
+      CatID: CatID,
+    );
+
+    print('Sending annonce: ${annonce.toString()}');
+
+    try {
+      final createdAnnonce = await ApiService().createAnnonce(annonce);
+      print('Received annonce: ${createdAnnonce.toString()}');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Annonce créée avec succès')),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnnonceDetailPage(annonce: createdAnnonce),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de la création de l\'annonce: $e')),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-        color: Colors.white, // Couleur de fond du conteneur
-        borderRadius: BorderRadius.circular(20), // Rayon des bords arrondis
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Ajouter une nouvelle annonce',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+    return Scaffold(
+      body: Container(
+        margin: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Ajouter une nouvelle annonce',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Form(
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: "Titre de l'annonce",
-                        border: OutlineInputBorder(),
+                const SizedBox(height: 20),
+                Form(
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: "Titre de l'annonce",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    TextFormField(
-                      maxLines: 2,
-                      decoration: const InputDecoration(
-                        labelText: "Description",
-                        border: OutlineInputBorder(),
+                      const SizedBox(height: 15),
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        // Action à effectuer lors du clic sur le bouton de sélection de fichier
-                        FilePickerResult? result = await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['jpg', 'pdf', 'doc'],
-                        );
-                        if (result != null) {
-                          PlatformFile file = result.files.first;
-                          // Vous pouvez utiliser file pour obtenir des informations sur le fichier sélectionné
-                          print('Nom du fichier: ${file.name}');
-                          print('Chemin du fichier: ${file.path}');
-                          print('Taille du fichier: ${file.size}');
-                          print(file.extension);
-                        } else {
-                          print('Aucun fichier sélectionné.');
-                        }
-                      },
-                      child: const Text('Sélectionner un fichier'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Action à effectuer lors de la soumission du formulaire
-                      },
-                      child: const Text('Envoyer'),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                  ],
+                      const SizedBox(height: 15),
+                      TextFormField(
+                        controller: _catIdController,
+                        decoration: const InputDecoration(
+                          labelText: "ID du chat",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: _sendData,
+                        child: const Text('Envoyer'),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.yellow,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          minimumSize: const Size(100, 40),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AddCat()),
+                          );
+                        },
+                        child: const Text('Ajouter un chat'),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
