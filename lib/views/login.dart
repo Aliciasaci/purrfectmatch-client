@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../main.dart';
+import 'register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -124,9 +125,28 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 20),
                         _isLoading
                             ? const CircularProgressIndicator()
-                            : ElevatedButton(
-                          onPressed: _login,
-                          child: const Text('Connexion'),
+                            : Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: _login,
+                              child: const Text('Connexion'),
+                            ),
+                            const SizedBox(height: 20),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => RegisterPage()),
+                                );
+                              },
+                              child: const Text(
+                                'Pas encore de compte ? Inscris-toi',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
