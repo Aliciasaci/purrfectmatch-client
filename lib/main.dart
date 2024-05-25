@@ -3,15 +3,15 @@ import 'services/auth_service.dart';
 import 'views/bottom_navigation_bar.dart';
 import 'views/swipe_card.dart';
 import 'views/form_add_annonce.dart';
-import 'views/form_add_cat.dart';
 import 'views/login.dart';
+import 'views/annonces_cats_menu.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
   final String title;
 
   @override
@@ -38,8 +38,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // List of widgets for each tab
   static const List<Widget> _widgetOptions = <Widget>[
     SwipeCardsWidget(),
+    AnnoncesCatsMenu(),
     AddAnnonce(),
-    AddCat(),
   ];
 
   void _onItemTapped(int index) {
@@ -71,8 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
           centerTitle: true,
           title: Stack(
             children: [
-              Center(
-                child: const Image(
+              const Center(
+                child: Image(
                   image: AssetImage('assets/logo.png'),
                   height: 30,
                   width: 30,

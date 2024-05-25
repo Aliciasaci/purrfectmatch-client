@@ -3,7 +3,7 @@ import '../services/auth_service.dart';
 import '../main.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -42,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (AuthService.authToken != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MyHomePage(title: '')),
+          MaterialPageRoute(builder: (context) => const MyHomePage(title: '')),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Inscription réussie!')),

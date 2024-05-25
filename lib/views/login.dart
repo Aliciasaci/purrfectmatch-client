@@ -4,7 +4,7 @@ import '../main.dart';
 import 'register.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       if (AuthService.authToken != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MyHomePage(title: '')),
+          MaterialPageRoute(builder: (context) => const MyHomePage(title: '')),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Connexion réussie!')),
@@ -146,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => RegisterPage()),
+                                  MaterialPageRoute(builder: (context) => const RegisterPage()),
                                 );
                               },
                               child: const Text(

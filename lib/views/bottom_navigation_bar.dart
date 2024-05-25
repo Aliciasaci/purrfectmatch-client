@@ -5,10 +5,10 @@ class CustomBottomNavigationBar extends StatefulWidget {
   final ValueChanged<int>? onItemTapped;
 
   const CustomBottomNavigationBar({
-    Key? key,
+    super.key,
     required this.selectedIndex,
     this.onItemTapped,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomBottomNavigationBar> createState() =>
@@ -21,13 +21,13 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     return Container(
       margin: const EdgeInsets.all(20.00),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+        borderRadius: const BorderRadius.all(Radius.circular(40.0)),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
             spreadRadius: 5,
             blurRadius: 7,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
         gradient: LinearGradient(
@@ -37,7 +37,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         ),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+        borderRadius: const BorderRadius.all(Radius.circular(40.0)),
         child: BottomNavigationBar(
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -65,7 +65,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     return Stack(
       children: [
         Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: Icon(
             iconData,
             color: color,

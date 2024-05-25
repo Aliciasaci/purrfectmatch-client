@@ -52,13 +52,41 @@ class ApiService {
     }
   }
 
-  Future<Annonce> fetchAnnonces(String id) async {
-    final response = await http.get(Uri.parse('$baseUrl/annonces/$id'));
 
+  Future<List<Cat>> fetchAllCats() async {
+    final token = AuthService.authToken;
+    final response = await http.get(Uri.parse('$baseUrl/cats'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      });
+
+    print('$baseUrl/cats');
+    print(response.statusCode);
     if (response.statusCode == 200) {
-      return Annonce.fromJson(jsonDecode(response.body));
+      List<dynamic> catsJson = jsonDecode(response.body);
+      return catsJson.map((json) => Cat.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load annonce');
+      throw Exception('Failed to load cats');
+    }
+  }
+
+
+
+  //*annonces
+  Future<List<Annonce>> fetchAllAnnonces() async {
+    final token = AuthService.authToken;
+    final response = await http.get(Uri.parse('$baseUrl/annonces'),
+        headers: <String, String>{
+          'Authorization': 'Bearer $token',
+        });
+
+    print('$baseUrl/annonces');
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List<dynamic> annoncesJson = jsonDecode(response.body);
+      return annoncesJson.map((json) => Annonce.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load annonces');
     }
   }
 
@@ -90,5 +118,4 @@ class ApiService {
       throw Exception('Échec de la création de l\'annonce');
     }
   }
-
 }

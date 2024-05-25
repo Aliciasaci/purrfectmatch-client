@@ -18,7 +18,6 @@ class AuthService {
         if (responseBody['token'] == null) {
           throw Exception('Le token est absent dans la réponse');
         }
-        // Stocker le token dans la variable globale
         authToken = responseBody['token'];
       } else if (response.statusCode == 401) {
         throw AuthException("Connexion refusée. Coordonnées invalides.");

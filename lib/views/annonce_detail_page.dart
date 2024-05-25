@@ -4,7 +4,7 @@ import '../models/annonce.dart';
 class AnnonceDetailPage extends StatefulWidget {
   final Annonce annonce;
 
-  const AnnonceDetailPage({Key? key, required this.annonce}) : super(key: key);
+  const AnnonceDetailPage({super.key, required this.annonce});
 
   @override
   _AnnonceDetailPageState createState() => _AnnonceDetailPageState();
@@ -88,7 +88,7 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                           },
                           child: const Text('Retour'),
                         ),
-                        SizedBox(width: 7,),
+                        const SizedBox(width: 7,),
                         ElevatedButton(
                           onPressed: () {
                             // à faire

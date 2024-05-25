@@ -1,20 +1,22 @@
 class Annonce {
   final String Title;
   final String Description;
-  final String CatID;
+  final String? UserID;
+  final String? CatID;
 
   Annonce({
     required this.Title,
     required this.Description,
-    required this.CatID,
+    this.UserID,
+    this.CatID,
   });
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
-    final annonceJson = json['annonce'] ?? {};
     return Annonce(
-      Title: annonceJson['Title'] ?? '',
-      Description: annonceJson['Description'] ?? '',
-      CatID: annonceJson['CatID'].toString(),  // Convertir en String si nécessaire
+      Title: json['Title'],
+      Description: json['Description'],
+      UserID: json['UserID'],
+      CatID: json['CatID']?.toString(),
     );
   }
 
@@ -22,12 +24,13 @@ class Annonce {
     return {
       'Title': Title,
       'Description': Description,
+      'UserID': UserID,
       'CatID': CatID,
     };
   }
 
   @override
   String toString() {
-    return '{title: $Title, description: $Description, catId: $CatID}';
+    return '{Title: $Title, Description: $Description, UserID: $UserID, CatID: $CatID}';
   }
 }

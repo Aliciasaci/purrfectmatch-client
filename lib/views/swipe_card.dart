@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:swipe_cards/draggable_card.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/models//content.dart';
 
@@ -10,9 +9,9 @@ class SwipeCardsWidget extends StatefulWidget {
 }
 
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
-  List<SwipeItem> _swipeItems = <SwipeItem>[];
+  final List<SwipeItem> _swipeItems = <SwipeItem>[];
   MatchEngine? _matchEngine;
-  List<String> _names = [
+  final List<String> _names = [
     "Red",
     "Blue",
     "Blue",
@@ -20,7 +19,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     "Blue",
     "Blue",
   ];
-  List<String> _imageUrls = [
+  final List<String> _imageUrls = [
     "https://i0.wp.com/katzenworld.co.uk/wp-content/uploads/2019/06/funny-cat.jpeg?fit=1920%2C1920&ssl=1",
     "https://media.gettyimages.com/id/146582583/fr/photo/cat-sandwich.jpg?s=612x612&w=gi&k=20&c=8S_TreIUX3LHbYojsZpYT4A5F6fZs9gT8VeXNRJeGiQ=",
     "https://media.gettyimages.com/id/146582583/fr/photo/cat-sandwich.jpg?s=612x612&w=gi&k=20&c=8S_TreIUX3LHbYojsZpYT4A5F6fZs9gT8VeXNRJeGiQ=",
@@ -37,19 +36,19 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           likeAction: () { // like l'animal
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text("like ${_names[i]}"),
-              duration: Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 500),
             ));
           },
           nopeAction: () {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text("Nope ${_names[i]}"),
-              duration: Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 500),
             ));
           },
           superlikeAction: () { // si super like alors voir l'animal
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text("Voir ${_names[i]}"),
-              duration: Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 500),
             ));
           }));
     }
@@ -64,7 +63,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
+          SizedBox(
             height: 600,
             width: 360,
             child: SwipeCards(
@@ -80,8 +79,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 );
               },
               onStackFinished: () {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: const Text("Stack Finished"),
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Stack Finished"),
                   duration: Duration(milliseconds: 500),
                 ));
               },
@@ -94,7 +93,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
               fillSpace: true,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
