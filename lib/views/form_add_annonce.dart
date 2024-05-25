@@ -118,8 +118,22 @@ class _AddAnnonceState extends State<AddAnnonce> {
                       const SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: _sendData,
-                        child: const Text('Envoyer'),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.add),
+                            SizedBox(width: 8),
+                            Text('Ajouter'),
+                          ],
+                        ),
                       ),
+                      SizedBox(height: 10,),
+                      Divider(
+                        color: Colors.grey,
+                        height: 20,
+                        thickness: 1,
+                      ),
+                      SizedBox(height: 10,),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.yellow,

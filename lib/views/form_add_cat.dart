@@ -96,15 +96,15 @@ class _AddCatState extends State<AddCat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text('Ajouter un chat'),
-      ),
+      // appBar: AppBar(
+        // leading: IconButton(
+         // icon: Icon(Icons.arrow_back),
+        //  onPressed: () {
+        //    Navigator.pop(context);
+         // },
+       // ),
+    //    title: const Text('Ajouter un chat'),
+     // ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

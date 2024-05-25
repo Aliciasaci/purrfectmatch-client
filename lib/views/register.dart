@@ -45,11 +45,11 @@ class _RegisterPageState extends State<RegisterPage> {
           MaterialPageRoute(builder: (context) => MyHomePage(title: '')),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Inscription réussie!')),
+          const SnackBar(content: Text('Inscription réussie!')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Échec de la récupération du token')),
+          const SnackBar(content: Text('Échec de la récupération du token')),
         );
       }
     } catch (e) {
@@ -73,7 +73,11 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          color: Colors.amber[50],
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+          ),
         ),
         child: Center(
           child: Padding(
@@ -90,6 +94,12 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        const Image(
+                          image: AssetImage('assets/logo.png'),
+                          height: 50,
+                          width: 50,
+                        ),
+                        const SizedBox(height: 20),
                         const Text(
                           'Inscription',
                           style: TextStyle(

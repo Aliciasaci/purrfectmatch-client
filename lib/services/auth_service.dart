@@ -23,6 +23,7 @@ class AuthService {
       } else if (response.statusCode == 401) {
         throw AuthException("Connexion refusée. Coordonnées invalides.");
       } else if (response.statusCode == 404) {
+
         throw AuthException("Connexion refusée. Utilisateur introuvable.");
       } else {
         throw AuthException('Échec de la connexion avec le code d\'état ${response.statusCode}');
@@ -42,33 +43,33 @@ class AuthService {
         Uri.parse('$baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'name': name,
-          'email': email,
-          'password': password,
-          'addressRue': addressRue,
-          'cp': cp,
-          'ville': ville,
+          "name": name,
+          "email": email,
+          "password": password,
+          "addressRue": addressRue,
+          "cp": cp,
+          "ville": ville
         }),
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      final responseBody = jsonDecode(response.body);
+      print(responseBody);
       if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
         if (responseBody['token'] == null) {
           throw Exception('Le token est absent dans la réponse');
         }
-        // Stocker le token dans la variable globale
         authToken = responseBody['token'];
-      } else if (response.statusCode == 401) {
-        throw AuthException("Inscription refusée. Coordonnées invalides.");
-      } else if (response.statusCode == 404) {
-        throw AuthException("Inscription refusée. Utilisateur introuvable.");
       } else {
-        throw AuthException('Échec de l\'inscription avec le code d\'état ${response.statusCode}');
+        throw AuthException('Échec de l\'inscription : code d\'état ${response.statusCode}');
       }
     } catch (e) {
       if (e is AuthException) {
         rethrow;
       } else {
+        print('Exception: $e');
         throw Exception('Échec de l\'envoi de la requête d\'inscription');
       }
     }
