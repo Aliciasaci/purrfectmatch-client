@@ -1,29 +1,31 @@
 import 'package:flutter/material.dart';
-import 'composants/bottom_navigation_bar.dart';
-import 'composants/swipe_card.dart';
-import 'composants/form_add_annonce.dart';
-import 'composants/form_add_cat.dart';
+import 'services/auth_service.dart';
+import 'views/bottom_navigation_bar.dart';
+import 'views/swipe_card.dart';
+import 'views/form_add_annonce.dart';
+import 'views/login.dart';
+import 'views/annonces_cats_menu.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'PurrfectMatch',
+      title: '',
       theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
-      home: const MyHomePage(title: ''),
+      home: AuthService.authToken == null ? const LoginPage() : const MyHomePage(title: ''),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
   final String title;
 
   @override
@@ -33,12 +35,26 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
-  //liste des widgets pour chaque onglet
+  // List of widgets for each tab
   static const List<Widget> _widgetOptions = <Widget>[
     SwipeCardsWidget(),
+    AnnoncesCatsMenu(),
     AddAnnonce(),
-    AddCat(),
   ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  void _logout() {
+    AuthService().logout();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,24 +68,36 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          centerTitle: true,
+          title: Stack(
             children: [
-              const Image(
-                image: AssetImage('assets/logo.png'),
-                height: 30,
-                width: 30,
+              const Center(
+                child: Image(
+                  image: AssetImage('assets/logo.png'),
+                  height: 30,
+                  width: 30,
+                ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                widget.title,
-                textAlign: TextAlign.center,
+              Center(
+                child: Text(
+                  widget.title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ],
           ),
-          centerTitle: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: _logout,
+              tooltip: 'Logout',
+            ),
+          ],
         ),
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),
@@ -81,11 +109,5 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.transparent,
       ),
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 }
