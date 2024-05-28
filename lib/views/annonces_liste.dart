@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/annonce.dart';
 import '../services/api_service.dart';
+import 'annonce_detail_page.dart';
 
 class AnnoncesListPage extends StatefulWidget {
   const AnnoncesListPage({super.key});
@@ -88,7 +89,12 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
                     'Description: ${annonce.Description}\nCat ID: ${annonce.CatID}'),
                 trailing: const Icon(Icons.arrow_forward),
                 onTap: () {
-                  // Navigate to detail page if needed
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AnnonceDetailPage(annonce: annonce),
+                    ),
+                  );
                 },
               ),
             );

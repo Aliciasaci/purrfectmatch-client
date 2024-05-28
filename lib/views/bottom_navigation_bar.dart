@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:purrfectmatch/screens/profile/profile_screen.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final int selectedIndex;

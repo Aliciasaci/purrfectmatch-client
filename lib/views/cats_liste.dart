@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/cat.dart';
 import '../services/api_service.dart';
+import './cat_detail_page.dart';
 
 class CatsListPage extends StatefulWidget {
   const CatsListPage({super.key});
@@ -91,7 +92,12 @@ class _CatsListPageState extends State<CatsListPage> {
                     'Race: ${cat.race}\nCouleur: ${cat.color}\nComportement: ${cat.behavior}\nRéservé: ${cat.reserved ? "Oui" : "Non"}'),
                 trailing: const Icon(Icons.arrow_forward),
                 onTap: () {
-                  // Ajoutez l'action pour naviguer vers une page de détail du chat, si nécessaire
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CatDetails(cat: cat),
+                    ),
+                  );
                 },
               ),
             );
