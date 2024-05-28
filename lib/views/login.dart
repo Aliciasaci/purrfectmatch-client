@@ -61,6 +61,31 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _providerLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      AuthService authService = AuthService();
+
+      await authService.providerLogin();
+    } catch (e) {
+      String errorMessage = 'Impossible de se connecter.';
+      if (e is AuthException) {
+        errorMessage = e.message;
+      }
+      print("Exception pendant la connexion: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,6 +165,10 @@ class _LoginPageState extends State<LoginPage> {
                             ElevatedButton(
                               onPressed: _login,
                               child: const Text('Connexion'),
+                            ),
+                            ElevatedButton(
+                              onPressed: _providerLogin,
+                              child: const Text('Google'),
                             ),
                             const SizedBox(height: 20),
                             GestureDetector(

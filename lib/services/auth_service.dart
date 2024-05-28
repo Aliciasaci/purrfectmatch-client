@@ -1,9 +1,34 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class AuthService {
   static const String baseUrl = 'http://10.0.2.2:8080';
   static String? authToken;
+
+  Future<void> providerLogin() async {
+    try {
+      final request = http.Request("GET", Uri.parse('$baseUrl/auth/google'))..followRedirects = false;
+      final client = http.Client();
+      final response = await client.send(request);
+      if (response.statusCode < 400) {
+        final location = response.headers['location'];
+        if (location == null) {
+          throw Exception('Problème de redirection');
+        } else {
+           launchUrlString(location);
+        }
+      }
+    } catch (e) {
+      if (e is AuthException) {
+        rethrow;
+      } else {
+        throw Exception('Échec de l\'envoi de la requête de connexion');
+      }
+    }
+  }
 
   Future<void> login(String email, String password) async {
     try {
