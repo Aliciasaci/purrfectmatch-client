@@ -11,10 +11,38 @@ class AnnonceDetailPage extends StatefulWidget {
 }
 
 class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
+  bool _isEditing = false;
+
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _catIDController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    _populateFields();
     print('====>Annonce créée : ${widget.annonce}');
+  }
+
+  void _populateFields() {
+    _titleController.text = widget.annonce.Title;
+    _descriptionController.text = widget.annonce.Description;
+    _catIDController.text = widget.annonce.CatID ?? '';
+  }
+
+  void _toggleEditing() {
+    setState(() {
+      _isEditing = !_isEditing;
+    });
+  }
+
+  void _saveChanges() {
+    // Implement the save functionality here, for example, calling an API to save the changes
+    // For now, just print the values to console
+    print('Title: ${_titleController.text}');
+    print('Description: ${_descriptionController.text}');
+    print('Cat ID: ${_catIDController.text}');
+    _toggleEditing(); // Switch back to non-editing mode
   }
 
   @override
@@ -55,7 +83,8 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
-                      initialValue: widget.annonce.Title,
+                      controller: _titleController,
+                      enabled: _isEditing,
                       decoration: const InputDecoration(
                         labelText: "Titre de l'annonce",
                         border: OutlineInputBorder(),
@@ -63,8 +92,9 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                     ),
                     const SizedBox(height: 15),
                     TextFormField(
-                      initialValue: widget.annonce.Description,
+                      controller: _descriptionController,
                       maxLines: 2,
+                      enabled: _isEditing,
                       decoration: const InputDecoration(
                         labelText: "Description",
                         border: OutlineInputBorder(),
@@ -72,7 +102,8 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                     ),
                     const SizedBox(height: 15),
                     TextFormField(
-                      initialValue: widget.annonce.CatID,
+                      controller: _catIDController,
+                      enabled: _isEditing,
                       decoration: const InputDecoration(
                         labelText: "ID du chat",
                         border: OutlineInputBorder(),
@@ -88,12 +119,10 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                           },
                           child: const Text('Retour'),
                         ),
-                        const SizedBox(width: 7,),
+                        const SizedBox(width: 7),
                         ElevatedButton(
-                          onPressed: () {
-                            // à faire
-                          },
-                          child: const Text('Modifier'),
+                          onPressed: _isEditing ? _saveChanges : _toggleEditing,
+                          child: Text(_isEditing ? 'Valider' : 'Modifier'),
                         ),
                       ],
                     ),
