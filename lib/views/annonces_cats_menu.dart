@@ -3,6 +3,8 @@ import 'annonces_liste.dart';
 import 'cats_liste.dart';
 import 'form_add_annonce.dart';
 import 'form_add_cat.dart';
+import 'user_annonces.dart'; // Importez la page pour "Mes annonces"
+import 'user_favoris.dart'; // Importez la page pour "Mes favoris"
 
 class AnnoncesCatsMenu extends StatelessWidget {
   const AnnoncesCatsMenu({super.key});
@@ -93,6 +95,47 @@ class AnnoncesCatsMenu extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => AddAnnonce()),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          Card(
+            color: Colors.white,
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  title: const Text(
+                    'Utilisateur',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.assignment),
+                  title: const Text('Mes annonces'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => UserAnnoncesPage()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.favorite),
+                  title: const Text('Mes favoris'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => UserFavorisPage()),
                     );
                   },
                 ),

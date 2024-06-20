@@ -52,13 +52,12 @@ class ApiService {
     }
   }
 
-
   Future<List<Cat>> fetchAllCats() async {
     final token = AuthService.authToken;
     final response = await http.get(Uri.parse('$baseUrl/cats'),
-      headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      });
+        headers: <String, String>{
+          'Authorization': 'Bearer $token',
+        });
 
     print('$baseUrl/cats');
     print(response.statusCode);
@@ -70,9 +69,7 @@ class ApiService {
     }
   }
 
-
-
-  //*annonces
+  // Annonces
   Future<List<Annonce>> fetchAllAnnonces() async {
     final token = AuthService.authToken;
     final response = await http.get(Uri.parse('$baseUrl/annonces'),
@@ -116,6 +113,42 @@ class ApiService {
       throw Exception('Erreur interne du serveur');
     } else {
       throw Exception('Échec de la création de l\'annonce');
+    }
+  }
+
+  // Fetch user's annonces
+  Future<List<Annonce>> fetchUserAnnonces() async {
+    final token = AuthService.authToken;
+    final response = await http.get(Uri.parse('$baseUrl/users/annonces/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+        headers: <String, String>{
+          'Authorization': 'Bearer $token',
+        });
+
+    print('$baseUrl/users/annonces');
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List<dynamic> annoncesJson = jsonDecode(response.body);
+      return annoncesJson.map((json) => Annonce.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load user annonces');
+    }
+  }
+
+  // Fetch user's favorite annonces
+  Future<List<Annonce>> fetchUserFavorites() async {
+    final token = AuthService.authToken;
+    final response = await http.get(Uri.parse('$baseUrl/user/favorites'),
+        headers: <String, String>{
+          'Authorization': 'Bearer $token',
+        });
+
+    print('$baseUrl/user/favorites');
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List<dynamic> annoncesJson = jsonDecode(response.body);
+      return annoncesJson.map((json) => Annonce.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load user favorites');
     }
   }
 }
