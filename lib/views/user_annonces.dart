@@ -4,15 +4,15 @@ import '../models/cat.dart';
 import '../services/api_service.dart';
 import 'annonce_detail_page.dart';
 
-class AnnoncesListPage extends StatefulWidget {
-  const AnnoncesListPage({super.key});
+class UserAnnoncesPage extends StatefulWidget {
+  const UserAnnoncesPage({super.key});
 
   @override
-  _AnnoncesListPageState createState() => _AnnoncesListPageState();
+  _UserAnnoncesPageState createState() => _UserAnnoncesPageState();
 }
 
-class _AnnoncesListPageState extends State<AnnoncesListPage> {
-  List<Annonce> annoncesData = [];
+class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
+  List<Annonce> userAnnoncesData = [];
   Map<String, Cat> catsData = {};
   final ScrollController _scrollController = ScrollController();
   bool _loading = false;
@@ -21,24 +21,24 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
   @override
   void initState() {
     super.initState();
-    _fetchAnnonces();
+    _fetchUserAnnonces();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent &&
           !_loading) {
-        _fetchAnnonces();
+        _fetchUserAnnonces();
       }
     });
   }
 
-  Future<void> _fetchAnnonces() async {
+  Future<void> _fetchUserAnnonces() async {
     setState(() {
       _loading = true;
     });
 
     try {
       final apiService = ApiService();
-      final newAnnonces = await apiService.fetchAllAnnonces();
+      final newAnnonces = await apiService.fetchUserAnnonces();
       for (var annonce in newAnnonces) {
         if (annonce.CatID != null) {
           final cat = await apiService.fetchCatByID(annonce.CatID!);
@@ -46,7 +46,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
         }
       }
       setState(() {
-        annoncesData.addAll(newAnnonces);
+        userAnnoncesData.addAll(newAnnonces);
         _loading = false;
         _page++;
       });
@@ -54,7 +54,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
       setState(() {
         _loading = false;
       });
-      print('Failed to load annonces: $e');
+      print('Failed to load user annonces: $e');
     }
   }
 
@@ -68,7 +68,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Liste des Annonces'),
+        title: const Text('Mes annonces'),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -80,14 +80,14 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
         ),
         child: ListView.builder(
           controller: _scrollController,
-          itemCount: annoncesData.length + 1,
+          itemCount: userAnnoncesData.length + 1,
           itemBuilder: (context, index) {
-            if (index == annoncesData.length) {
+            if (index == userAnnoncesData.length) {
               return _loading
                   ? const Center(child: CircularProgressIndicator())
                   : const SizedBox.shrink();
             }
-            final annonce = annoncesData[index];
+            final annonce = userAnnoncesData[index];
             final cat = annonce.CatID != null ? catsData[annonce.CatID!] : null;
             return Card(
               margin: const EdgeInsets.all(10),
