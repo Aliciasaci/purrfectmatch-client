@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:swipe_cards/swipe_cards.dart';
-import 'package:purrfectmatch/models//content.dart';
+import 'package:purrfectmatch/services/api_service.dart';
+import 'package:purrfectmatch/models/annonce.dart';
+import 'package:purrfectmatch/models/cat.dart';
+import 'package:purrfectmatch/views/cat_detail_page.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
   const SwipeCardsWidget({super.key});
@@ -11,50 +14,87 @@ class SwipeCardsWidget extends StatefulWidget {
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
   MatchEngine? _matchEngine;
-  final List<String> _names = [
-    "Red",
-    "Blue",
-    "Blue",
-    "Blue",
-    "Blue",
-    "Blue",
-  ];
-  final List<String> _imageUrls = [
-    "https://i0.wp.com/katzenworld.co.uk/wp-content/uploads/2019/06/funny-cat.jpeg?fit=1920%2C1920&ssl=1",
-    "https://media.gettyimages.com/id/146582583/fr/photo/cat-sandwich.jpg?s=612x612&w=gi&k=20&c=8S_TreIUX3LHbYojsZpYT4A5F6fZs9gT8VeXNRJeGiQ=",
-    "https://media.gettyimages.com/id/146582583/fr/photo/cat-sandwich.jpg?s=612x612&w=gi&k=20&c=8S_TreIUX3LHbYojsZpYT4A5F6fZs9gT8VeXNRJeGiQ=",
-    "https://i.pinimg.com/736x/14/1f/67/141f675b8ddac4a80ca16d33cc9b34bf.jpg",
-    "https://i0.wp.com/katzenworld.co.uk/wp-content/uploads/2019/06/funny-cat.jpeg?fit=1920%2C1920&ssl=1",
-    "https://i0.wp.com/katzenworld.co.uk/wp-content/uploads/2019/06/funny-cat.jpeg?fit=1920%2C1920&ssl=1",
-  ];
+  final ApiService apiService = ApiService();
 
   @override
   void initState() {
-    for (int i = 0; i < _names.length; i++) {
-      _swipeItems.add(SwipeItem(
-          content: Content(text: _names[i], image: _imageUrls[i]),
-          likeAction: () { // like l'animal
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("like ${_names[i]}"),
-              duration: const Duration(milliseconds: 500),
-            ));
-          },
-          nopeAction: () {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Nope ${_names[i]}"),
-              duration: const Duration(milliseconds: 500),
-            ));
-          },
-          superlikeAction: () { // si super like alors voir l'animal
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Voir ${_names[i]}"),
-              duration: const Duration(milliseconds: 500),
-            ));
-          }));
+    super.initState();
+    apiService.fetchAllAnnonces().then((annonces) async {
+      for (var annonce in annonces) {
+        try {
+          Cat cat = await apiService.fetchCatByID(annonce.CatID);
+          _swipeItems.add(SwipeItem(
+            content: {'annonce': annonce, 'cat': cat},
+            likeAction: () {
+              print("annonceID");
+              print(annonce.ID);
+              _handleLikeAction(annonce.ID, cat.name);
+            },
+            nopeAction: () {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Passed ${cat.name}"),
+                duration: const Duration(milliseconds: 500),
+              ));
+            },
+            superlikeAction: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+              );
+            },
+          ));
+        } catch (error) {
+          print("Failed to load cat for annonce ${annonce.ID}: $error");
+        }
+      }
+
+      setState(() {
+        _matchEngine = MatchEngine(swipeItems: _swipeItems);
+      });
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Failed to load annonces: $error"),
+        duration: const Duration(milliseconds: 1500),
+      ));
+    });
+  }
+
+  void _handleLikeAction(int? annonceID, String catName) {
+
+    print("annonceID2");
+    print(annonceID);
+
+    apiService.createFavorite(annonceID).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Ajout de $catName à tes favoris"),
+        duration: const Duration(milliseconds: 500),
+      ));
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Failed to like $catName: $error"),
+        duration: const Duration(milliseconds: 1500),
+      ));
+    });
+  }
+
+  String calculateAge(String birthDateString) {
+    DateTime birthDate = DateTime.parse(birthDateString);
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    int month1 = currentDate.month;
+    int month2 = birthDate.month;
+
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      int day1 = currentDate.day;
+      int day2 = birthDate.day;
+      if (day2 > day1) {
+        age--;
+      }
     }
 
-    _matchEngine = MatchEngine(swipeItems: _swipeItems);
-    super.initState();
+    return age.toString();
   }
 
   @override
@@ -63,36 +103,122 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 600,
-            width: 360,
-            child: SwipeCards(
-              matchEngine: _matchEngine!,
-              itemBuilder: (BuildContext context, int index) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.network(
-                    _imageUrls[index],
-                    fit: BoxFit.cover,
-                    height: 600,
-                  ),
-                );
-              },
-              onStackFinished: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Stack Finished"),
-                  duration: Duration(milliseconds: 500),
-                ));
-              },
-              itemChanged: (SwipeItem item, int index) {
-                print("item: ${item.content.text}, index: $index");
-              },
-              leftSwipeAllowed: true,
-              rightSwipeAllowed: true,
-              upSwipeAllowed: true,
-              fillSpace: true,
+          if (_matchEngine == null)
+            CircularProgressIndicator()
+          else
+            SizedBox(
+              height: 600,
+              width: 360,
+              child: SwipeCards(
+                matchEngine: _matchEngine!,
+                itemBuilder: (BuildContext context, int index) {
+                  var item = _swipeItems[index].content as Map;
+                  Annonce annonce = item['annonce'] as Annonce;
+                  Cat cat = item['cat'] as Cat;
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          cat.picturesUrl.first,
+                          fit: BoxFit.cover,
+                          height: 600,
+                          width: 360,
+                        ),
+                        Container(
+                          height: 600,
+                          width: 360,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.5),
+                                Colors.transparent
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(20),
+                          height: 600,
+                          width: 360,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                cat.name,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "${calculateAge(cat.birthDate)} ans",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              Text(
+                                "Sexe: ${cat.sexe}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              Text(
+                                "Race: ${cat.race}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              if (!cat.reserved)
+                                Text(
+                                  "Disponible",
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              if (cat.reserved)
+                                Text(
+                                  "Réservé",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                onStackFinished: () {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Stack Finished"),
+                    duration: Duration(milliseconds: 500),
+                  ));
+                },
+                itemChanged: (SwipeItem item, int index) {
+                  var itemContent = item.content as Map;
+                  Annonce annonce = itemContent['annonce'] as Annonce;
+                  Cat cat = itemContent['cat'] as Cat;
+                  print("item: ${cat.name}, index: $index");
+                },
+                leftSwipeAllowed: true,
+                rightSwipeAllowed: true,
+                upSwipeAllowed: true,
+                fillSpace: true,
+              ),
             ),
-          ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
