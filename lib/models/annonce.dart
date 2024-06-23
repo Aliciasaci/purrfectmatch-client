@@ -1,10 +1,12 @@
 class Annonce {
+  final int? ID;
   final String Title;
   final String Description;
   final String? UserID;
   final String? CatID;
 
   Annonce({
+    this.ID,
     required this.Title,
     required this.Description,
     this.UserID,
@@ -13,6 +15,7 @@ class Annonce {
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
     return Annonce(
+      ID : json['ID'],
       Title: json['Title'],
       Description: json['Description'],
       UserID: json['UserID'],
@@ -22,6 +25,7 @@ class Annonce {
 
   Map<String, dynamic> toJson() {
     return {
+      'ID' : ID,
       'Title': Title,
       'Description': Description,
       'UserID': UserID,
@@ -31,6 +35,6 @@ class Annonce {
 
   @override
   String toString() {
-    return '{Title: $Title, Description: $Description, UserID: $UserID, CatID: $CatID}';
+    return '{ID: $ID, Title: $Title, Description: $Description, UserID: $UserID, CatID: $CatID}';
   }
 }

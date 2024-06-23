@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/annonce.dart';
+import '../models/cat.dart';
 import '../services/api_service.dart';
 import 'annonce_detail_page.dart';
 
@@ -12,6 +13,7 @@ class UserAnnoncesPage extends StatefulWidget {
 
 class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
   List<Annonce> userAnnoncesData = [];
+  Map<String, Cat> catsData = {};
   final ScrollController _scrollController = ScrollController();
   bool _loading = false;
   int _page = 1;
@@ -37,6 +39,12 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     try {
       final apiService = ApiService();
       final newAnnonces = await apiService.fetchUserAnnonces();
+      for (var annonce in newAnnonces) {
+        if (annonce.CatID != null) {
+          final cat = await apiService.fetchCatByID(annonce.CatID!);
+          catsData[annonce.CatID!] = cat;
+        }
+      }
       setState(() {
         userAnnoncesData.addAll(newAnnonces);
         _loading = false;
@@ -80,10 +88,14 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
                   : const SizedBox.shrink();
             }
             final annonce = userAnnoncesData[index];
+            final cat = annonce.CatID != null ? catsData[annonce.CatID!] : null;
             return Card(
               margin: const EdgeInsets.all(10),
               color: Colors.white,
               child: ListTile(
+                leading: cat != null && cat.picturesUrl.isNotEmpty
+                    ? Image.network(cat.picturesUrl.first, width: 50, height: 50, fit: BoxFit.cover)
+                    : const Icon(Icons.image, size: 50),
                 title: Text(annonce.Title),
                 subtitle: Text(
                     'Description: ${annonce.Description}\nCat ID: ${annonce.CatID}'),

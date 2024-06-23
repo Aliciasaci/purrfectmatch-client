@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
+import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/views/cat_detail_page.dart';
 
@@ -13,34 +14,38 @@ class SwipeCardsWidget extends StatefulWidget {
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
   MatchEngine? _matchEngine;
-  final ApiService apiService = ApiService(); // Instance de ApiService
+  final ApiService apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    apiService.fetchAllCats().then((cats) {
-      for (var cat in cats) {
-        _swipeItems.add(SwipeItem(
-          content: cat, // Utilisez l'objet Cat directement
-          likeAction: () {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("like ${cat.name}"),
-              duration: const Duration(milliseconds: 500),
-            ));
-          },
-          nopeAction: () {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Passer ${cat.name}"),
-              duration: const Duration(milliseconds: 500),
-            ));
-          },
-          superlikeAction: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
-            );
-          },
-        ));
+    apiService.fetchAllAnnonces().then((annonces) async {
+      for (var annonce in annonces) {
+        try {
+          Cat cat = await apiService.fetchCatByID(annonce.CatID);
+          _swipeItems.add(SwipeItem(
+            content: {'annonce': annonce, 'cat': cat},
+            likeAction: () {
+              print("annonceID");
+              print(annonce.ID);
+              _handleLikeAction(annonce.ID, cat.name);
+            },
+            nopeAction: () {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Passed ${cat.name}"),
+                duration: const Duration(milliseconds: 500),
+              ));
+            },
+            superlikeAction: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+              );
+            },
+          ));
+        } catch (error) {
+          print("Failed to load cat for annonce ${annonce.ID}: $error");
+        }
       }
 
       setState(() {
@@ -48,7 +53,25 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       });
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Failed to load cats: $error"),
+        content: Text("Failed to load annonces: $error"),
+        duration: const Duration(milliseconds: 1500),
+      ));
+    });
+  }
+
+  void _handleLikeAction(int? annonceID, String catName) {
+
+    print("annonceID2");
+    print(annonceID);
+
+    apiService.createFavorite(annonceID).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Ajout de $catName à tes favoris"),
+        duration: const Duration(milliseconds: 500),
+      ));
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Failed to like $catName: $error"),
         duration: const Duration(milliseconds: 1500),
       ));
     });
@@ -89,7 +112,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
               child: SwipeCards(
                 matchEngine: _matchEngine!,
                 itemBuilder: (BuildContext context, int index) {
-                  Cat cat = _swipeItems[index].content as Cat;
+                  var item = _swipeItems[index].content as Map;
+                  Annonce annonce = item['annonce'] as Annonce;
+                  Cat cat = item['cat'] as Cat;
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Stack(
@@ -183,7 +208,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   ));
                 },
                 itemChanged: (SwipeItem item, int index) {
-                  Cat cat = item.content as Cat;
+                  var itemContent = item.content as Map;
+                  Annonce annonce = itemContent['annonce'] as Annonce;
+                  Cat cat = itemContent['cat'] as Cat;
                   print("item: ${cat.name}, index: $index");
                 },
                 leftSwipeAllowed: true,
