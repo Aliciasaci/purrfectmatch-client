@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:purrfectmatch/constants/color.dart';
 import 'package:purrfectmatch/constants/image_strings.dart';
 import 'package:purrfectmatch/constants/text_strings.dart';
+import '../../models/user.dart';
+import '../../services/api_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -11,10 +13,82 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _addressRueController = TextEditingController();
+  final _cpController = TextEditingController();
+  final _villeController = TextEditingController();
+
+  User? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    ApiService().fetchCurrentUser().then((user) {
+      setState(() {
+        _currentUser = user;
+        _nameController.text = _currentUser!.name;
+        _emailController.text = _currentUser!.email;
+        _addressRueController.text = _currentUser!.addressRue;
+        _cpController.text = _currentUser!.cp;
+        _villeController.text = _currentUser!.ville;
+      });
+    }).catchError((error) {
+      print('Error fetching user data: $error');
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _addressRueController.dispose();
+    _cpController.dispose();
+    _villeController.dispose();
+    super.dispose();
+  }
+
+  void _updateUser() {
+    final updatedUser = User(
+      id: _currentUser!.id,
+      name: _nameController.text,
+      email: _emailController.text,
+      addressRue: _addressRueController.text,
+      cp: _cpController.text,
+      ville: _villeController.text,
+    );
+
+    ApiService().updateUser(updatedUser).then((_) {
+      print('User data updated');
+      final snackBar = SnackBar(
+        content: const Text('Profil mis à jour avec succès !'),
+        action: SnackBarAction(
+          label: 'Fermer',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }).catchError((error) {
+      print('Error updating user data: $error');
+      final snackBar = SnackBar(
+        content: Text("Une erreur s'est produite.: $error"),
+        action: SnackBarAction(
+          label: 'Fermer',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(userEditProfileTitle, style: Theme.of(context).textTheme.headlineSmall),
         centerTitle: true,
@@ -55,44 +129,55 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: Column(
                     children: [
                       TextFormField(
+                        controller: _nameController,
                         decoration: const InputDecoration(
-                          labelText: "Name",
+                          labelText: "Nom",
                           prefixIcon: Icon(Icons.person),
+                          border: OutlineInputBorder(),
                         ),
                       ),
+                      const SizedBox(height: 15),
                       TextFormField(
+                        controller: _emailController,
                         decoration: const InputDecoration(
-                          labelText: "Firstname",
-                          prefixIcon: Icon(Icons.person),
+                          labelText: "Mail",
+                          prefixIcon: Icon(Icons.email),
+                          border: OutlineInputBorder(),
                         ),
                       ),
+                      const SizedBox(height: 15),
                       TextFormField(
+                        controller: _addressRueController,
                         decoration: const InputDecoration(
-                          labelText: "Email",
-                          prefixIcon: Icon(Icons.email)
+                          labelText: "Adresse rue",
+                          prefixIcon: Icon(Icons.home),
+                          border: OutlineInputBorder(),
                         ),
                       ),
+                      const SizedBox(height: 15),
                       TextFormField(
+                        controller: _cpController,
                         decoration: const InputDecoration(
-                          labelText: "Phone",
-                          prefixIcon: Icon(Icons.phone)
+                          labelText: "CP",
+                          prefixIcon: Icon(Icons.home),
+                          border: OutlineInputBorder(),
                         ),
                       ),
+                      const SizedBox(height: 15),
                       TextFormField(
-                        obscureText: true,
+                        controller: _villeController,
                         decoration: const InputDecoration(
-                          labelText: "Password",
-                          prefixIcon: Icon(Icons.password),
-                          // suffixIcon: IconButton(icon: Icon(Icons.remove_red_eye), onPressed),
+                          labelText: "Ville",
+                          prefixIcon: Icon(Icons.home),
+                          border: OutlineInputBorder(),
                         ),
                       ),
-
                       const SizedBox(height: 30),
 
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () { },
+                          onPressed: _updateUser,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: darkYellowColor,
                             side: BorderSide.none,

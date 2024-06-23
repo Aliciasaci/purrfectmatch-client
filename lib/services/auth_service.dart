@@ -15,10 +15,12 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
+        print("Response body: $responseBody");
         if (responseBody['token'] == null) {
           throw Exception('Le token est absent dans la réponse');
         }
         authToken = responseBody['token'];
+        print("authToken: $authToken");
       } else if (response.statusCode == 401) {
         throw AuthException("Connexion refusée. Coordonnées invalides.");
       } else if (response.statusCode == 404) {

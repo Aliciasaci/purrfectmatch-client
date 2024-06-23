@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:purrfectmatch/views/profile/profile_screen.dart';
 import 'services/auth_service.dart';
 import 'views/bottom_navigation_bar.dart';
 import 'views/swipe_card.dart';
@@ -40,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
     SwipeCardsWidget(),
     AnnoncesCatsMenu(),
     AddAnnonce(),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:purrfectmatch/screens/profile/profile_screen.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final int selectedIndex;
@@ -53,6 +52,11 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               icon: _buildIcon(
                   Icons.supervised_user_circle, 2, Colors.amber),
               label: 'Chats',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildIcon(
+                  Icons.person, 3, Colors.blueAccent),
+              label: 'Mon profil',
             ),
           ],
           currentIndex: widget.selectedIndex,
