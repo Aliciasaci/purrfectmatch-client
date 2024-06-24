@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../models/user.dart';
+
 class AuthService {
   static const String baseUrl = 'http://10.0.2.2:8080';
   static String? authToken;
@@ -73,6 +75,43 @@ class AuthService {
         print('Exception: $e');
         throw Exception('Échec de l\'envoi de la requête d\'inscription');
       }
+    }
+  }
+
+  Future<User> getCurrentUser() async {
+    final response = await http.get(Uri.parse('$baseUrl/users/current'),
+        headers: <String, String>{
+          'Authorization': 'Bearer $authToken',
+        });
+
+    if (response.statusCode == 200) {
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to fetch current user data');
+    }
+  }
+  Future<User> updateProfile(User user) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/users/${user.id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Bearer $token',
+      },
+      body: {
+        'name': user.name,
+        'email': user.email,
+        'addressRue': user.addressRue,
+        'cp': user.cp,
+        'ville': user.ville,
+        if (user.password != null) 'password': user.password!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to update user profile');
     }
   }
 

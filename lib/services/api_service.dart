@@ -143,20 +143,6 @@ class ApiService {
   }
 
   //USER
-  Future<User> fetchCurrentUser() async {
-    final token = AuthService.authToken;
-    final response = await http.get(Uri.parse('$baseUrl/users/current'),
-      headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      });
-
-    if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load user profile');
-    }
-  }
-
   Future<User> createUser(User user) async {
     final response = await http.post(
       Uri.parse('$baseUrl/users'),
