@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/cat.dart';
 import '../models/annonce.dart';
+import '../models/user.dart';
 import '../models/favoris.dart';
 import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
@@ -138,6 +139,111 @@ class ApiService {
       throw Exception('Erreur interne du serveur');
     } else {
       throw Exception('Échec de la création de l\'annonce');
+    }
+  }
+
+  //USER
+  Future<User> fetchCurrentUser() async {
+    final token = AuthService.authToken;
+    final response = await http.get(Uri.parse('$baseUrl/users/current'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      });
+
+    if (response.statusCode == 200) {
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load user profile');
+    }
+  }
+
+  Future<User> createUser(User user) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/users'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(user.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to create user profile');
+    }
+  }
+
+  Future<User> updateUser(User user) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/users/${user.id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Bearer $token',
+      },
+      body: {
+        'name': user.name,
+        'email': user.email,
+        'addressRue': user.addressRue,
+        'cp': user.cp,
+        'ville': user.ville,
+        if (user.password != null) 'password': user.password!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to update user profile');
+    }
+  }
+
+  Future<void> updateUserProfilePic(PlatformFile selectedFile) async {
+    final token = AuthService.authToken;
+    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
+
+    request.headers['Authorization'] = 'Bearer $token';
+    request.files.add(
+      http.MultipartFile(
+        'uploaded_file',
+        selectedFile.readStream!,
+        selectedFile.size,
+        filename: selectedFile.name,
+      ),
+    );
+
+    var response = await request.send();
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update user profile pic');
+    }
+  }
+
+  Future<void> deleteUserProfile() async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/users/{user.id}'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete user profile');
+    }
+  }
+
+  Future<void> deleteUserProfilePic() async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/users/{user.id}/profile/pic'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete user profile pic');
     }
   }
 

@@ -53,6 +53,11 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                   Icons.supervised_user_circle, 2, Colors.amber),
               label: 'Chats',
             ),
+            BottomNavigationBarItem(
+              icon: _buildIcon(
+                  Icons.person, 3, Colors.blueAccent),
+              label: 'Mon profil',
+            ),
           ],
           currentIndex: widget.selectedIndex,
           onTap: widget.onItemTapped,
