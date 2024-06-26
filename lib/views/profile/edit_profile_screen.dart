@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/constants/color.dart';
 import 'package:purrfectmatch/constants/image_strings.dart';
 import 'package:purrfectmatch/constants/text_strings.dart';
+import '../../blocs/auth_bloc.dart';
 import '../../models/user.dart';
-import '../../services/api_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -24,18 +25,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    ApiService().fetchCurrentUser().then((user) {
-      setState(() {
-        _currentUser = user;
-        _nameController.text = _currentUser!.name;
-        _emailController.text = _currentUser!.email;
-        _addressRueController.text = _currentUser!.addressRue;
-        _cpController.text = _currentUser!.cp;
-        _villeController.text = _currentUser!.ville;
-      });
-    }).catchError((error) {
-      print('Error fetching user data: $error');
-    });
+    _initializeCurrentUser();
+  }
+
+  void _initializeCurrentUser() {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    if (authState is AuthAuthenticated) {
+      _currentUser = authState.user;
+      _nameController.text = _currentUser!.name;
+      _emailController.text = _currentUser!.email;
+      _addressRueController.text = _currentUser!.addressRue;
+      _cpController.text = _currentUser!.cp;
+      _villeController.text = _currentUser!.ville;
+    }
   }
 
   @override
@@ -48,7 +50,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  void _updateUser() {
+  Future<void> _updateUser() async {
     final updatedUser = User(
       id: _currentUser!.id,
       name: _nameController.text,
@@ -58,31 +60,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ville: _villeController.text,
     );
 
-    ApiService().updateUser(updatedUser).then((_) {
-      print('User data updated');
-      final snackBar = SnackBar(
-        content: const Text('Profil mis à jour avec succès !'),
-        action: SnackBarAction(
-          label: 'Fermer',
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }).catchError((error) {
-      print('Error updating user data: $error');
-      final snackBar = SnackBar(
-        content: Text("Une erreur s'est produite.: $error"),
-        action: SnackBarAction(
-          label: 'Fermer',
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    });
+    final success = await BlocProvider.of<AuthBloc>(context).updateProfile(updatedUser);
+
+    if (success) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Profile updated successfully"),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to update profile"),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -93,8 +91,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: Text(userEditProfileTitle, style: Theme.of(context).textTheme.headlineSmall),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Container(
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthAuthenticated) {
+            setState(() {
+              _currentUser = state.user;
+              _nameController.text = _currentUser!.name;
+              _emailController.text = _currentUser!.email;
+              _addressRueController.text = _currentUser!.addressRue;
+              _cpController.text = _currentUser!.cp;
+              _villeController.text = _currentUser!.ville;
+            });
+          }
+        },
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
           child: Column(
             children: [
@@ -105,8 +115,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     height: 120,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: const Image(image: AssetImage(userProfileImage))
-                    )
+                      child: const Image(image: AssetImage(userProfileImage)),
+                    ),
                   ),
                   Positioned(
                     bottom: 0,
@@ -118,110 +128,98 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: const Icon(
                         Icons.camera_alt,
                         color: Colors.black,
-                        size: 20
-                      )
-                    ))
+                        size: 20,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 50),
-
               Form(
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: const InputDecoration(
-                          labelText: "Nom",
-                          prefixIcon: Icon(Icons.person),
-                          border: OutlineInputBorder(),
-                        ),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        labelText: "Nom",
+                        prefixIcon: Icon(Icons.person),
+                        border: OutlineInputBorder(),
                       ),
-                      const SizedBox(height: 15),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: "Mail",
-                          prefixIcon: Icon(Icons.email),
-                          border: OutlineInputBorder(),
-                        ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        labelText: "Mail",
+                        prefixIcon: Icon(Icons.email),
+                        border: OutlineInputBorder(),
                       ),
-                      const SizedBox(height: 15),
-                      TextFormField(
-                        controller: _addressRueController,
-                        decoration: const InputDecoration(
-                          labelText: "Adresse rue",
-                          prefixIcon: Icon(Icons.home),
-                          border: OutlineInputBorder(),
-                        ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextFormField(
+                      controller: _addressRueController,
+                      decoration: const InputDecoration(
+                        labelText: "Adresse rue",
+                        prefixIcon: Icon(Icons.home),
+                        border: OutlineInputBorder(),
                       ),
-                      const SizedBox(height: 15),
-                      TextFormField(
-                        controller: _cpController,
-                        decoration: const InputDecoration(
-                          labelText: "CP",
-                          prefixIcon: Icon(Icons.home),
-                          border: OutlineInputBorder(),
-                        ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextFormField(
+                      controller: _cpController,
+                      decoration: const InputDecoration(
+                        labelText: "CP",
+                        prefixIcon: Icon(Icons.home),
+                        border: OutlineInputBorder(),
                       ),
-                      const SizedBox(height: 15),
-                      TextFormField(
-                        controller: _villeController,
-                        decoration: const InputDecoration(
-                          labelText: "Ville",
-                          prefixIcon: Icon(Icons.home),
-                          border: OutlineInputBorder(),
-                        ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextFormField(
+                      controller: _villeController,
+                      decoration: const InputDecoration(
+                        labelText: "Ville",
+                        prefixIcon: Icon(Icons.home),
+                        border: OutlineInputBorder(),
                       ),
-                      const SizedBox(height: 30),
-
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _updateUser,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: darkYellowColor,
-                            side: BorderSide.none,
-                            shape: const StadiumBorder(),
+                    ),
+                    const SizedBox(height: 30),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _updateUser,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: darkYellowColor,
+                          side: BorderSide.none,
+                          shape: const StadiumBorder(),
+                        ),
+                        child: const Text(userEditProfileTitle, style: TextStyle(color: darkColor)),
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text.rich(
+                          TextSpan(
+                            text: "Joined",
+                            style: const TextStyle(fontSize: 12),
+                            children: [
+                              TextSpan(
+                                text: " ${_currentUser?.createdAt ?? ''}",
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                              ),
+                            ],
                           ),
-                          child: const Text(userEditProfileTitle, style: TextStyle(color: darkColor)),
-                        )
-                      ),
-
-                      const SizedBox(height: 50),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text.rich(
-                            TextSpan(
-                              text: "Joined",
-                              style: TextStyle(fontSize: 12),
-                              children: [
-                                TextSpan(
-                                    text: " 19/09/2023",
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))
-                              ],
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.redAccent.withOpacity(0.1),
-                                elevation: 0,
-                                foregroundColor: Colors.red,
-                                shape: const StadiumBorder(),
-                                side: BorderSide.none),
-                            child: const Text(userDeleteProfile),
-                          ),
-                        ],
-                      )
-                    ],
-                  )
-              )
-            ]
-          )
-        )
-      )
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

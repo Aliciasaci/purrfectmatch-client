@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/views/profile/profile_screen.dart';
+import 'blocs/auth_bloc.dart';
+import 'models/user.dart';
 import 'services/auth_service.dart';
 import 'views/bottom_navigation_bar.dart';
 import 'views/swipe_card.dart';
@@ -8,26 +11,39 @@ import 'views/login.dart';
 import 'views/annonces_cats_menu.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: '',
-      theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
-      home: AuthService.authToken == null ? const LoginPage() : const MyHomePage(title: ''),
+    return BlocProvider(
+      create: (context) => AuthBloc(authService: authService),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: '',
+        theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
+        home: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state is AuthAuthenticated) {
+              return MyHomePage(title: '', user: state.user);
+            } else {
+              return const LoginPage();
+            }
+          },
+        ),
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title, this.user});
   final String title;
+  final User? user;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -36,7 +52,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
-  // List of widgets for each tab
   static const List<Widget> _widgetOptions = <Widget>[
     SwipeCardsWidget(),
     AnnoncesCatsMenu(),
@@ -51,12 +66,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _logout() {
-    AuthService().logout();
+    BlocProvider.of<AuthBloc>(context).logout();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
