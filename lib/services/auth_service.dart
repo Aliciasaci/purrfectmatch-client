@@ -1,15 +1,17 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/user.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
   static String? authToken;
 
   Future<void> login(String email, String password) async {
     try {
-      final response = await http.post(
+        print("baseUrl: $baseUrl");
+        final response = await http.post(
         Uri.parse('$baseUrl/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),

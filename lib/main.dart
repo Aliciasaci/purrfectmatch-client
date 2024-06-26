@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:purrfectmatch/views/profile/profile_screen.dart';
 import 'blocs/auth_bloc.dart';
 import 'models/user.dart';
@@ -10,8 +11,9 @@ import 'views/form_add_annonce.dart';
 import 'views/login.dart';
 import 'views/annonces_cats_menu.dart';
 
-void main() {
+void main () async {
   runApp(MyApp());
+  await dotenv.load(fileName: ".env");
 }
 
 class MyApp extends StatelessWidget {

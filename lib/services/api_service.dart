@@ -6,9 +6,11 @@ import '../models/user.dart';
 import '../models/favoris.dart';
 import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
 
   Future<Cat> fetchCatByID(String? catID) async {
     final token = AuthService.authToken;
