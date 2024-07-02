@@ -1,9 +1,13 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/views/cat_detail_page.dart';
+
+import 'filter_modal.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
   const SwipeCardsWidget({super.key});
@@ -13,6 +17,10 @@ class SwipeCardsWidget extends StatefulWidget {
 
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
+  final bool _filteredSearch = false;
+  final String _catSex = "";
+  final int _ageMax = 0;
+  final int _raceID = 0;
   MatchEngine? _matchEngine;
   final ApiService apiService = ApiService();
 
@@ -106,8 +114,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           if (_matchEngine == null)
             CircularProgressIndicator()
           else
+            const FilterModalWidget(_ageMax),
             SizedBox(
-              height: 600,
+              height: 580,
               width: 360,
               child: SwipeCards(
                 matchEngine: _matchEngine!,
@@ -122,11 +131,11 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                         Image.network(
                           cat.picturesUrl.first,
                           fit: BoxFit.cover,
-                          height: 600,
+                          height: 580,
                           width: 360,
                         ),
                         Container(
-                          height: 600,
+                          height: 580,
                           width: 360,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -141,7 +150,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                         ),
                         Container(
                           padding: EdgeInsets.all(20),
-                          height: 600,
+                          height: 580,
                           width: 360,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
