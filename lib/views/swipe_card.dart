@@ -114,7 +114,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           if (_matchEngine == null)
             CircularProgressIndicator()
           else
-            const FilterModalWidget(_ageMax),
+            const FilterModalWidget(),
             SizedBox(
               height: 580,
               width: 360,

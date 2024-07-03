@@ -1,4 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:purrfectmatch/views/test.dart';
+
+enum CatSex { femelle, male }
 
 class FilterModalWidget extends StatefulWidget {
   const FilterModalWidget({super.key});
@@ -8,8 +12,7 @@ class FilterModalWidget extends StatefulWidget {
 }
 
 class _FilterModalWidgetState extends State<FilterModalWidget> {
-
-
+  CatSex? _catSex = CatSex.femelle;
 
 
   @override
@@ -19,14 +22,14 @@ class _FilterModalWidgetState extends State<FilterModalWidget> {
         backgroundColor: Colors.white,
         child: const Icon(
           Icons.search,
-              color: Colors.black,
+          color: Colors.black,
         ),
         onPressed: () {
           showModalBottomSheet<void>(
             context: context,
             builder: (BuildContext context) {
               return Container(
-                height: 300,
+                height: 600,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(25),
@@ -38,12 +41,54 @@ class _FilterModalWidgetState extends State<FilterModalWidget> {
                     colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
                   ),
                 ),
-                  child: Center(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(60.0),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Ceci est une modale'),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Age du chat',
+                            border: OutlineInputBorder(),
+                          ),
+                          autocorrect: false,
+                          maxLength: 2,
+                        ),
+                        // Row(
+                        //   children: [
+                        //     Expanded(
+                        //       child: ListTile(
+                        //         title: const Text('M'),
+                        //         leading: Radio<CatSex>(
+                        //           value: CatSex.male,
+                        //           groupValue: _catSex,
+                        //           onChanged: (CatSex? value) {
+                        //             setState(() {
+                        //               _catSex = value;
+                        //             });
+                        //           },
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     Expanded(
+                        //       child: ListTile(
+                        //         title: const Text('F'),
+                        //         leading: Radio<CatSex>(
+                        //           value: CatSex.femelle,
+                        //           groupValue: _catSex,
+                        //           onChanged: (CatSex? value) {
+                        //             setState(() {
+                        //               _catSex = value;
+                        //             });
+                        //           },
+                        //         ),
+                        //       ),
+                        //     )
+                        //   ],
+                        // ),
+                        const RadioExample(),
                         ElevatedButton(
                           child: const Text('Lancer la recherche'),
                           onPressed: () => Navigator.pop(context),
@@ -51,6 +96,7 @@ class _FilterModalWidgetState extends State<FilterModalWidget> {
                       ],
                     ),
                   ),
+                ),
               );
             },
           );
