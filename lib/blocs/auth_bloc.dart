@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import '../models/user.dart';
@@ -9,37 +8,40 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthService authService;
 
-  AuthBloc({required this.authService}) : super(AuthInitial());
+  AuthBloc({required this.authService}) : super(AuthInitial()) {
+    on<LoginRequested>(_onLoginRequested);
+    on<LogoutRequested>(_onLogoutRequested);
+    on<UpdateProfileRequested>(_onUpdateProfileRequested);
+  }
 
-  void login(String email, String password) async {
+  Future<void> _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      await authService.login(email, password);
+      await authService.login(event.email, event.password);
       final user = await authService.getCurrentUser();
-      emit(AuthAuthenticated(token: AuthService.authToken!, user: user));
+      if (user != null) {
+        emit(AuthAuthenticated(token: AuthService.authToken!, user: user));
+      } else {
+        emit(AuthError(message: 'Failed to retrieve user.'));
+      }
     } catch (e) {
       emit(AuthError(message: 'Failed to login.'));
     }
   }
 
-  void logout() {
+  Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async {
     authService.logout();
     emit(AuthInitial());
   }
 
-  //NOTE: change back to void if use state for snackbar message
-  updateProfile(User user) async {
+  Future<void> _onUpdateProfileRequested(UpdateProfileRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      await authService.updateProfile(user);
-      final updatedUser = await authService.getCurrentUser();
-
+      final updatedUser = await authService.updateProfile(event.user);
       if (updatedUser != null) {
         emit(AuthAuthenticated(token: AuthService.authToken!, user: updatedUser));
-        return true;
       } else {
         emit(AuthError(message: 'Failed to update profile.'));
-        return false;
       }
     } catch (e) {
       emit(AuthError(message: 'Failed to update profile.'));

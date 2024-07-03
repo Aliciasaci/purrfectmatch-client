@@ -15,10 +15,11 @@ class ProfileScreen extends StatefulWidget {
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
-  class _ProfileScreenState extends State<ProfileScreen> {
+
+class _ProfileScreenState extends State<ProfileScreen> {
 
   void _logout(BuildContext context) {
-    BlocProvider.of<AuthBloc>(context).logout();
+    BlocProvider.of<AuthBloc>(context).add(LogoutRequested());
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -71,16 +72,10 @@ class ProfileScreen extends StatefulWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  currentUser == null
-                      ? const CircularProgressIndicator()
-                      : Column(
-                    children: [
-                      Text(currentUser.name,
-                          style: Theme.of(context).textTheme.headlineSmall),
-                      Text(currentUser.email,
-                          style: Theme.of(context).textTheme.bodyMedium),
-                    ],
-                  ),
+                  Text(currentUser.name,
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  Text(currentUser.email,
+                      style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: 10),
                   SizedBox(
                     width: 200,
@@ -101,7 +96,6 @@ class ProfileScreen extends StatefulWidget {
                   const SizedBox(height: 30),
                   const Divider(),
                   const SizedBox(height: 10),
-
                   ProfileMenuWidget(
                     title: "Settings",
                     icon: Icons.settings,

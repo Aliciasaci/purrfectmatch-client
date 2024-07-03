@@ -10,7 +10,6 @@ class AuthService {
 
   Future<void> login(String email, String password) async {
     try {
-        print("baseUrl: $baseUrl");
         final response = await http.post(
         Uri.parse('$baseUrl/login'),
         headers: {'Content-Type': 'application/json'},
@@ -19,16 +18,15 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        print("Response body: $responseBody");
+
         if (responseBody['token'] == null) {
           throw Exception('Le token est absent dans la réponse');
         }
         authToken = responseBody['token'];
-        print("authToken: $authToken");
+        await getCurrentUser();
       } else if (response.statusCode == 401) {
         throw AuthException("Connexion refusée. Coordonnées invalides.");
       } else if (response.statusCode == 404) {
-
         throw AuthException("Connexion refusée. Utilisateur introuvable.");
       } else {
         throw AuthException('Échec de la connexion avec le code d\'état ${response.statusCode}');
@@ -57,11 +55,8 @@ class AuthService {
         }),
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       final responseBody = jsonDecode(response.body);
-      print(responseBody);
+
       if (response.statusCode == 200) {
         if (responseBody['token'] == null) {
           throw Exception('Le token est absent dans la réponse');
@@ -87,11 +82,14 @@ class AuthService {
         });
 
     if (response.statusCode == 200) {
+      print('Response body current user: ${response.body}');
+      print('User : ${User.fromJson(jsonDecode(response.body))}');
       return User.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to fetch current user data');
     }
   }
+
   Future<User> updateProfile(User user) async {
     final token = AuthService.authToken;
     final response = await http.put(
