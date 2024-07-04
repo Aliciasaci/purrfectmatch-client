@@ -12,7 +12,9 @@ class FilterModalWidget extends StatefulWidget {
 }
 
 class _FilterModalWidgetState extends State<FilterModalWidget> {
+  static const Map<String, String> list = {'': 'Race', 'toto': 'toto1', 'tata': 'tata1', 'pepe': 'pepe1'};
   CatSex? _catSex = CatSex.femelle;
+  String? _dropdownValue = 'aaaaaaaaaaaaa';
 
 
   @override
@@ -56,39 +58,55 @@ class _FilterModalWidgetState extends State<FilterModalWidget> {
                           autocorrect: false,
                           maxLength: 2,
                         ),
-                        // Row(
-                        //   children: [
-                        //     Expanded(
-                        //       child: ListTile(
-                        //         title: const Text('M'),
-                        //         leading: Radio<CatSex>(
-                        //           value: CatSex.male,
-                        //           groupValue: _catSex,
-                        //           onChanged: (CatSex? value) {
-                        //             setState(() {
-                        //               _catSex = value;
-                        //             });
-                        //           },
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     Expanded(
-                        //       child: ListTile(
-                        //         title: const Text('F'),
-                        //         leading: Radio<CatSex>(
-                        //           value: CatSex.femelle,
-                        //           groupValue: _catSex,
-                        //           onChanged: (CatSex? value) {
-                        //             setState(() {
-                        //               _catSex = value;
-                        //             });
-                        //           },
-                        //         ),
-                        //       ),
-                        //     )
-                        //   ],
-                        // ),
-                        const RadioExample(),
+                         Row(
+                           children: [
+                             Expanded(
+                               child: ListTile(
+                                 title: const Text('M'),
+                                 leading: Radio<CatSex>(
+                                   value: CatSex.male,
+                                   groupValue: _catSex,
+                                   onChanged: (CatSex? value) {
+                                     setState(() {
+                                       _catSex = value;
+                                     });
+                                   },
+                                 ),
+                               ),
+                             ),
+                             Expanded(
+                               child: ListTile(
+                                 title: const Text('F'),
+                                 leading: Radio<CatSex>(
+                                   value: CatSex.femelle,
+                                   groupValue: _catSex,
+                                   onChanged: (CatSex? value) {
+                                     setState(() {
+                                       _catSex = value;
+                                     });
+                                   },
+                                 ),
+                               ),
+                             )
+                           ],
+                         ),
+                        DropdownButton(
+                            items: list.map((id, race) {
+                              return MapEntry(
+                                  id,
+                                  DropdownMenuItem<String>(
+                                value: id,
+                                child: Text(race),
+                              ));
+                            }).values.toList(),
+                            value: _dropdownValue,
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  _dropdownValue = newValue;
+                                });
+                              }
+                            }),
                         ElevatedButton(
                           child: const Text('Lancer la recherche'),
                           onPressed: () => Navigator.pop(context),
