@@ -145,6 +145,25 @@ class ApiService {
   }
 
   //USER
+  Future<List<User>> fetchAllUsers() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/users'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('response body: ${response.body}');
+      List<dynamic> usersJson = jsonDecode(response.body);
+      print('response body users: $usersJson');
+      return usersJson.map((json) => User.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load users');
+    }
+  }
+
   Future<User> createUser(User user) async {
     final response = await http.post(
       Uri.parse('$baseUrl/users'),
@@ -207,17 +226,17 @@ class ApiService {
     }
   }
 
-  Future<void> deleteUserProfile() async {
+  Future<void> deleteUser(int userId) async {
     final token = AuthService.authToken;
     final response = await http.delete(
-      Uri.parse('$baseUrl/users/{user.id}'),
+      Uri.parse('$baseUrl/users/$userId'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to delete user profile');
+      throw Exception('Failed to delete user');
     }
   }
 

@@ -82,8 +82,6 @@ class AuthService {
         });
 
     if (response.statusCode == 200) {
-      print('Response body current user: ${response.body}');
-      print('User : ${User.fromJson(jsonDecode(response.body))}');
       return User.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to fetch current user data');
