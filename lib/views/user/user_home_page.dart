@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/views/profile/profile_screen.dart';
+import 'package:purrfectmatch/views/user/profile/profile_screen.dart';
 import '../../blocs/auth_bloc.dart';
 import '../../models/user.dart';
 import '../annonces_cats_menu.dart';

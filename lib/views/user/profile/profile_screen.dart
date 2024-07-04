@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/views/profile/profile_menu_widget.dart';
+import 'package:purrfectmatch/views/user/profile/profile_menu_widget.dart';
 import 'package:purrfectmatch/constants/color.dart';
 import 'package:purrfectmatch/constants/image_strings.dart';
 import 'package:purrfectmatch/constants/text_strings.dart';
-import 'package:purrfectmatch/views/profile/edit_profile_screen.dart';
+import 'package:purrfectmatch/views/user/profile/edit_profile_screen.dart';
 import 'package:purrfectmatch/models/user.dart';
-import '../../blocs/auth_bloc.dart';
-import '../login.dart';
+import '../../../blocs/auth_bloc.dart';
+import '../../login.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
