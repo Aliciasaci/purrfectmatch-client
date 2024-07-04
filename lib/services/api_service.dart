@@ -155,9 +155,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      print('response body: ${response.body}');
       List<dynamic> usersJson = jsonDecode(response.body);
-      print('response body users: $usersJson');
       return usersJson.map((json) => User.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load users');
@@ -165,18 +163,21 @@ class ApiService {
   }
 
   Future<User> createUser(User user) async {
+    final token = AuthService.authToken;
     final response = await http.post(
       Uri.parse('$baseUrl/users'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(user.toJson()),
     );
 
-    if (response.statusCode == 201) {
-      return User.fromJson(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> userJson = jsonDecode(response.body);
+      return User.fromJson(userJson);
     } else {
-      throw Exception('Failed to create user profile');
+      throw Exception('Failed to create user.');
     }
   }
 
@@ -185,23 +186,17 @@ class ApiService {
     final response = await http.put(
       Uri.parse('$baseUrl/users/${user.id}'),
       headers: <String, String>{
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: {
-        'name': user.name,
-        'email': user.email,
-        'addressRue': user.addressRue,
-        'cp': user.cp,
-        'ville': user.ville,
-        if (user.password != null) 'password': user.password!,
-      },
+      body: jsonEncode(user.toJson()),
     );
 
     if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
+      final Map<String, dynamic> userJson = jsonDecode(response.body);
+      return User.fromJson(userJson);
     } else {
-      throw Exception('Failed to update user profile');
+      throw Exception('Failed to update user.');
     }
   }
 
@@ -226,7 +221,7 @@ class ApiService {
     }
   }
 
-  Future<void> deleteUser(int userId) async {
+  Future<void> deleteUser(String userId) async {
     final token = AuthService.authToken;
     final response = await http.delete(
       Uri.parse('$baseUrl/users/$userId'),
@@ -235,7 +230,7 @@ class ApiService {
       },
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception('Failed to delete user');
     }
   }

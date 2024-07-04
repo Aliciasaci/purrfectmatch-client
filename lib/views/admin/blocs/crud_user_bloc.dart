@@ -18,10 +18,8 @@ class CrudUserBloc extends Bloc<CrudUserEvent, CrudUserState> {
 
   Future<void> _onLoadUsers(LoadUsers event, Emitter<CrudUserState> emit) async {
     emit(CrudUserLoading());
-    print('ok');
     try {
       final users = await apiService.fetchAllUsers();
-      print('users: $users');
       emit(CrudUserLoaded(users));
     } catch (e) {
       emit(CrudUserError('Failed to load users.'));
@@ -29,10 +27,10 @@ class CrudUserBloc extends Bloc<CrudUserEvent, CrudUserState> {
   }
 
   Future<void> _onCreateUser(CreateUser event, Emitter<CrudUserState> emit) async {
-    emit(CrudUserLoading());
     try {
-      final user = await apiService.createUser(event.user);
-      emit(CrudUserCreated(user));
+      await apiService.createUser(event.user);
+      emit(CrudUserCreated(event.user));
+      add(LoadUsers());
     } catch (e) {
       emit(CrudUserError('Failed to create user.'));
     }
@@ -41,8 +39,9 @@ class CrudUserBloc extends Bloc<CrudUserEvent, CrudUserState> {
   Future<void> _onUpdateUser(UpdateUser event, Emitter<CrudUserState> emit) async {
     emit(CrudUserLoading());
     try {
-      final user = await apiService.updateUser(event.user);
-      emit(CrudUserUpdated(user));
+      await apiService.updateUser(event.user);
+      emit(CrudUserUpdated(event.user));
+      add(LoadUsers());
     } catch (e) {
       emit(CrudUserError('Failed to update user.'));
     }
@@ -53,7 +52,9 @@ class CrudUserBloc extends Bloc<CrudUserEvent, CrudUserState> {
     try {
       await apiService.deleteUser(event.userId);
       emit(CrudUserDeleted());
+      add(LoadUsers());
     } catch (e) {
+      print('error: $e');
       emit(CrudUserError('Failed to delete user. ${e.toString()}'));
     }
   }

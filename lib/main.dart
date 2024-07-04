@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:purrfectmatch/views/admin/admin_home_page.dart';
+import 'package:purrfectmatch/views/admin/crud_user_page.dart';
 import 'package:purrfectmatch/views/not_found_page.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
 import 'blocs/auth_bloc.dart';
@@ -66,6 +67,7 @@ class MyApp extends StatelessWidget {
           '/admin': (context) => const AdminHomePage(title: 'Admin Home Page'),
           '/asso': (context) => const UserHomePage(title: 'User Home Page'),
           '/not-found': (context) => const NotFoundPage(title: 'Page not found'),
+          '/admin/users': (context) => const CrudUserPage(),
         },
       ),
     );

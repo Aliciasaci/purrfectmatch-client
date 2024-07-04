@@ -1,7 +1,7 @@
 import 'package:purrfectmatch/models/role.dart';
 
 class User {
-  final String id;
+  final String? id;
   final String name;
   final String email;
   final String addressRue;
@@ -14,7 +14,7 @@ class User {
   final List<Role> roles;
 
   User({
-    required this.id,
+    this.id,
     required this.name,
     required this.email,
     required this.addressRue,
@@ -35,15 +35,15 @@ class User {
 
     return User(
       id: json['ID'],
-      createdAt: DateTime.parse(json['CreatedAt']).toIso8601String(),
-      updatedAt: DateTime.parse(json['UpdatedAt']).toIso8601String(),
-      name: json['Name'],
-      email: json['Email'],
-      password: json['Password'],
-      addressRue: json['AddressRue'],
-      cp: json['Cp'],
-      ville: json['Ville'],
-      profilePicURL: json['ProfilePicURL'],
+      createdAt: json['CreatedAt'] != null ? DateTime.parse(json['CreatedAt']).toIso8601String() : null,
+      updatedAt: json['UpdatedAt'] != null ? DateTime.parse(json['UpdatedAt']).toIso8601String() : null,
+      name: json['Name'] ?? '',
+      email: json['Email'] ?? '',
+      password: json['Password'] ?? '',
+      addressRue: json['AddressRue'] ?? '',
+      cp: json['Cp'] ?? '',
+      ville: json['Ville'] ?? '',
+      profilePicURL: json['ProfilePicURL'] ?? '',
       roles: rolesList,
     );
   }
@@ -66,6 +66,4 @@ class User {
   String toString() {
     return '{name: $name, email: $email, addressRue: $addressRue, cp: $cp, ville: $ville, password: $password, profilePicURL: $profilePicURL, createdAt: $createdAt, roles: $roles}';
   }
-
-
 }

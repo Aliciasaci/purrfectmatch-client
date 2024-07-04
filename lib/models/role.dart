@@ -1,12 +1,12 @@
 class Role {
-  final int id;
+  final int? id;
   final String name;
   final String? createdAt;
   final String? updatedAt;
   final String? deletedAt;
 
   Role({
-    required this.id,
+    this.id,
     required this.name,
     this.createdAt,
     this.updatedAt,

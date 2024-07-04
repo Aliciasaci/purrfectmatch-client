@@ -19,7 +19,7 @@ class UpdateUser extends CrudUserEvent {
 }
 
 class DeleteUser extends CrudUserEvent {
-  final int userId;
+  final String userId;
 
   DeleteUser(this.userId);
 }
