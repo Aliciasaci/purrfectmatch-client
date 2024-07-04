@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/cat.dart';
 import '../models/annonce.dart';
+import '../models/race.dart';
 import '../models/user.dart';
 import '../models/favoris.dart';
 import 'package:file_picker/file_picker.dart';
@@ -318,4 +319,24 @@ class ApiService {
       throw Exception('Failed to create favorite');
     }
   }
+
+  Future<List<Races>> fetchAllRaces() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/races'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    print('$baseUrl/races');
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List<dynamic> raceJson = jsonDecode(response.body);
+      return raceJson.map((json) => Races.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load races');
+    }
+  }
+
 }
