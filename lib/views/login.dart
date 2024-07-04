@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:purrfectmatch/views/user/user_home_page.dart';
 import '../blocs/auth_bloc.dart';
-import '../main.dart';
 import 'register.dart';
 
 class LoginPage extends StatefulWidget {
@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
             } else if (state is AuthAuthenticated) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const MyHomePage(title: '')),
+                MaterialPageRoute(builder: (context) => const UserHomePage(title: '')),
               );
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Connexion réussie!')),
@@ -122,9 +122,11 @@ class _LoginPageState extends State<LoginPage> {
                                 ElevatedButton(
                                   onPressed: () {
                                     if (_formKey.currentState!.validate()) {
-                                      BlocProvider.of<AuthBloc>(context).login(
-                                        _emailController.text,
-                                        _passwordController.text,
+                                      BlocProvider.of<AuthBloc>(context).add(
+                                        LoginRequested(
+                                          email: _emailController.text,
+                                          password: _passwordController.text,
+                                        ),
                                       );
                                     }
                                   },
