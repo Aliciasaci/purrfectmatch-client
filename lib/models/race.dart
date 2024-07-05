@@ -1,28 +1,32 @@
 class Races {
-  final int ID;
+  final int id;
   final String raceName;
+  final String? cats;
 
   Races({
-    required this.ID,
-    required this.raceName
+    required this.id,
+    required this.raceName,
+    this.cats
   });
 
   factory Races.fromJson(Map<String, dynamic> json) {
+    print(json);
     return Races(
-      ID : json['ID'],
-      raceName: json['raceName']
+      id : json['ID'],
+      raceName: json['RaceName'],
+      cats: json['Cats'] ?? ''
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'ID' : ID,
-      'RaceName' : raceName
+      'id' : id,
+      'raceName' : raceName
     };
   }
 
   @override
   String toString() {
-    return '{ID: $ID, RaceName: $raceName}';
+    return '{ID: $id, RaceName: $raceName}';
   }
 }

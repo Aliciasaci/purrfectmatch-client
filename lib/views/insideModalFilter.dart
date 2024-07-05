@@ -14,7 +14,7 @@ class InsideModalFilter extends StatefulWidget {
 }
 
 class _InsideModalFilterState extends State<InsideModalFilter> {
-  static const Map<int?, String> raceList ={null:'toto'};
+  static Map<int?, String> raceList = {};
   CatSex? _catSex = CatSex.femelle;
   String? _dropdownValue;
 
@@ -33,8 +33,9 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
       final apiService = ApiService();
       final newRaces = await apiService.fetchAllRaces();
       for (var race in newRaces) {
-        raceList[race.ID] = race.raceName;
+        raceList[race.id] = race.raceName;
       }
+      print(raceList);
     } catch (e) {
       print(raceList);
       print('Failed to load races: $e');
@@ -109,7 +110,7 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                 ],
               ),
               DropdownButton(
-                hint: Text('Sélectionner une race'),
+                hint: const Text('Sélectionner une race'),
                   items: raceList.map((id, race) {
                     return MapEntry(
                         id,
