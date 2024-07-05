@@ -7,9 +7,11 @@ import '../models/user.dart';
 import '../models/favoris.dart';
 import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
 
   Future<Cat> fetchCatByID(String? catID) async {
     final token = AuthService.authToken;
@@ -144,19 +146,39 @@ class ApiService {
   }
 
   //USER
+  Future<List<User>> fetchAllUsers() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/users'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> usersJson = jsonDecode(response.body);
+      return usersJson.map((json) => User.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load users');
+    }
+  }
+
   Future<User> createUser(User user) async {
+    final token = AuthService.authToken;
     final response = await http.post(
       Uri.parse('$baseUrl/users'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(user.toJson()),
     );
 
-    if (response.statusCode == 201) {
-      return User.fromJson(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> userJson = jsonDecode(response.body);
+      return User.fromJson(userJson);
     } else {
-      throw Exception('Failed to create user profile');
+      throw Exception('Failed to create user.');
     }
   }
 
@@ -165,23 +187,17 @@ class ApiService {
     final response = await http.put(
       Uri.parse('$baseUrl/users/${user.id}'),
       headers: <String, String>{
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
-      body: {
-        'name': user.name,
-        'email': user.email,
-        'addressRue': user.addressRue,
-        'cp': user.cp,
-        'ville': user.ville,
-        if (user.password != null) 'password': user.password!,
-      },
+      body: jsonEncode(user.toJson()),
     );
 
     if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
+      final Map<String, dynamic> userJson = jsonDecode(response.body);
+      return User.fromJson(userJson);
     } else {
-      throw Exception('Failed to update user profile');
+      throw Exception('Failed to update user.');
     }
   }
 
@@ -206,17 +222,17 @@ class ApiService {
     }
   }
 
-  Future<void> deleteUserProfile() async {
+  Future<void> deleteUser(String userId) async {
     final token = AuthService.authToken;
     final response = await http.delete(
-      Uri.parse('$baseUrl/users/{user.id}'),
+      Uri.parse('$baseUrl/users/$userId'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to delete user profile');
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('Failed to delete user');
     }
   }
 

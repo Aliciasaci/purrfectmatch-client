@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:purrfectmatch/views/user/user_home_page.dart';
 import '../services/auth_service.dart';
-import '../main.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -42,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (AuthService.authToken != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const MyHomePage(title: '')),
+          MaterialPageRoute(builder: (context) => const UserHomePage(title: '')),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Inscription réussie!')),
