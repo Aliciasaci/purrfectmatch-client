@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
@@ -16,7 +14,7 @@ class SwipeCardsWidget extends StatefulWidget {
 }
 
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
-  static Map<int?, Cat> catList = {};
+  static List<Annonce> annonceList = [];
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
   // final bool _filteredSearch = false;
   MatchEngine? _matchEngine;
@@ -26,37 +24,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   void initState() {
     super.initState();
     apiService.fetchAllAnnonces().then((annonces) async {
-      for (var annonce in annonces) {
-        try {
-          Cat cat = await apiService.fetchCatByID(annonce.CatID);
-          _swipeItems.add(SwipeItem(
-            content: {'annonce': annonce, 'cat': cat},
-            likeAction: () {
-              print("annonceID");
-              print(annonce.ID);
-              _handleLikeAction(annonce.ID, cat.name);
-            },
-            nopeAction: () {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Passed ${cat.name}"),
-                duration: const Duration(milliseconds: 500),
-              ));
-            },
-            superlikeAction: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
-              );
-            },
-          ));
-        } catch (error) {
-          print("Failed to load cat for annonce ${annonce.ID}: $error");
-        }
-      }
-
-      setState(() {
-        _matchEngine = MatchEngine(swipeItems: _swipeItems);
-      });
+      displayCats(annonces);
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Failed to load annonces: $error"),
@@ -64,23 +32,57 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       ));
     });
   }
-
   Future<void> fetchCatsByFilters(String? age, String? catSex, int? race) async {
     try {
       final apiService = ApiService();
-      final filteredCat = await apiService.fetchCatsByFilters(age, catSex, race);
-      for (var cat in filteredCat) {
-        catList[cat.ID] = cat;
+      final List<Annonce> annoncesList = [];
+      final filteredAnnonce = await apiService.fetchCatsByFilters(age, catSex, race);
+      for (var annonce in filteredAnnonce) {
+        annoncesList.add(annonce);
       }
       setState(() {
-        catList = catList;
+        annonceList = annoncesList;
       });
+      displayCats(annonceList);
     } catch (e) {
-      print(catList);
+      print(annonceList);
       print('Failed to load cats with filter: $e');
     }
   }
+  
+  Future<void> displayCats(List<Annonce> annonces) async {
+    for (var annonce in annonces) {
+      try {
+        Cat cat = await apiService.fetchCatByID(annonce.CatID);
+        _swipeItems.add(SwipeItem(
+          content: {'annonce': annonce, 'cat': cat},
+          likeAction: () {
+            print("annonceID");
+            print(annonce.ID);
+            _handleLikeAction(annonce.ID, cat.name);
+          },
+          nopeAction: () {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Passed ${cat.name}"),
+              duration: const Duration(milliseconds: 500),
+            ));
+          },
+          superlikeAction: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+            );
+          },
+        ));
+      } catch (error) {
+        print("Failed to load cat for annonce ${annonce.ID}: $error");
+      }
+    }
 
+    setState(() {
+      _matchEngine = MatchEngine(swipeItems: _swipeItems);
+    });
+  }
 
   void _handleLikeAction(int? annonceID, String catName) {
 

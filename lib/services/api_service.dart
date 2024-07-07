@@ -97,7 +97,7 @@ class ApiService {
     }
   }
 
-  Future<List<Cat>> fetchCatsByFilters(age, catSex, race) async {
+  Future<List<Annonce>> fetchCatsByFilters(age, catSex, race) async {
     final token = AuthService.authToken;
     final filters = {"age": age, "raceId": race.toString(), "sexe": catSex};
     final response = await http.get(
@@ -106,13 +106,11 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
     );
-
     print('$baseUrl/cats/');
     print(response.statusCode);
     if (response.statusCode == 200) {
-      List<dynamic> catsJson = jsonDecode(response.body);
-      print(response.body);
-      return catsJson.map((json) => Cat.fromJson(json)).toList();
+      List<dynamic> annonceJson = jsonDecode(response.body);
+      return annonceJson.map((json) => Annonce.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cats');
     }
