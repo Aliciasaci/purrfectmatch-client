@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:purrfectmatch/views/insideModalFilter.dart';
@@ -6,7 +8,7 @@ import 'package:purrfectmatch/views/insideModalFilter.dart';
 
 class FilterModalWidget extends StatefulWidget {
   const FilterModalWidget({super.key, required this.callback});
-  final Future<void> Function() callback;
+  final Future<void> Function(String?, String?, int?) callback;
 
   @override
   State<FilterModalWidget> createState() => _FilterModalWidgetState();

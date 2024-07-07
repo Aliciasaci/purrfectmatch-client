@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../services/api_service.dart';
 
-enum CatSex { femelle, male }
-
 class InsideModalFilter extends StatefulWidget {
   const InsideModalFilter({super.key, required this.callback});
-  final Future<void> Function() callback;
+  final Future<void> Function(String? age, String? catSex, int? race) callback;
 
   @override
   State<InsideModalFilter> createState() => _InsideModalFilterState();
@@ -16,8 +14,9 @@ class InsideModalFilter extends StatefulWidget {
 
 class _InsideModalFilterState extends State<InsideModalFilter> {
   static Map<int?, String> raceList = {};
-  CatSex? _catSex = CatSex.femelle;
-  String? _dropdownValue;
+  String? _catSex = "";
+  int? _dropdownValue;
+  String? _age;
 
   @override
   void initState() {
@@ -35,10 +34,6 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
     } catch (e) {
       print('Failed to load races: $e');
     }
-    }
-
-    Future<void> _fetchCatsByFilters() async {
-      await widget.callback();
     }
 
   @override
@@ -75,16 +70,21 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                 ),
                 autocorrect: false,
                 maxLength: 2,
+                onChanged: (text) {
+                  setState(() {
+                    _age = text;
+                  });
+                },
               ),
               Row(
                 children: [
                   Expanded(
                     child: ListTile(
                       title: const Text('M'),
-                      leading: Radio<CatSex>(
-                        value: CatSex.male,
+                      leading: Radio<String>(
+                        value: "male",
                         groupValue: _catSex,
-                        onChanged: (CatSex? value) {
+                        onChanged: (String? value) {
                           setState(() {
                             _catSex = value;
                           });
@@ -95,10 +95,10 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                   Expanded(
                     child: ListTile(
                       title: const Text('F'),
-                      leading: Radio<CatSex>(
-                        value: CatSex.femelle,
+                      leading: Radio<String>(
+                        value: "femelle",
                         groupValue: _catSex,
-                        onChanged: (CatSex? value) {
+                        onChanged: (String? value) {
                           setState(() {
                             _catSex = value;
                           });
@@ -110,16 +110,14 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
               ),
               DropdownButton(
                 hint: const Text('Sélectionner une race'),
-                  items: raceList.map((id, race) {
-                    return MapEntry(
-                        id,
-                        DropdownMenuItem<String>(
-                          value: race,
-                          child: Text(race),
-                        ));
-                  }).values.toList(),
+                  items: raceList.entries.map((entry) {
+                    return DropdownMenuItem<dynamic>(
+                          value: entry.key,
+                          child: Text(entry.value),
+                        );
+                  }).toList(),
                   value: _dropdownValue,
-                  onChanged: (String? newValue) {
+                  onChanged: (dynamic newValue) {
                     if (newValue != null) {
                       setState(() {
                         _dropdownValue = newValue;
@@ -129,7 +127,7 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
               ElevatedButton(
                 child: const Text('Lancer la recherche'),
                 onPressed: () => {
-                  _fetchCatsByFilters(),
+                  widget.callback(_age, _catSex, _dropdownValue),
                   Navigator.pop(context)},
               ),
             ],

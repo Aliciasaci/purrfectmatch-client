@@ -18,10 +18,7 @@ class SwipeCardsWidget extends StatefulWidget {
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   static Map<int?, Cat> catList = {};
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
-  final bool _filteredSearch = false;
-  final String _catSex = "";
-  final int _ageMax = 0;
-  final int _raceID = 0;
+  // final bool _filteredSearch = false;
   MatchEngine? _matchEngine;
   final ApiService apiService = ApiService();
 
@@ -68,14 +65,16 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     });
   }
 
-  Future<void> fetchCatsByFilters() async {
+  Future<void> fetchCatsByFilters(String? age, String? catSex, int? race) async {
     try {
       final apiService = ApiService();
-      final filteredCat = await apiService.fetchCatsByFilters(/* Arguments manquant */);
+      final filteredCat = await apiService.fetchCatsByFilters(age, catSex, race);
       for (var cat in filteredCat) {
         catList[cat.ID] = cat;
       }
-      print(catList);
+      setState(() {
+        catList = catList;
+      });
     } catch (e) {
       print(catList);
       print('Failed to load cats with filter: $e');

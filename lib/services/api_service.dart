@@ -11,7 +11,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get baseUrl =>
+      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
 
   Future<Cat> fetchCatByID(String? catID) async {
     final token = AuthService.authToken;
@@ -96,16 +97,17 @@ class ApiService {
     }
   }
 
-  Future<List<Cat>> fetchCatsByFilters() async {
+  Future<List<Cat>> fetchCatsByFilters(age, catSex, race) async {
     final token = AuthService.authToken;
+    final filters = {"age": age, "raceId": race.toString(), "sexe": catSex};
     final response = await http.get(
-      Uri.parse('$baseUrl/cats  '),
+      Uri.parse('$baseUrl/cats/').replace(queryParameters: filters),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
     );
 
-    print('$baseUrl/cats');
+    print('$baseUrl/cats/');
     print(response.statusCode);
     if (response.statusCode == 200) {
       List<dynamic> catsJson = jsonDecode(response.body);
@@ -223,7 +225,8 @@ class ApiService {
 
   Future<void> updateUserProfilePic(PlatformFile selectedFile) async {
     final token = AuthService.authToken;
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
+    var request = http.MultipartRequest(
+        'PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
 
     request.headers['Authorization'] = 'Bearer $token';
     request.files.add(
@@ -292,7 +295,8 @@ class ApiService {
   Future<List<Favoris>> fetchUserFavorites() async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+      Uri.parse(
+          '$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -342,7 +346,8 @@ class ApiService {
     if (response.statusCode == 201) {
       try {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        if (responseData['success'] == 'true' && responseData['favorite'] != null) {
+        if (responseData['success'] == 'true' &&
+            responseData['favorite'] != null) {
           return responseData['favorite'];
         } else {
           throw Exception('Failed to create favorite');
