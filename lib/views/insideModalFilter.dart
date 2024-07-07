@@ -7,7 +7,8 @@ import '../services/api_service.dart';
 enum CatSex { femelle, male }
 
 class InsideModalFilter extends StatefulWidget {
-  const InsideModalFilter({super.key});
+  const InsideModalFilter({super.key, required this.callback});
+  final Future<void> Function() callback;
 
   @override
   State<InsideModalFilter> createState() => _InsideModalFilterState();
@@ -25,21 +26,19 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
   }
 
   Future<void> _fetchCatRaces() async {
-    //setState(() {
-    //  _loading = true;
-    //});
-
     try {
       final apiService = ApiService();
       final newRaces = await apiService.fetchAllRaces();
       for (var race in newRaces) {
         raceList[race.id] = race.raceName;
       }
-      print(raceList);
     } catch (e) {
-      print(raceList);
       print('Failed to load races: $e');
     }
+    }
+
+    Future<void> _fetchCatsByFilters() async {
+      await widget.callback();
     }
 
   @override
@@ -129,7 +128,9 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                   }),
               ElevatedButton(
                 child: const Text('Lancer la recherche'),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => {
+                  _fetchCatsByFilters(),
+                  Navigator.pop(context)},
               ),
             ],
           ),

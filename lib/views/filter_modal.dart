@@ -5,16 +5,14 @@ import 'package:purrfectmatch/views/insideModalFilter.dart';
 
 
 class FilterModalWidget extends StatefulWidget {
-  const FilterModalWidget({super.key});
+  const FilterModalWidget({super.key, required this.callback});
+  final Future<void> Function() callback;
 
   @override
   State<FilterModalWidget> createState() => _FilterModalWidgetState();
 }
 
-// TODO: Appel d'une async function pour récupérer les races de chats. La fonction doit renvoyer une map avec une valeur vide.
-
 class _FilterModalWidgetState extends State<FilterModalWidget> {
-
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +27,7 @@ class _FilterModalWidgetState extends State<FilterModalWidget> {
           showModalBottomSheet<void>(
             context: context,
             builder: (BuildContext context) {
-              return const InsideModalFilter();
+              return InsideModalFilter(callback: widget.callback);
             },
           );
         },

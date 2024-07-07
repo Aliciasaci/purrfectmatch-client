@@ -10,7 +10,6 @@ class Races {
   });
 
   factory Races.fromJson(Map<String, dynamic> json) {
-    print(json);
     return Races(
       id : json['ID'],
       raceName: json['RaceName'],

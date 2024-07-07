@@ -16,6 +16,7 @@ class SwipeCardsWidget extends StatefulWidget {
 }
 
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
+  static Map<int?, Cat> catList = {};
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
   final bool _filteredSearch = false;
   final String _catSex = "";
@@ -67,6 +68,21 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     });
   }
 
+  Future<void> fetchCatsByFilters() async {
+    try {
+      final apiService = ApiService();
+      final filteredCat = await apiService.fetchCatsByFilters(/* Arguments manquant */);
+      for (var cat in filteredCat) {
+        catList[cat.ID] = cat;
+      }
+      print(catList);
+    } catch (e) {
+      print(catList);
+      print('Failed to load cats with filter: $e');
+    }
+  }
+
+
   void _handleLikeAction(int? annonceID, String catName) {
 
     print("annonceID2");
@@ -112,9 +128,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (_matchEngine == null)
-            CircularProgressIndicator()
+            const CircularProgressIndicator()
           else
-            const FilterModalWidget(),
+            FilterModalWidget(callback: fetchCatsByFilters),
             SizedBox(
               height: 580,
               width: 360,
