@@ -192,6 +192,7 @@ class CrudUserModalBottomSheets {
                               TextFormField(
                                 controller: passwordController,
                                 decoration: const InputDecoration(labelText: 'Mot de passe', border: OutlineInputBorder()),
+                                obscureText: true,
                               ),
                               const SizedBox(height: 8),
                               DropdownButtonFormField(

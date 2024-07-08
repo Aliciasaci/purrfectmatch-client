@@ -64,8 +64,8 @@ class MyApp extends StatelessWidget {
         ),
         routes: {
           '/user': (context) => const UserHomePage(title: ''),
-          '/admin': (context) => const AdminHomePage(title: 'Admin Home Page'),
-          '/asso': (context) => const UserHomePage(title: 'User Home Page'),
+          '/admin': (context) => const AdminHomePage(title: ''),
+          '/asso': (context) => const UserHomePage(title: ''),
           '/not-found': (context) => const NotFoundPage(title: 'Page not found'),
           '/admin/users': (context) => const CrudUserPage(),
         },

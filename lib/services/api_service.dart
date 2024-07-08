@@ -334,4 +334,9 @@ class ApiService {
       throw Exception('Failed to create favorite');
     }
   }
+
+  //ASSOCIATION
+
 }
+
+
