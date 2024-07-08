@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/models/annonce.dart';
@@ -60,7 +62,6 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   }
 
   void _handleLikeAction(int? annonceID, String catName) {
-
     print("annonceID2");
     print(annonceID);
 
@@ -99,15 +100,21 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    double availableHeight = MediaQuery.of(context).size.height -
+        MediaQuery.of(context).padding.top -
+        MediaQuery.of(context).padding.bottom;
+    return Container(
+      //color: Colors.red,
+      height: availableHeight,
+      width: MediaQuery.of(context).size.width,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
           if (_matchEngine == null)
-            CircularProgressIndicator()
+            const CircularProgressIndicator()
           else
             SizedBox(
-              height: 600,
+              height: availableHeight * 0.7,
               width: 360,
               child: SwipeCards(
                 matchEngine: _matchEngine!,
@@ -140,7 +147,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                           ),
                         ),
                         Container(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           height: 600,
                           width: 360,
                           child: Column(
@@ -149,7 +156,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                             children: [
                               Text(
                                 cat.name,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -157,27 +164,27 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                               ),
                               Text(
                                 "${calculateAge(cat.birthDate)} ans",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
                                 ),
                               ),
                               Text(
                                 "Sexe: ${cat.sexe}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
                                 ),
                               ),
                               Text(
                                 "Race: ${cat.race}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
                                 ),
                               ),
                               if (!cat.reserved)
-                                Text(
+                                const Text(
                                   "Disponible",
                                   style: TextStyle(
                                     color: Colors.green,
@@ -186,7 +193,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                   ),
                                 ),
                               if (cat.reserved)
-                                Text(
+                                const Text(
                                   "Réservé",
                                   style: TextStyle(
                                     color: Colors.red,
@@ -219,56 +226,99 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 fillSpace: true,
               ),
             ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
+          Positioned(
+            bottom: 10,
+            width: MediaQuery.of(context).size.width,
+            height: 150,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Positioned(
+                  left: 10,
+                  child: Transform.rotate(
+                    angle: -0.3,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blueGrey,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          _matchEngine!.currentItem?.nope();
+                        },
+                        icon: const Icon(Icons.close),
+                        iconSize: 60,
+                        color: Colors.white,
+                        tooltip: 'Passer',
+                        padding: const EdgeInsets.all(20),
+                      ),
+                    ),
+                  ),
                 ),
-                child: IconButton(
-                  onPressed: () {
-                    _matchEngine!.currentItem?.nope();
-                  },
-                  icon: const Icon(Icons.close),
-                  iconSize: 40,
-                  color: Colors.red.withOpacity(0.8),
-                  tooltip: 'Passer',
+                Positioned(
+                  bottom: 10,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.orange,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orangeAccent,
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        _matchEngine!.currentItem?.superLike();
+                      },
+                      icon: const Icon(Icons.visibility),
+                      iconSize: 60,
+                      color: Colors.white,
+                      tooltip: 'Voir',
+                      padding: const EdgeInsets.all(20),
+                    ),
+                  ),
                 ),
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
+                Positioned(
+                  right: 10,
+                  child: Transform.rotate(
+                    angle: 0.3,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.red,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.redAccent,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          _matchEngine!.currentItem?.like();
+                        },
+                        icon: const Icon(Icons.favorite),
+                        iconSize: 60,
+                        padding: const EdgeInsets.all(20),
+                        color: Colors.white,
+                        tooltip: 'Favoris',
+                      ),
+                    ),
+                  ),
                 ),
-                child: IconButton(
-                  onPressed: () {
-                    _matchEngine!.currentItem?.superLike();
-                  },
-                  icon: const Icon(Icons.visibility),
-                  iconSize: 40,
-                  color: Colors.orange.withOpacity(0.8),
-                  tooltip: 'Voir',
-                ),
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    _matchEngine!.currentItem?.like();
-                  },
-                  icon: const Icon(Icons.favorite),
-                  iconSize: 40,
-                  color: Colors.green.withOpacity(0.8),
-                  tooltip: 'Favoris',
-                ),
-              ),
-            ],
+              ],
+            ),
           )
         ],
       ),

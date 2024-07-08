@@ -4,7 +4,7 @@ import '../models/annonce.dart';
 import '../models/cat.dart';
 import '../services/api_service.dart';
 import 'annonce_detail_page.dart';
-import 'chat_page.dart'; 
+import 'chat_page.dart';
 
 class UserFavorisPage extends StatefulWidget {
   const UserFavorisPage({super.key});
@@ -24,7 +24,9 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
     super.initState();
     _fetchUserFavoris();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !_loading) {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          !_loading) {
         _fetchUserFavoris();
       }
     });
@@ -67,12 +69,8 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
         title: const Text('Mes favoris'),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
         child: ListView.builder(
           controller: _scrollController,
@@ -91,22 +89,32 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
               child: ListTile(
                 leading: annonce != null && annonce.CatID != null
                     ? FutureBuilder<Cat>(
-                  future: ApiService().fetchCatByID(annonce.CatID!),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return const Icon(Icons.error);
-                    } else if (!snapshot.hasData || snapshot.data!.picturesUrl.isEmpty) {
-                      return const Icon(Icons.image);
-                    } else {
-                      return Image.network(snapshot.data!.picturesUrl.first, width: 50, height: 50, fit: BoxFit.cover);
-                    }
-                  },
-                )
+                        future: ApiService().fetchCatByID(annonce.CatID!),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return const Icon(Icons.error);
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.picturesUrl.isEmpty) {
+                            return const Icon(Icons.image);
+                          } else {
+                            return Image.network(
+                                snapshot.data!.picturesUrl.first,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover);
+                          }
+                        },
+                      )
                     : const Icon(Icons.image, size: 50),
-                title: Text(annonce != null ? annonce.Title : 'Annonce ID: ${favori.AnnonceID}'),
-                subtitle: Text(annonce != null ? annonce.Description : 'User ID: ${favori.UserID}'),
+                title: Text(annonce != null
+                    ? annonce.Title
+                    : 'Annonce ID: ${favori.AnnonceID}'),
+                subtitle: Text(annonce != null
+                    ? annonce.Description
+                    : 'User ID: ${favori.UserID}'),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -116,7 +124,8 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChatPage(userId: favori.UserID),
+                            builder: (context) =>
+                                ChatPage(userId: favori.UserID),
                           ),
                         );
                       },
@@ -129,7 +138,8 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AnnonceDetailPage(annonce: annonce),
+                        builder: (context) =>
+                            AnnonceDetailPage(annonce: annonce),
                       ),
                     );
                   }

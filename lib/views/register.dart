@@ -72,12 +72,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
         child: Center(
           child: Padding(
@@ -132,7 +128,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             if (value == null || value.isEmpty) {
                               return 'Veuillez entrer votre email';
                             }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                .hasMatch(value)) {
                               return 'Veuillez entrer une adresse email valide';
                             }
                             return null;
@@ -202,9 +199,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         _isLoading
                             ? const CircularProgressIndicator()
                             : ElevatedButton(
-                          onPressed: _register,
-                          child: const Text('Inscription'),
-                        ),
+                                onPressed: _register,
+                                child: const Text('Inscription'),
+                              ),
                         const SizedBox(height: 20),
                         GestureDetector(
                           onTap: () {

@@ -16,8 +16,10 @@ class _AddCatState extends State<AddCat> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _sexeController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
-  final TextEditingController _lastVaccineDateController = TextEditingController();
-  final TextEditingController _lastVaccineNameController = TextEditingController();
+  final TextEditingController _lastVaccineDateController =
+      TextEditingController();
+  final TextEditingController _lastVaccineNameController =
+      TextEditingController();
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _behaviorController = TextEditingController();
   final TextEditingController _raceController = TextEditingController();
@@ -41,7 +43,8 @@ class _AddCatState extends State<AddCat> {
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -113,12 +116,8 @@ class _AddCatState extends State<AddCat> {
         title: const Text('Ajouter un chat'),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
         child: Center(
           child: Container(
@@ -144,11 +143,16 @@ class _AddCatState extends State<AddCat> {
                       const SizedBox(height: 20),
                       buildTextFormField(_nameController, "Nom*"),
                       const SizedBox(height: 10),
-                      buildTextFormFieldWithDatepicker(_birthDateController, "Date de Naissance*", context),
+                      buildTextFormFieldWithDatepicker(
+                          _birthDateController, "Date de Naissance*", context),
                       const SizedBox(height: 10),
-                      buildTextFormFieldWithDatepicker(_lastVaccineDateController, "Date du dernier vaccin", context),
+                      buildTextFormFieldWithDatepicker(
+                          _lastVaccineDateController,
+                          "Date du dernier vaccin",
+                          context),
                       const SizedBox(height: 10),
-                      buildTextFormField(_lastVaccineNameController, "Nom du dernier vaccin"),
+                      buildTextFormField(
+                          _lastVaccineNameController, "Nom du dernier vaccin"),
                       const SizedBox(height: 10),
                       buildTextFormField(_colorController, "Couleur*"),
                       const SizedBox(height: 10),
@@ -160,12 +164,16 @@ class _AddCatState extends State<AddCat> {
                       const SizedBox(height: 10),
                       buildSexeDropdown(),
                       const SizedBox(height: 10),
-                      buildSwitchTile("Stérilisé*", _sterilized, (value) => setState(() => _sterilized = value)),
-                      buildSwitchTile("Réservé*", _reserved, (value) => setState(() => _reserved = value)),
+                      buildSwitchTile("Stérilisé*", _sterilized,
+                          (value) => setState(() => _sterilized = value)),
+                      buildSwitchTile("Réservé*", _reserved,
+                          (value) => setState(() => _reserved = value)),
                       const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: _pickFile,
-                        child: Text(_selectedFile == null ? 'Sélectionnez une photo' : 'Photo sélectionnée: ${_selectedFile!.name}'),
+                        child: Text(_selectedFile == null
+                            ? 'Sélectionnez une photo'
+                            : 'Photo sélectionnée: ${_selectedFile!.name}'),
                       ),
                       const SizedBox(height: 15),
                       ElevatedButton(
@@ -184,54 +192,60 @@ class _AddCatState extends State<AddCat> {
     );
   }
 
-  Widget buildTextFormField(TextEditingController controller, String label) => TextFormField(
-    controller: controller,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-    ),
-  );
+  Widget buildTextFormField(TextEditingController controller, String label) =>
+      TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+      );
 
-  Widget buildTextFormFieldWithDatepicker(TextEditingController controller, String label, BuildContext context) => TextFormField(
-    controller: controller,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-      suffixIcon: const Icon(Icons.calendar_today),
-    ),
-    readOnly: true,
-    onTap: () => _selectDate(context, controller),
-  );
+  Widget buildTextFormFieldWithDatepicker(TextEditingController controller,
+          String label, BuildContext context) =>
+      TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          suffixIcon: const Icon(Icons.calendar_today),
+        ),
+        readOnly: true,
+        onTap: () => _selectDate(context, controller),
+      );
 
-  Widget buildDescriptionFormField(TextEditingController controller) => TextFormField(
-    controller: controller,
-    maxLines: 3,
-    decoration: const InputDecoration(
-      labelText: "Description",
-      border: OutlineInputBorder(),
-    ),
-  );
+  Widget buildDescriptionFormField(TextEditingController controller) =>
+      TextFormField(
+        controller: controller,
+        maxLines: 3,
+        decoration: const InputDecoration(
+          labelText: "Description",
+          border: OutlineInputBorder(),
+        ),
+      );
 
   Widget buildSexeDropdown() => DropdownButton<String>(
-    value: _selectedValue,
-    hint: const Text('Sélectionnez un genre'),
-    items: _options.map((String value) {
-      return DropdownMenuItem<String>(
-        value: value,
-        child: Text(value),
+        value: _selectedValue,
+        hint: const Text('Sélectionnez un genre'),
+        items: _options.map((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() {
+            _selectedValue = newValue;
+          });
+        },
+        isExpanded: true,
       );
-    }).toList(),
-    onChanged: (String? newValue) {
-      setState(() {
-        _selectedValue = newValue;
-      });
-    },
-    isExpanded: true,
-  );
 
-  Widget buildSwitchTile(String title, bool value, ValueChanged<bool> onChanged) => SwitchListTile(
-    title: Text(title),
-    value: value,
-    onChanged: onChanged,
-  );
+  Widget buildSwitchTile(
+          String title, bool value, ValueChanged<bool> onChanged) =>
+      SwitchListTile(
+        title: Text(title),
+        value: value,
+        onChanged: onChanged,
+      );
 }

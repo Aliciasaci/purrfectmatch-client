@@ -24,7 +24,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
     _fetchAnnonces();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent &&
+              _scrollController.position.maxScrollExtent &&
           !_loading) {
         _fetchAnnonces();
       }
@@ -71,12 +71,8 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
         title: const Text('Liste des Annonces'),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
         child: ListView.builder(
           controller: _scrollController,
@@ -94,7 +90,8 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
               color: Colors.white,
               child: ListTile(
                 leading: cat != null && cat.picturesUrl.isNotEmpty
-                    ? Image.network(cat.picturesUrl.first, width: 50, height: 50, fit: BoxFit.cover)
+                    ? Image.network(cat.picturesUrl.first,
+                        width: 50, height: 50, fit: BoxFit.cover)
                     : const Icon(Icons.image, size: 50),
                 title: Text(annonce.Title),
                 subtitle: Text(

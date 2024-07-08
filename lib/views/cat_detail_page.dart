@@ -15,8 +15,10 @@ class _CatDetailsState extends State<CatDetails> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
-  final TextEditingController _lastVaccineDateController = TextEditingController();
-  final TextEditingController _lastVaccineNameController = TextEditingController();
+  final TextEditingController _lastVaccineDateController =
+      TextEditingController();
+  final TextEditingController _lastVaccineNameController =
+      TextEditingController();
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _behaviorController = TextEditingController();
   final TextEditingController _raceController = TextEditingController();
@@ -74,12 +76,8 @@ class _CatDetailsState extends State<CatDetails> {
         title: const Text('Profil du chat'),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
         child: Center(
           child: Card(
