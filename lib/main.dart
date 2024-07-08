@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:purrfectmatch/views/admin/admin_home_page.dart';
 import 'package:purrfectmatch/views/admin/crud_user_page.dart';
 import 'package:purrfectmatch/views/not_found_page.dart';
+import 'package:purrfectmatch/views/user/profile/create_association.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
 import 'blocs/auth_bloc.dart';
 import 'services/auth_service.dart';
@@ -68,6 +69,7 @@ class MyApp extends StatelessWidget {
           '/asso': (context) => const UserHomePage(title: ''),
           '/not-found': (context) => const NotFoundPage(title: 'Page not found'),
           '/admin/users': (context) => const CrudUserPage(),
+          '/user/create-association': (context) => const CreateAssociation(),
         },
       ),
     );

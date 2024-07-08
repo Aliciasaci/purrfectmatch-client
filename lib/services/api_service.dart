@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import '../models/association.dart';
 import '../models/cat.dart';
 import '../models/annonce.dart';
 import '../models/user.dart';
@@ -336,6 +338,41 @@ class ApiService {
   }
 
   //ASSOCIATION
+  Future<void> createAssociation(Association association, String filePath, String fileName) async {
+    final token = AuthService.authToken;
+    final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+
+    association.toJson().forEach((key, value) {
+      request.fields[key] = value.toString();
+      print('Key: $key, Value: $value');
+    });
+
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'kbisFile',
+        filePath,
+        filename: fileName,
+        contentType: MediaType('application', 'pdf'),
+      ),
+    );
+
+    request.headers.addAll({
+      'Authorization': 'Bearer $token',
+    });
+
+    print('Request fields: ${request.fields}');
+    print('Request files: ${request.files}');
+
+    var response = await request.send();
+    final responseString = await response.stream.bytesToString();
+    print('Response string: $responseString');
+
+    if (response.statusCode == 201) {
+      print('Association created successfully');
+    } else {
+      print('Failed to create association');
+    }
+  }
 
 }
 

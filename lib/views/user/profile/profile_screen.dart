@@ -109,9 +109,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const Divider(),
                   const SizedBox(height: 10),
                   ProfileMenuWidget(
-                    title: "Devenir association",
+                    title: "Créer Association",
                     icon: Icons.verified,
-                    onPress: () {},
+                    onPress: () => Navigator.pushNamed(context, '/user/create-association'),
                   ),
                   ProfileMenuWidget(
                     title: "Se déconnecter",
