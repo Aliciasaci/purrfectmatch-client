@@ -18,8 +18,10 @@ class AssociationBloc extends Bloc<AssociationEvent, AssociationState> {
     emit(AssociationLoading());
     try {
       final associations = await apiService.fetchAllAssociations();
+      print('Associations: $associations');
       emit(AssociationLoaded(associations));
     } catch (e) {
+      print('Error: $e');
       emit(AssociationError('Erreur lors du chargement des associations.'));
     }
   }

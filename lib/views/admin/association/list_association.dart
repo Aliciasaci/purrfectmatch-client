@@ -39,17 +39,16 @@ class ListAssociation extends StatelessWidget {
                         rows: state.associations.map((association) => DataRow(cells: [
                           DataCell(Text(association.name)),
                           DataCell(Text(association.email)),
-                          DataCell(Text(association.owner!.name!)),
+                          DataCell(Text(association.ownerId)),
+                          //DataCell(Text(association.owner!.name!)),
                           DataCell(Text(association.verified! ? 'Oui' : 'Non')),
                           DataCell(IconButton(
                             icon: const Icon(Icons.visibility),
                             onPressed: () async {
-                              final String relativeFilePath = association.kbisFile.replaceFirst('internal/uploads/', '');
-                              final kbisUrl = Uri.parse('$baseUrl/uploads/$relativeFilePath');
                               try {
-                                await launchUrl(kbisUrl);
+                                await launchUrl(Uri.parse(association.kbisFile));
                               } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to open KBIS')));
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Erreur lors de l\'ouverture du fichier KBIS')));
                               }
                             })),
                           DataCell(TextButton(

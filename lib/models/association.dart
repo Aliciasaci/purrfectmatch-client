@@ -10,7 +10,7 @@ class Association {
   final String email;
   final String kbisFile;
   final String ownerId;
-  final User? owner;
+  // final User? owner;
   final bool? verified;
   final String? createdAt;
   final String? updatedAt;
@@ -25,18 +25,13 @@ class Association {
     required this.email,
     required this.kbisFile,
     required this.ownerId,
-    this.owner,
+    // this.owner,
     this.verified,
     this.createdAt,
     this.updatedAt,
   });
 
   factory Association.fromJson(Map<String, dynamic> json) {
-    List<User> membersList = [];
-    if (json['members'] != null) {
-      membersList = List<User>.from(json['members'].map((member) => User.fromJson(member)));
-    }
-
     return Association(
       id: json['ID'],
       name: json['Name'] ?? '',
@@ -46,30 +41,31 @@ class Association {
       phone: json['Phone'] ?? '',
       email: json['Email'] ?? '',
       kbisFile: json['KbisFile'] ?? '',
-      ownerId: json['OwnerID'] ?? '',
-      owner: User.fromJson(json['Owner']),
-      verified: json['Verified'] ?? false,
+      ownerId: json['OwnerId'] ?? '',
+      // owner: json['owner'] != null ? User.fromJson(json['owner']) : null,
+      verified: json['Rerified'] ?? false,
       createdAt: json['CreatedAt'] != null ? DateTime.parse(json['CreatedAt']).toIso8601String() : null,
       updatedAt: json['UpdatedAt'] != null ? DateTime.parse(json['UpdatedAt']).toIso8601String() : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    final data = {
-      'id': id,
+    final Map<String, dynamic> data = {
       'name': name,
       'addressRue': addressRue,
       'cp': cp,
       'ville': ville,
       'phone': phone,
       'email': email,
+      'kbisFile': kbisFile,
       'ownerId': ownerId,
-      'owner': owner?.toJson(),
+      //'owner': owner?.toJson(),
     };
 
-    if (verified != null) data['verified'] = verified.toString();
-    if (createdAt != null) data['createdAt'] = createdAt!;
-    if (updatedAt != null) data['updatedAt'] = updatedAt!;
+    if (id != null) data['id'] = id;
+    if (verified != null) data['verified'] = verified;
+    if (createdAt != null) data['createdAt'] = createdAt;
+    if (updatedAt != null) data['updatedAt'] = updatedAt;
 
     return data;
   }
@@ -84,7 +80,7 @@ class Association {
     String? email,
     String? kbisFile,
     String? ownerId,
-    User? owner,
+    // User? owner,
     bool? verified,
     String? createdAt,
     String? updatedAt,
@@ -99,7 +95,7 @@ class Association {
       email: email ?? this.email,
       kbisFile: kbisFile ?? this.kbisFile,
       ownerId: ownerId ?? this.ownerId,
-      owner: owner ?? this.owner,
+      // owner: owner ?? this.owner,
       verified: verified ?? this.verified,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -108,6 +104,6 @@ class Association {
 
   @override
   String toString() {
-    return 'Association { id: $id, name: $name, addressRue: $addressRue, cp: $cp, ville: $ville, phone: $phone, email: $email, kbisFile: $kbisFile, ownerId: $ownerId, owner: $owner, verified: $verified, createdAt: $createdAt, updatedAt: $updatedAt }';
+    return 'Association { id: $id, name: $name, addressRue: $addressRue, cp: $cp, ville: $ville, phone: $phone, email: $email, kbisFile: $kbisFile, ownerId: $ownerId, verified: $verified, createdAt: $createdAt, updatedAt: $updatedAt }';
   }
 }
