@@ -1,6 +1,3 @@
-import 'dart:ffi';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:purrfectmatch/views/insideModalFilter.dart';
 
@@ -18,8 +15,7 @@ class _FilterModalWidgetState extends State<FilterModalWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: FloatingActionButton.small(
+    return FloatingActionButton.small(
         backgroundColor: Colors.white,
         child: const Icon(
           Icons.search,
@@ -33,7 +29,6 @@ class _FilterModalWidgetState extends State<FilterModalWidget> {
             },
           );
         },
-      ),
-    );
+      );
   }
 }

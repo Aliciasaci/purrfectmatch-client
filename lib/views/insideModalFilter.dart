@@ -13,7 +13,7 @@ class InsideModalFilter extends StatefulWidget {
 }
 
 class _InsideModalFilterState extends State<InsideModalFilter> {
-  static Map<int?, String> raceList = {};
+  Map<int?, String> raceList = {};
   String? _catSex = "";
   int? _dropdownValue;
   String? _age;
@@ -31,6 +31,9 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
       for (var race in newRaces) {
         raceList[race.id] = race.raceName;
       }
+      setState(() {
+        raceList = raceList;
+      });
     } catch (e) {
       print('Failed to load races: $e');
     }
