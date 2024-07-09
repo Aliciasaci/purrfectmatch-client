@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:badges/badges.dart' as badges;
-import '../../models/role.dart';
-import '../../models/user.dart';
+import '../../../models/role.dart';
+import '../../../models/user.dart';
 import 'blocs/crud_user_bloc.dart';
 
 class CrudUserPage extends StatelessWidget {
