@@ -344,7 +344,6 @@ class ApiService {
 
     association.toJson().forEach((key, value) {
       request.fields[key] = value.toString();
-      print('Key: $key, Value: $value');
     });
 
     request.files.add(
@@ -360,9 +359,6 @@ class ApiService {
       'Authorization': 'Bearer $token',
     });
 
-    print('Request fields: ${request.fields}');
-    print('Request files: ${request.files}');
-
     var response = await request.send();
     final responseString = await response.stream.bytesToString();
     print('Response string: $responseString');
@@ -371,6 +367,68 @@ class ApiService {
       print('Association created successfully');
     } else {
       print('Failed to create association');
+    }
+  }
+
+  Future<List<Association>> fetchAllAssociations() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/associations'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> associationsJson = jsonDecode(response.body);
+      return associationsJson.map((json) => Association.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load associations');
+    }
+  }
+
+  Future<void> updateAssociation(Association association) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/associations/${association.id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(association.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update association');
+    }
+  }
+
+  Future<void> updateAssociationVerifyStatus(int associationId, bool verified) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/associations/$associationId/verify'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'verified': verified}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to verify association');
+    }
+  }
+
+  Future<void> deleteAssociation(String associationId) async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/associations/$associationId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete association');
     }
   }
 

@@ -11,15 +11,13 @@ class AdminHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-        ),
-        drawer: const DrawerNavigation(),
-        body: const CrudUserPage(),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(title),
       ),
+      drawer: const DrawerNavigation(),
+      body: const Center(child: Text('Bienvenue sur la page d\'accueil de l\'administrateur')),
     );
   }
 }
