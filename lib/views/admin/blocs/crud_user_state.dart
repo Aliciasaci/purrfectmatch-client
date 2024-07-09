@@ -1,7 +1,6 @@
 part of 'crud_user_bloc.dart';
 
 @immutable
-
 abstract class CrudUserState {}
 
 class CrudUserInitial extends CrudUserState {}

@@ -2,15 +2,15 @@ class Annonce {
   final int? ID;
   final String Title;
   final String Description;
-  final String? UserID;
-  final String? CatID;
+  final String UserID;
+  final String CatID;
 
   Annonce({
     this.ID,
     required this.Title,
     required this.Description,
-    this.UserID,
-    this.CatID,
+    required this.UserID,
+    required this.CatID,
   });
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
@@ -19,7 +19,7 @@ class Annonce {
       Title: json['Title'],
       Description: json['Description'],
       UserID: json['UserID'],
-      CatID: json['CatID']?.toString(),
+      CatID: json['CatID'],
     );
   }
 

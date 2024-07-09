@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/cat.dart';
 import '../models/annonce.dart';
@@ -8,6 +9,8 @@ import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../blocs/auth_bloc.dart';
 
 class ApiService {
   static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
@@ -200,9 +203,9 @@ class ApiService {
     }
   }
 
-  Future<void> updateUserProfilePic(PlatformFile selectedFile) async {
+  Future<void> updateUserProfilePic(String userId, PlatformFile selectedFile) async {
     final token = AuthService.authToken;
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
+    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/$userId/profile/pic'));
 
     request.headers['Authorization'] = 'Bearer $token';
     request.files.add(
@@ -235,10 +238,10 @@ class ApiService {
     }
   }
 
-  Future<void> deleteUserProfilePic() async {
+  Future<void> deleteUserProfilePic(String userId) async {
     final token = AuthService.authToken;
     final response = await http.delete(
-      Uri.parse('$baseUrl/users/{user.id}/profile/pic'),
+      Uri.parse('$baseUrl/users/$userId/profile/pic'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -249,10 +252,10 @@ class ApiService {
     }
   }
 
-  Future<List<Annonce>> fetchUserAnnonces() async {
+  Future<List<Annonce>> fetchUserAnnonces(String userId) async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/users/annonces/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+      Uri.parse('$baseUrl/users/annonces/$userId'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -268,10 +271,10 @@ class ApiService {
     }
   }
 
-  Future<List<Favoris>> fetchUserFavorites() async {
+  Future<List<Favoris>> fetchUserFavorites(String userId) async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+      Uri.parse('$baseUrl/favorites/users/$userId'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -332,6 +335,27 @@ class ApiService {
       }
     } else {
       throw Exception('Failed to create favorite');
+    }
+  }
+
+
+  Future<User> fetchUserByID(String? userID) async {
+
+    print("USERID");
+    print(userID);
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/users/$userID'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> userJson = jsonDecode(response.body);
+      return User.fromJson(userJson);
+    } else {
+      throw Exception('Failed to load user for ID: $userID');
     }
   }
 }

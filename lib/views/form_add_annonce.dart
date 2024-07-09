@@ -41,6 +41,7 @@ class _AddAnnonceState extends State<AddAnnonce> {
       Title: title,
       Description: description,
       CatID: catID,
+      UserID: '',
     );
 
     print('Sending annonce: ${annonce.toString()}');

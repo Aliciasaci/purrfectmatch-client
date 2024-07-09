@@ -3,7 +3,10 @@ import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
+import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/views/cat_detail_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:purrfectmatch/blocs/auth_bloc.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
   const SwipeCardsWidget({super.key});
@@ -19,51 +22,64 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   @override
   void initState() {
     super.initState();
-    apiService.fetchAllAnnonces().then((annonces) async {
-      for (var annonce in annonces) {
-        try {
-          Cat cat = await apiService.fetchCatByID(annonce.CatID);
-          _swipeItems.add(SwipeItem(
-            content: {'annonce': annonce, 'cat': cat},
-            likeAction: () {
-              print("annonceID");
-              print(annonce.ID);
-              _handleLikeAction(annonce.ID, cat.name);
-            },
-            nopeAction: () {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Passed ${cat.name}"),
-                duration: const Duration(milliseconds: 500),
-              ));
-            },
-            superlikeAction: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
-              );
-            },
-          ));
-        } catch (error) {
-          print("Failed to load cat for annonce ${annonce.ID}: $error");
-        }
-      }
+    _loadAnnonces();
+  }
 
-      setState(() {
-        _matchEngine = MatchEngine(swipeItems: _swipeItems);
-      });
-    }).catchError((error) {
+  Future<void> _loadAnnonces() async {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    if (authState is AuthAuthenticated) {
+      final currentUser = authState.user;
+      try {
+        final annonces = await apiService.fetchAllAnnonces();
+        final filteredAnnonces = annonces.where((annonce) => annonce.UserID != currentUser.id).toList();
+
+        for (var annonce in filteredAnnonces) {
+          try {
+            Cat cat = await apiService.fetchCatByID(annonce.CatID);
+            User user = await apiService.fetchUserByID(annonce.UserID);
+            print(annonce.UserID);
+
+            _swipeItems.add(SwipeItem(
+              content: {'annonce': annonce, 'cat': cat, 'user': user},
+              likeAction: () {
+                _handleLikeAction(annonce.ID, cat.name);
+              },
+              nopeAction: () {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Passé ${cat.name}"),
+                  duration: const Duration(milliseconds: 500),
+                ));
+              },
+              superlikeAction: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+                );
+              },
+            ));
+          } catch (error) {
+            print("Échec du chargement des données pour l'annonce ${annonce.ID}: $error");
+          }
+        }
+
+        setState(() {
+          _matchEngine = MatchEngine(swipeItems: _swipeItems);
+        });
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Échec du chargement des annonces: $error"),
+          duration: const Duration(milliseconds: 1500),
+        ));
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Failed to load annonces: $error"),
+        content: Text("Utilisateur non authentifié"),
         duration: const Duration(milliseconds: 1500),
       ));
-    });
+    }
   }
 
   void _handleLikeAction(int? annonceID, String catName) {
-
-    print("annonceID2");
-    print(annonceID);
-
     apiService.createFavorite(annonceID).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Ajout de $catName à tes favoris"),
@@ -71,7 +87,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       ));
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Failed to like $catName: $error"),
+        content: Text("Échec de l'ajout de $catName aux favoris: $error"),
         duration: const Duration(milliseconds: 1500),
       ));
     });
@@ -115,6 +131,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   var item = _swipeItems[index].content as Map;
                   Annonce annonce = item['annonce'] as Annonce;
                   Cat cat = item['cat'] as Cat;
+                  User user = item['user'] as User;
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Stack(
@@ -176,6 +193,13 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                   fontSize: 20,
                                 ),
                               ),
+                              Text(
+                                "Mise en ligne par: ${user.name}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
                               if (!cat.reserved)
                                 Text(
                                   "Disponible",
@@ -203,7 +227,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 },
                 onStackFinished: () {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("Stack Finished"),
+                    content: Text("Pile terminée"),
                     duration: Duration(milliseconds: 500),
                   ));
                 },

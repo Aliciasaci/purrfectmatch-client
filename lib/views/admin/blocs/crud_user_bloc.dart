@@ -59,4 +59,3 @@ class CrudUserBloc extends Bloc<CrudUserEvent, CrudUserState> {
     }
   }
 }
-

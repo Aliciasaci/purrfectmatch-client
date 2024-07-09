@@ -1,7 +1,6 @@
 part of 'crud_user_bloc.dart';
 
 @immutable
-
 abstract class CrudUserEvent {}
 
 class LoadUsers extends CrudUserEvent {}
@@ -20,6 +19,7 @@ class UpdateUser extends CrudUserEvent {
 
 class DeleteUser extends CrudUserEvent {
   final String userId;
+  final BuildContext context;
 
-  DeleteUser(this.userId);
+  DeleteUser(this.userId, this.context);
 }
