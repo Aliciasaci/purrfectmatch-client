@@ -14,9 +14,8 @@ class SwipeCardsWidget extends StatefulWidget {
 }
 
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
-  static List<Annonce> annonceList = [];
+  static List<Annonce> _annonceList = [];
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
-  // final bool _filteredSearch = false;
   MatchEngine? _matchEngine;
   final ApiService apiService = ApiService();
 
@@ -41,11 +40,14 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
         annoncesList.add(annonce);
       }
       setState(() {
-        annonceList = annoncesList;
+        _annonceList = annoncesList;
+        _matchEngine = null;
       });
-      displayCats(annonceList);
+      _swipeItems.clear();
+      displayCats(_annonceList);
     } catch (e) {
-      print(annonceList);
+      print(_annonceList);
+      print('çafoire');
       print('Failed to load cats with filter: $e');
     }
   }
