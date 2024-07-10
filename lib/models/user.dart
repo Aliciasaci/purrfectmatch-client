@@ -33,13 +33,13 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     List<Role> rolesList = [];
-    if (json['roles'] != null) {
-      rolesList = List<Role>.from(json['roles'].map((role) => Role.fromJson(role)));
+    if (json['Roles'] != null) {
+      rolesList = List<Role>.from(json['Roles'].map((role) => Role.fromJson(role)));
     }
 
     List<Association> associationsList = [];
-    if (json['associations'] != null) {
-      associationsList = List<Association>.from(json['associations'].map((association) => Association.fromJson(association)));
+    if (json['Associations'] != null) {
+      associationsList = List<Association>.from(json['Associations'].map((association) => Association.fromJson(association)));
     }
 
     return User(
