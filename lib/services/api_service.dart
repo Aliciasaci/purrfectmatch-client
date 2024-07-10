@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:purrfectmatch/models/message.dart';
+import 'package:purrfectmatch/models/room.dart';
+import 'package:web_socket_channel/io.dart';
 import '../models/cat.dart';
 import '../models/annonce.dart';
 import '../models/user.dart';
@@ -8,7 +11,8 @@ import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static String get baseUrl =>
+      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
 
   Future<Cat> fetchCatByID(String? catID) async {
     final token = AuthService.authToken;
@@ -186,7 +190,8 @@ class ApiService {
 
   Future<void> updateUserProfilePic(PlatformFile selectedFile) async {
     final token = AuthService.authToken;
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
+    var request = http.MultipartRequest(
+        'PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
 
     request.headers['Authorization'] = 'Bearer $token';
     request.files.add(
@@ -255,7 +260,8 @@ class ApiService {
   Future<List<Favoris>> fetchUserFavorites() async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+      Uri.parse(
+          '$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -305,7 +311,8 @@ class ApiService {
     if (response.statusCode == 201) {
       try {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        if (responseData['success'] == 'true' && responseData['favorite'] != null) {
+        if (responseData['success'] == 'true' &&
+            responseData['favorite'] != null) {
           return responseData['favorite'];
         } else {
           throw Exception('Failed to create favorite');
@@ -317,5 +324,47 @@ class ApiService {
     } else {
       throw Exception('Failed to create favorite');
     }
+  }
+
+  Future<List<Room>> getUserRooms() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> roomsJson = jsonDecode(response.body);
+      return roomsJson.map((json) => Room.fromModifiedJson(json)).toList();
+    } else {
+      throw Exception('Failed to load rooms');
+    }
+  }
+
+  Future<List<Message>> getRoomMessages(String roomID) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms/$roomID'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> messagesJson = jsonDecode(response.body);
+      return messagesJson.map((json) => Message.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load messages');
+    }
+  }
+
+  IOWebSocketChannel connectToRoom(String roomID) {
+    final token = AuthService.authToken;
+    return IOWebSocketChannel.connect(Uri.parse('$baseUrl/ws/$roomID'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        });
   }
 }
