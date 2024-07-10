@@ -85,7 +85,7 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                     child: ListTile(
                       title: const Text('M'),
                       leading: Radio<String>(
-                        value: "male",
+                        value: "Male",
                         groupValue: _catSex,
                         onChanged: (String? value) {
                           setState(() {
@@ -99,7 +99,7 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                     child: ListTile(
                       title: const Text('F'),
                       leading: Radio<String>(
-                        value: "femelle",
+                        value: "Female",
                         groupValue: _catSex,
                         onChanged: (String? value) {
                           setState(() {

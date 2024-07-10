@@ -46,8 +46,6 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       _swipeItems.clear();
       displayCats(_annonceList);
     } catch (e) {
-      print(_annonceList);
-      print('çafoire');
       print('Failed to load cats with filter: $e');
     }
   }
