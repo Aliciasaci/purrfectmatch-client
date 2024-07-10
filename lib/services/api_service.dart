@@ -5,12 +5,11 @@ import '../models/cat.dart';
 import '../models/annonce.dart';
 import '../models/user.dart';
 import '../models/favoris.dart';
+import '../models/rating.dart';
 import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../blocs/auth_bloc.dart';
 
 class ApiService {
   static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
@@ -147,7 +146,7 @@ class ApiService {
     }
   }
 
-  //USER
+  // USER
   Future<List<User>> fetchAllUsers() async {
     final token = AuthService.authToken;
     final response = await http.get(
@@ -338,9 +337,61 @@ class ApiService {
     }
   }
 
+  // Ratings
+  Future<List<Rating>> fetchAllRatings() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/ratings'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> ratingsJson = jsonDecode(response.body);
+      return ratingsJson.map((json) => Rating.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load ratings');
+    }
+  }
+
+  Future<List<Rating>> fetchUserRatings(String userId) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/ratings/user/$userId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> ratingsJson = jsonDecode(response.body);
+      return ratingsJson.map((json) => Rating.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load user ratings');
+    }
+  }
+
+  Future<Rating> createRating(Rating rating) async {
+    final token = AuthService.authToken;
+    final response = await http.post(
+      Uri.parse('$baseUrl/ratings'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(rating.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      final Map<String, dynamic> ratingJson = jsonDecode(response.body);
+      return Rating.fromJson(ratingJson);
+    } else {
+      throw Exception('Failed to create rating');
+    }
+  }
 
   Future<User> fetchUserByID(String? userID) async {
-
     print("USERID");
     print(userID);
     final token = AuthService.authToken;

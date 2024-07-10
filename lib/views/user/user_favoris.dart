@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/favoris.dart';
-import '../models/annonce.dart';
-import '../models/cat.dart';
-import '../services/api_service.dart';
-import 'annonce_detail_page.dart';
-import 'chat_page.dart';
-import '../../../blocs/auth_bloc.dart';
+import '../../models/favoris.dart';
+import '../../models/annonce.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
+import '../annonce/annonce_detail_page.dart';
+import '../cat/chat_page.dart';
+import '../../../../blocs/auth_bloc.dart';
 
 
 class UserFavorisPage extends StatefulWidget {

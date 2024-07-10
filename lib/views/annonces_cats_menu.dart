@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'annonces_liste.dart';
-import 'cats_liste.dart';
-import 'form_add_annonce.dart';
-import 'form_add_cat.dart';
-import 'user_annonces.dart';
-import 'user_favoris.dart';
+import 'annonce/annonces_liste.dart';
+import 'cat/cats_liste.dart';
+import 'annonce/form_add_annonce.dart';
+import 'cat/form_add_cat.dart';
+import 'user/user_annonces.dart';
+import 'user/user_favoris.dart';
 
 class AnnoncesCatsMenu extends StatelessWidget {
   const AnnoncesCatsMenu({super.key});

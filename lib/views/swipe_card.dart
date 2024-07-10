@@ -4,7 +4,8 @@ import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/models/user.dart';
-import 'package:purrfectmatch/views/cat_detail_page.dart';
+import 'package:purrfectmatch/views/cat/cat_details.dart';
+import 'package:purrfectmatch/views/user/user_public_profile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/blocs/auth_bloc.dart';
 
@@ -36,27 +37,29 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
         for (var annonce in filteredAnnonces) {
           try {
             Cat cat = await apiService.fetchCatByID(annonce.CatID);
-            User user = await apiService.fetchUserByID(annonce.UserID);
-            print(annonce.UserID);
+            if (!cat.reserved) {
+              User user = await apiService.fetchUserByID(annonce.UserID);
+              print(annonce.UserID);
 
-            _swipeItems.add(SwipeItem(
-              content: {'annonce': annonce, 'cat': cat, 'user': user},
-              likeAction: () {
-                _handleLikeAction(annonce.ID, cat.name);
-              },
-              nopeAction: () {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("Passé ${cat.name}"),
-                  duration: const Duration(milliseconds: 500),
-                ));
-              },
-              superlikeAction: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
-                );
-              },
-            ));
+              _swipeItems.add(SwipeItem(
+                content: {'annonce': annonce, 'cat': cat, 'user': user},
+                likeAction: () {
+                  _handleLikeAction(annonce.ID, cat.name);
+                },
+                nopeAction: () {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Passé ${cat.name}"),
+                    duration: const Duration(milliseconds: 500),
+                  ));
+                },
+                superlikeAction: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+                  );
+                },
+              ));
+            }
           } catch (error) {
             print("Échec du chargement des données pour l'annonce ${annonce.ID}: $error");
           }
@@ -193,31 +196,36 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                   fontSize: 20,
                                 ),
                               ),
-                              Text(
-                                "Mise en ligne par: ${user.name}",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => UserPublicProfile(user: user)),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Mise en ligne par: ${user.name}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 2,
+                                      height: 1.5, // This will add some space between the text and the underline
+                                    ),
+                                  ),
                                 ),
                               ),
-                              if (!cat.reserved)
-                                Text(
-                                  "Disponible",
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              Text(
+                                "Disponible",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              if (cat.reserved)
-                                Text(
-                                  "Réservé",
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                              ),
                             ],
                           ),
                         ),

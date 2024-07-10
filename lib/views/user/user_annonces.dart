@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // Assurez-vous d'importer flutter_bloc
-import '../models/annonce.dart';
-import '../models/cat.dart';
-import '../services/api_service.dart';
-import 'annonce_detail_page.dart';
-import '../../../blocs/auth_bloc.dart'; // Import du bloc d'authentification
+import '../../models/annonce.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
+import '../annonce/annonce_detail_page.dart';
+import '../../../../blocs/auth_bloc.dart'; // Import du bloc d'authentification
 
 class UserAnnoncesPage extends StatefulWidget {
   const UserAnnoncesPage({super.key});

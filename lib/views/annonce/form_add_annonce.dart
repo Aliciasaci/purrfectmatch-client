@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:purrfectmatch/services/api_service.dart';
-import '../models/annonce.dart';
-import './annonce_detail_page.dart';
-import './form_add_cat.dart';
-import './annonces_cats_menu.dart';
+import '../../models/annonce.dart';
+import 'annonce_detail_page.dart';
+import '../cat/form_add_cat.dart';
+import '../annonces_cats_menu.dart';
 
 class AddAnnonce extends StatefulWidget {
   const AddAnnonce({super.key});
