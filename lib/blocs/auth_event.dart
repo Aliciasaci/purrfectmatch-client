@@ -13,4 +13,8 @@ class LoginRequested extends AuthEvent {
 
 class LogoutRequested extends AuthEvent {}
 
+class UpdateProfileRequested extends AuthEvent {
+  final User user;
 
+  UpdateProfileRequested(this.user);
+}

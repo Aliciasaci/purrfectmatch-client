@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/views/profile/profile_menu_widget.dart';
+import 'package:purrfectmatch/views/user/profile/profile_menu_widget.dart';
 import 'package:purrfectmatch/constants/color.dart';
 import 'package:purrfectmatch/constants/image_strings.dart';
 import 'package:purrfectmatch/constants/text_strings.dart';
-import 'package:purrfectmatch/views/profile/edit_profile_screen.dart';
+import 'package:purrfectmatch/views/user/profile/edit_profile_screen.dart';
 import 'package:purrfectmatch/models/user.dart';
-import '../../blocs/auth_bloc.dart';
-import '../login.dart';
+import '../../../blocs/auth_bloc.dart';
+import '../../login.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,10 +15,11 @@ class ProfileScreen extends StatefulWidget {
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
-  class _ProfileScreenState extends State<ProfileScreen> {
+
+class _ProfileScreenState extends State<ProfileScreen> {
 
   void _logout(BuildContext context) {
-    BlocProvider.of<AuthBloc>(context).logout();
+    BlocProvider.of<AuthBloc>(context).add(LogoutRequested());
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -71,16 +72,10 @@ class ProfileScreen extends StatefulWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  currentUser == null
-                      ? const CircularProgressIndicator()
-                      : Column(
-                    children: [
-                      Text(currentUser.name,
-                          style: Theme.of(context).textTheme.headlineSmall),
-                      Text(currentUser.email,
-                          style: Theme.of(context).textTheme.bodyMedium),
-                    ],
-                  ),
+                  Text(currentUser.name,
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  Text(currentUser.email,
+                      style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: 10),
                   SizedBox(
                     width: 200,
@@ -101,7 +96,6 @@ class ProfileScreen extends StatefulWidget {
                   const SizedBox(height: 30),
                   const Divider(),
                   const SizedBox(height: 10),
-
                   ProfileMenuWidget(
                     title: "Settings",
                     icon: Icons.settings,
