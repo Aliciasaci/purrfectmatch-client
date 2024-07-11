@@ -1,5 +1,7 @@
 import 'package:purrfectmatch/models/role.dart';
 
+import 'association.dart';
+
 class User {
   final String? id;
   final String name;
@@ -12,6 +14,7 @@ class User {
   final String? createdAt;
   final String? updatedAt;
   final List<Role> roles;
+  final List<Association> associations;
 
   User({
     this.id,
@@ -25,12 +28,18 @@ class User {
     this.createdAt,
     this.updatedAt,
     this.roles = const [],
+    this.associations = const [],
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     List<Role> rolesList = [];
-    if (json['roles'] != null) {
-      rolesList = List<Role>.from(json['roles'].map((role) => Role.fromJson(role)));
+    if (json['Roles'] != null) {
+      rolesList = List<Role>.from(json['Roles'].map((role) => Role.fromJson(role)));
+    }
+
+    List<Association> associationsList = [];
+    if (json['Associations'] != null) {
+      associationsList = List<Association>.from(json['Associations'].map((association) => Association.fromJson(association)));
     }
 
     return User(
@@ -45,6 +54,7 @@ class User {
       ville: json['Ville'] ?? '',
       profilePicURL: json['ProfilePicURL'] ?? '',
       roles: rolesList,
+      associations: associationsList,
     );
   }
 
@@ -59,11 +69,12 @@ class User {
       'profilePicURL': profilePicURL,
       'createdAt': createdAt,
       'roles': roles.map((role) => role.toJson()).toList(),
+      'associations': associations.map((association) => association.toJson()).toList(),
     };
   }
 
   @override
   String toString() {
-    return '{name: $name, email: $email, addressRue: $addressRue, cp: $cp, ville: $ville, password: $password, profilePicURL: $profilePicURL, createdAt: $createdAt, roles: $roles}';
+    return '{name: $name, email: $email, addressRue: $addressRue, cp: $cp, ville: $ville, password: $password, profilePicURL: $profilePicURL, createdAt: $createdAt, roles: $roles, associations: $associations }';
   }
 }
