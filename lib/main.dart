@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/views/profile/profile_screen.dart';
+import 'package:purrfectmatch/views/user/room/rooms_list_screen.dart';
 import 'blocs/auth_bloc.dart';
 import 'models/user.dart';
 import 'services/auth_service.dart';
@@ -56,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
     SwipeCardsWidget(),
     AnnoncesCatsMenu(),
     AddAnnonce(),
+    RoomsListScreen(),
     ProfileScreen(),
   ];
 
@@ -72,7 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,6 @@ import 'package:purrfectmatch/models/message.dart';
 import 'package:purrfectmatch/models/room.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:purrfectmatch/services/auth_service.dart';
 import 'package:web_socket_channel/io.dart';
 import '../../services/api_service.dart';
 part 'room_event.dart';
@@ -13,22 +12,14 @@ part 'room_state.dart';
 
 class RoomBloc extends Bloc<RoomEvent, RoomState> {
   final ApiService apiService;
-  final AuthService authService;
   StreamSubscription? _messageSubscription;
   IOWebSocketChannel? _channel;
-  var currentUser;
 
-  RoomBloc({required this.apiService, required this.authService})
-      : super(RoomInitial()) {
+  RoomBloc({required this.apiService}) : super(RoomInitial()) {
     on<LoadRooms>(_onLoadRooms);
     on<LoadChatHistory>(_onLoadChatHistory);
     on<SendMessage>(_onSendMessage);
     on<ReceiveMessage>(_onReceiveMessage);
-    _fetchCurrentUser();
-  }
-
-  Future<void> _fetchCurrentUser() async {
-    currentUser = await authService.getCurrentUser();
   }
 
   Future<void> _onLoadRooms(LoadRooms event, Emitter<RoomState> emit) async {
