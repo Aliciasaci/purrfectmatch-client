@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/admin/admin_home_page.dart';
-import 'package:purrfectmatch/views/admin/crud_user_page.dart';
+import 'package:purrfectmatch/views/admin/association/blocs/association_bloc.dart';
+import 'package:purrfectmatch/views/admin/association/list_association.dart';
+import 'package:purrfectmatch/views/admin/user/blocs/crud_user_bloc.dart';
+import 'package:purrfectmatch/views/admin/user/crud_user_page.dart';
 import 'package:purrfectmatch/views/not_found_page.dart';
+import 'package:purrfectmatch/views/user/profile/create_association.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
 import 'blocs/auth_bloc.dart';
 import 'services/auth_service.dart';
@@ -63,11 +68,18 @@ class MyApp extends StatelessWidget {
           ),
         ),
         routes: {
-          '/user': (context) => const UserHomePage(title: ''),
-          '/admin': (context) => const AdminHomePage(title: 'Admin Home Page'),
-          '/asso': (context) => const UserHomePage(title: 'User Home Page'),
+          '/admin': (context) => const AdminHomePage(title: ''),
+          '/admin/users': (context) => BlocProvider(
+            create: (context) => CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
+            child: const CrudUserPage(),
+          ),
+          '/admin/associations': (context) => BlocProvider(
+            create: (context) => AssociationBloc(apiService: ApiService())..add(LoadAssociations()),
+            child: const ListAssociation(),
+          ),
           '/not-found': (context) => const NotFoundPage(title: 'Page not found'),
-          '/admin/users': (context) => const CrudUserPage(),
+          '/user': (context) => const UserHomePage(title: ''),
+          '/user/create-association': (context) => const CreateAssociation(),
         },
       ),
     );

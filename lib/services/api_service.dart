@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import '../models/association.dart';
 import '../models/cat.dart';
 import '../models/annonce.dart';
 import '../models/race.dart';
@@ -11,8 +13,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  static String get baseUrl =>
-      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
 
   Future<Cat> fetchCatByID(String? catID) async {
     final token = AuthService.authToken;
@@ -223,8 +224,7 @@ class ApiService {
 
   Future<void> updateUserProfilePic(PlatformFile selectedFile) async {
     final token = AuthService.authToken;
-    var request = http.MultipartRequest(
-        'PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
+    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
 
     request.headers['Authorization'] = 'Bearer $token';
     request.files.add(
@@ -293,8 +293,7 @@ class ApiService {
   Future<List<Favoris>> fetchUserFavorites() async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse(
-          '$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+      Uri.parse('$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -344,8 +343,7 @@ class ApiService {
     if (response.statusCode == 201) {
       try {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        if (responseData['success'] == 'true' &&
-            responseData['favorite'] != null) {
+        if (responseData['success'] == 'true' && responseData['favorite'] != null) {
           return responseData['favorite'];
         } else {
           throw Exception('Failed to create favorite');
@@ -358,6 +356,103 @@ class ApiService {
       throw Exception('Failed to create favorite');
     }
   }
+
+  //ASSOCIATION
+  Future<void> createAssociation(Association association, String filePath, String fileName) async {
+    final token = AuthService.authToken;
+    final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+
+    association.toJson().forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
+
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'kbisFile',
+        filePath,
+        filename: fileName,
+        contentType: MediaType('application', 'pdf'),
+      ),
+    );
+
+    request.headers.addAll({
+      'Authorization': 'Bearer $token',
+    });
+
+    var response = await request.send();
+    final responseString = await response.stream.bytesToString();
+    print('Response string: $responseString');
+
+    if (response.statusCode == 201) {
+      print('Association created successfully');
+    } else {
+      print('Failed to create association');
+    }
+  }
+
+  Future<List<Association>> fetchAllAssociations() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/associations'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> associationsJson = jsonDecode(response.body);
+      return associationsJson.map((json) => Association.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load associations');
+    }
+  }
+
+  Future<void> updateAssociation(Association association) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/associations/${association.id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(association.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update association');
+    }
+  }
+
+  Future<void> updateAssociationVerifyStatus(int associationId, bool verified) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/associations/$associationId/verify'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'verified': verified}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to verify association');
+    }
+  }
+
+  Future<void> deleteAssociation(String associationId) async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/associations/$associationId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete association');
+    }
+  }
+
+}
 
   Future<List<Races>> fetchAllRaces() async {
     final token = AuthService.authToken;
