@@ -34,18 +34,24 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     List<Role> rolesList = [];
     if (json['Roles'] != null) {
-      rolesList = List<Role>.from(json['Roles'].map((role) => Role.fromJson(role)));
+      rolesList =
+          List<Role>.from(json['Roles'].map((role) => Role.fromJson(role)));
     }
 
     List<Association> associationsList = [];
     if (json['Associations'] != null) {
-      associationsList = List<Association>.from(json['Associations'].map((association) => Association.fromJson(association)));
+      associationsList = List<Association>.from(json['Associations']
+          .map((association) => Association.fromJson(association)));
     }
 
     return User(
       id: json['ID'],
-      createdAt: json['CreatedAt'] != null ? DateTime.parse(json['CreatedAt']).toIso8601String() : null,
-      updatedAt: json['UpdatedAt'] != null ? DateTime.parse(json['UpdatedAt']).toIso8601String() : null,
+      createdAt: json['CreatedAt'] != null
+          ? DateTime.parse(json['CreatedAt']).toIso8601String()
+          : null,
+      updatedAt: json['UpdatedAt'] != null
+          ? DateTime.parse(json['UpdatedAt']).toIso8601String()
+          : null,
       name: json['Name'] ?? '',
       email: json['Email'] ?? '',
       password: json['Password'] ?? '',
@@ -69,7 +75,8 @@ class User {
       'profilePicURL': profilePicURL,
       'createdAt': createdAt,
       'roles': roles.map((role) => role.toJson()).toList(),
-      'associations': associations.map((association) => association.toJson()).toList(),
+      'associations':
+          associations.map((association) => association.toJson()).toList(),
     };
   }
 

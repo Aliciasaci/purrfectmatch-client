@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../models/association.dart';
+import 'package:purrfectmatch/models/message.dart';
+import 'package:purrfectmatch/models/room.dart';
+import 'package:web_socket_channel/io.dart';
 import '../models/cat.dart';
 import '../models/annonce.dart';
 import '../models/race.dart';
@@ -13,7 +16,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get baseUrl =>
+      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get wsUrl =>
+      kIsWeb ? dotenv.env['WEB_WS_URL']! : dotenv.env['MOBILE_WS_URL']!;
 
   Future<Cat> fetchCatByID(String? catID) async {
     final token = AuthService.authToken;
@@ -224,7 +230,8 @@ class ApiService {
 
   Future<void> updateUserProfilePic(PlatformFile selectedFile) async {
     final token = AuthService.authToken;
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
+    var request = http.MultipartRequest(
+        'PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
 
     request.headers['Authorization'] = 'Bearer $token';
     request.files.add(
@@ -293,7 +300,8 @@ class ApiService {
   Future<List<Favoris>> fetchUserFavorites() async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+      Uri.parse(
+          '$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -343,7 +351,8 @@ class ApiService {
     if (response.statusCode == 201) {
       try {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        if (responseData['success'] == 'true' && responseData['favorite'] != null) {
+        if (responseData['success'] == 'true' &&
+            responseData['favorite'] != null) {
           return responseData['favorite'];
         } else {
           throw Exception('Failed to create favorite');
@@ -357,10 +366,68 @@ class ApiService {
     }
   }
 
-  //ASSOCIATION
-  Future<void> createAssociation(Association association, String filePath, String fileName) async {
+  Future<List<Room>> getUserRooms() async {
     final token = AuthService.authToken;
-    final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Room> rooms = parsed.map((json) {
+          return Room.fromModifiedJson(json);
+        }).toList();
+        return rooms;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load rooms');
+    }
+  }
+
+  Future<List<Message>> getRoomMessages(int roomID) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms/$roomID'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Message> messages = parsed.map((json) {
+          return Message.fromJson(json);
+        }).toList();
+        return messages;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load messages');
+    }
+  }
+
+  IOWebSocketChannel connectToRoom(int roomID) {
+    final token = AuthService.authToken;
+    print("calling this $wsUrl/ws/$roomID");
+    return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
+      'Authorization': 'Bearer $token',
+    });
+  }
+
+  //ASSOCIATION
+  Future<void> createAssociation(
+      Association association, String filePath, String fileName) async {
+    final token = AuthService.authToken;
+    final request =
+        http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
 
     association.toJson().forEach((key, value) {
       request.fields[key] = value.toString();
@@ -401,7 +468,9 @@ class ApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> associationsJson = jsonDecode(response.body);
-      return associationsJson.map((json) => Association.fromJson(json)).toList();
+      return associationsJson
+          .map((json) => Association.fromJson(json))
+          .toList();
     } else {
       throw Exception('Failed to load associations');
     }
@@ -423,7 +492,8 @@ class ApiService {
     }
   }
 
-  Future<void> updateAssociationVerifyStatus(int associationId, bool verified) async {
+  Future<void> updateAssociationVerifyStatus(
+      int associationId, bool verified) async {
     final token = AuthService.authToken;
     final response = await http.put(
       Uri.parse('$baseUrl/associations/$associationId/verify'),
@@ -470,5 +540,4 @@ class ApiService {
       throw Exception('Failed to load races');
     }
   }
-
 }
