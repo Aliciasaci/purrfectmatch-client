@@ -20,13 +20,15 @@ class _AddCatState extends State<AddCat> {
   final TextEditingController _lastVaccineNameController = TextEditingController();
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _behaviorController = TextEditingController();
-  final TextEditingController _raceController = TextEditingController();
+  // final TextEditingController _raceController = DropdownButtonFormField(items: items, onChanged: onChanged);
   final TextEditingController _descriptionController = TextEditingController();
   String? _selectedValue;
   bool _sterilized = false;
   bool _reserved = false;
   final List<String> _options = ['male', 'femelle'];
   PlatformFile? _selectedFile;
+  Map<int?, String> raceList = {};
+  int? _dropdownValue;
 
   @override
   void dispose() {
@@ -36,9 +38,15 @@ class _AddCatState extends State<AddCat> {
     _lastVaccineNameController.dispose();
     _colorController.dispose();
     _behaviorController.dispose();
-    _raceController.dispose();
+    // _raceController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCatRaces();
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -72,6 +80,22 @@ class _AddCatState extends State<AddCat> {
     }
   }
 
+  Future<void> _fetchCatRaces() async {
+    try {
+      final apiService = ApiService();
+      final newRaces = await apiService.fetchAllRaces();
+      for (var race in newRaces) {
+        raceList[race.id] = race.raceName;
+      }
+      setState(() {
+        raceList = raceList;
+      });
+    } catch (e) {
+      print('Failed to load races: $e');
+    }
+  }
+
+
   Future<void> _sendData() async {
     Cat cat = Cat(
       name: _nameController.text,
@@ -80,7 +104,8 @@ class _AddCatState extends State<AddCat> {
       lastVaccineName: _lastVaccineNameController.text,
       color: _colorController.text,
       behavior: _behaviorController.text,
-      race: _raceController.text,
+      race: _dropdownValue.toString(),
+      // race: _raceController.text,
       description: _descriptionController.text,
       sexe: _selectedValue ?? '',
       sterilized: _sterilized,
@@ -154,7 +179,8 @@ class _AddCatState extends State<AddCat> {
                       const SizedBox(height: 10),
                       buildTextFormField(_behaviorController, "Comportement*"),
                       const SizedBox(height: 10),
-                      buildTextFormField(_raceController, "Race*"),
+                      // buildTextFormField(_raceController, "Race*"),
+                      buildRaceSelectFormField(raceList, 'Race'),
                       const SizedBox(height: 10),
                       buildDescriptionFormField(_descriptionController),
                       const SizedBox(height: 10),
@@ -234,4 +260,23 @@ class _AddCatState extends State<AddCat> {
     value: value,
     onChanged: onChanged,
   );
+
+  Widget buildRaceSelectFormField(Map items, String hint) => DropdownButton(
+  hint: Text(hint),
+  items: items.entries.map((entry) {
+  return DropdownMenuItem<dynamic>(
+  value: entry.key,
+  child: Text(entry.value),
+  );
+  }).toList(),
+  value: _dropdownValue,
+  onChanged: (dynamic newValue) {
+  if (newValue != null) {
+    print('DropdownValue: $_dropdownValue');
+    print('NewValue: $newValue');
+  setState(() {
+    _dropdownValue = newValue;
+  });
+  }
+  });
 }

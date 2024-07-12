@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:purrfectmatch/blocs/room/room_bloc.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/admin/admin_home_page.dart';
 import 'package:purrfectmatch/views/admin/association/blocs/association_bloc.dart';
@@ -14,9 +15,10 @@ import 'blocs/auth_bloc.dart';
 import 'services/auth_service.dart';
 import 'views/login.dart';
 
-void main () async {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -25,8 +27,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthBloc(authService: authService),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(authService: authService),
+        ),
+        BlocProvider<RoomBloc>(
+          create: (context) => RoomBloc(apiService: ApiService()),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: '',
@@ -70,14 +79,17 @@ class MyApp extends StatelessWidget {
         routes: {
           '/admin': (context) => const AdminHomePage(title: ''),
           '/admin/users': (context) => BlocProvider(
-            create: (context) => CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
-            child: const CrudUserPage(),
-          ),
+                create: (context) =>
+                    CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
+                child: const CrudUserPage(),
+              ),
           '/admin/associations': (context) => BlocProvider(
-            create: (context) => AssociationBloc(apiService: ApiService())..add(LoadAssociations()),
-            child: const ListAssociation(),
-          ),
-          '/not-found': (context) => const NotFoundPage(title: 'Page not found'),
+                create: (context) => AssociationBloc(apiService: ApiService())
+                  ..add(LoadAssociations()),
+                child: const ListAssociation(),
+              ),
+          '/not-found': (context) =>
+              const NotFoundPage(title: 'Page not found'),
           '/user': (context) => const UserHomePage(title: ''),
           '/user/create-association': (context) => const CreateAssociation(),
         },
@@ -85,5 +97,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

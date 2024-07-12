@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../models/association.dart';
+import 'package:purrfectmatch/models/message.dart';
+import 'package:purrfectmatch/models/room.dart';
+import 'package:web_socket_channel/io.dart';
 import '../models/cat.dart';
 import '../models/annonce.dart';
+import '../models/race.dart';
 import '../models/user.dart';
 import '../models/favoris.dart';
 import '../models/rating.dart';
@@ -14,7 +18,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get baseUrl =>
+      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get wsUrl =>
+      kIsWeb ? dotenv.env['WEB_WS_URL']! : dotenv.env['MOBILE_WS_URL']!;
 
   Future<Cat> fetchCatByID(String? catID) async {
     final token = AuthService.authToken;
@@ -94,6 +101,25 @@ class ApiService {
       List<dynamic> catsJson = jsonDecode(response.body);
       print(response.body);
       return catsJson.map((json) => Cat.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cats');
+    }
+  }
+
+  Future<List<Annonce>> fetchCatsByFilters(age, catSex, race) async {
+    final token = AuthService.authToken;
+    final filters = {"age": age, "raceId": race.toString(), "sexe": catSex};
+    final response = await http.get(
+      Uri.parse('$baseUrl/cats/').replace(queryParameters: filters),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+    print('$baseUrl/cats/');
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List<dynamic> annonceJson = jsonDecode(response.body);
+      return annonceJson.map((json) => Annonce.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cats');
     }
@@ -325,7 +351,8 @@ class ApiService {
     if (response.statusCode == 201) {
       try {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        if (responseData['success'] == 'true' && responseData['favorite'] != null) {
+        if (responseData['success'] == 'true' &&
+            responseData['favorite'] != null) {
           return responseData['favorite'];
         } else {
           throw Exception('Failed to create favorite');
@@ -377,7 +404,6 @@ class ApiService {
     }
   }
 
-
   Future<Rating> createRating(Rating rating) async {
     final token = AuthService.authToken;
 
@@ -409,7 +435,6 @@ class ApiService {
       throw Exception('Failed to create rating');
     }
   }
-
 
   Future<Rating> updateRating(Rating rating) async {
     final token = AuthService.authToken;
@@ -478,9 +503,11 @@ class ApiService {
   }
 
   // ASSOCIATION
-  Future<void> createAssociation(Association association, String filePath, String fileName) async {
+  Future<void> createAssociation(
+      Association association, String filePath, String fileName) async {
     final token = AuthService.authToken;
-    final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+    final request =
+    http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
 
     association.toJson().forEach((key, value) {
       request.fields[key] = value.toString();
@@ -521,7 +548,9 @@ class ApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> associationsJson = jsonDecode(response.body);
-      return associationsJson.map((json) => Association.fromJson(json)).toList();
+      return associationsJson
+          .map((json) => Association.fromJson(json))
+          .toList();
     } else {
       throw Exception('Failed to load associations');
     }
@@ -543,7 +572,8 @@ class ApiService {
     }
   }
 
-  Future<void> updateAssociationVerifyStatus(int associationId, bool verified) async {
+  Future<void> updateAssociationVerifyStatus(
+      int associationId, bool verified) async {
     final token = AuthService.authToken;
     final response = await http.put(
       Uri.parse('$baseUrl/associations/$associationId/verify'),
@@ -570,5 +600,81 @@ class ApiService {
     if (response.statusCode != 200) {
       throw Exception('Failed to delete association');
     }
+  }
+
+  Future<List<Races>> fetchAllRaces() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/races'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    print('$baseUrl/races');
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List<dynamic> raceJson = jsonDecode(response.body);
+      return raceJson.map((json) => Races.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load races');
+    }
+  }
+
+  // Chat
+  Future<List<Room>> getUserRooms() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Room> rooms = parsed.map((json) {
+          return Room.fromModifiedJson(json);
+        }).toList();
+        return rooms;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load rooms');
+    }
+  }
+
+  Future<List<Message>> getRoomMessages(int roomID) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms/$roomID'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Message> messages = parsed.map((json) {
+          return Message.fromJson(json);
+        }).toList();
+        return messages;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load messages');
+    }
+  }
+
+  IOWebSocketChannel connectToRoom(int roomID) {
+    final token = AuthService.authToken;
+    print("calling this $wsUrl/ws/$roomID");
+    return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
+      'Authorization': 'Bearer $token',
+    });
   }
 }
