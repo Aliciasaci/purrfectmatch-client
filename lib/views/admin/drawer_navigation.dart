@@ -26,6 +26,7 @@ class DrawerNavigation extends StatelessWidget {
             title: const Text('Gestion des demandes d\'association'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/admin/associations');
             },
           ),
         ],

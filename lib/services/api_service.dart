@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import '../models/association.dart';
 import '../models/cat.dart';
 import '../models/annonce.dart';
 import '../models/user.dart';
@@ -364,6 +366,9 @@ class ApiService {
       },
     );
 
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
     if (response.statusCode == 200) {
       List<dynamic> ratingsJson = jsonDecode(response.body);
       return ratingsJson.map((json) => Rating.fromJson(json)).toList();
@@ -372,22 +377,84 @@ class ApiService {
     }
   }
 
+
   Future<Rating> createRating(Rating rating) async {
     final token = AuthService.authToken;
+
+    final body = jsonEncode({
+      'mark': rating.mark,
+      'comment': rating.comment,
+      'userID': rating.userId,
+    });
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    print('Request Headers: $headers');
+
     final response = await http.post(
       Uri.parse('$baseUrl/ratings'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(rating.toJson()),
+      headers: headers,
+      body: body,
     );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
 
     if (response.statusCode == 201) {
       final Map<String, dynamic> ratingJson = jsonDecode(response.body);
       return Rating.fromJson(ratingJson);
     } else {
       throw Exception('Failed to create rating');
+    }
+  }
+
+
+  Future<Rating> updateRating(Rating rating) async {
+    final token = AuthService.authToken;
+
+    final body = jsonEncode({
+      'mark': rating.mark,
+      'comment': rating.comment,
+    });
+
+    print('Request Body: $body');
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/ratings/${rating.id}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: body,
+    );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> ratingJson = jsonDecode(response.body);
+      return Rating.fromJson(ratingJson);
+    } else {
+      throw Exception('Failed to update rating');
+    }
+  }
+
+  Future<void> deleteRating(int ratingId) async {
+    final token = AuthService.authToken;
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/ratings/$ratingId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    print('Response status: ${response.statusCode}');
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete rating');
     }
   }
 
@@ -407,6 +474,101 @@ class ApiService {
       return User.fromJson(userJson);
     } else {
       throw Exception('Failed to load user for ID: $userID');
+    }
+  }
+
+  // ASSOCIATION
+  Future<void> createAssociation(Association association, String filePath, String fileName) async {
+    final token = AuthService.authToken;
+    final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+
+    association.toJson().forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
+
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'kbisFile',
+        filePath,
+        filename: fileName,
+        contentType: MediaType('application', 'pdf'),
+      ),
+    );
+
+    request.headers.addAll({
+      'Authorization': 'Bearer $token',
+    });
+
+    var response = await request.send();
+    final responseString = await response.stream.bytesToString();
+    print('Response string: $responseString');
+
+    if (response.statusCode == 201) {
+      print('Association created successfully');
+    } else {
+      print('Failed to create association');
+    }
+  }
+
+  Future<List<Association>> fetchAllAssociations() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/associations'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> associationsJson = jsonDecode(response.body);
+      return associationsJson.map((json) => Association.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load associations');
+    }
+  }
+
+  Future<void> updateAssociation(Association association) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/associations/${association.id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(association.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update association');
+    }
+  }
+
+  Future<void> updateAssociationVerifyStatus(int associationId, bool verified) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/associations/$associationId/verify'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'verified': verified}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to verify association');
+    }
+  }
+
+  Future<void> deleteAssociation(String associationId) async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/associations/$associationId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete association');
     }
   }
 }

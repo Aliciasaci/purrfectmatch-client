@@ -55,7 +55,7 @@ class CrudUserBloc extends Bloc<CrudUserEvent, CrudUserState> {
       add(LoadUsers());
     } catch (e) {
       print('error: $e');
-      emit(CrudUserError('Failed to delete user. ${e.toString()}'));
+      emit(CrudUserError('Failed to delete user.'));
     }
   }
 }

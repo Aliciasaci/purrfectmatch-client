@@ -1,9 +1,9 @@
 class Rating {
-  final int id;
-  final int mark;
-  final String comment;
-  final String userId;
-  final String authorId;
+   int id;
+   int mark;
+   String comment;
+   String userId;
+   String authorId;
 
   Rating({
     required this.id,
@@ -15,12 +15,20 @@ class Rating {
 
   factory Rating.fromJson(Map<String, dynamic> json) {
     return Rating(
-      id: json['ID'],
-      mark: json['Mark'],
-      comment: json['Comment'],
-      userId: json['UserID'],
-      authorId: json['AuthorID'],
+      id: json['ID'] ?? 0,
+      mark: json['Mark'] ?? 0,
+      comment: json['Comment'] ?? '',
+      userId: json['UserID'] ?? '',
+      authorId: json['AuthorID'] ?? '',
     );
+  }
+
+  set setMark(int mark) {
+    this.mark = mark;
+  }
+
+  set setComment(String comment) {
+    this.comment = comment;
   }
 
   Map<String, dynamic> toJson() {
