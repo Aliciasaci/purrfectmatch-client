@@ -30,7 +30,9 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
               // Display a message when there are no rooms
               return const Center(
                 child: Text(
-                    'Vous n\'avez pas encore de conversations. Likez des annonces pour commencer à discuter !'),
+                  'Vous n\'avez pas encore de conversations. Likez des annonces pour commencer à discuter !',
+                  textAlign: TextAlign.center,
+                ),
               );
             }
             return ListView.builder(

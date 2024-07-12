@@ -5,7 +5,7 @@ import 'package:purrfectmatch/blocs/auth_bloc.dart';
 import 'package:purrfectmatch/blocs/room/room_bloc.dart';
 
 class RoomScreen extends StatefulWidget {
-  final String roomID;
+  final int roomID;
   final String annonceTitle;
 
   const RoomScreen(
@@ -72,6 +72,13 @@ class _RoomScreenState extends State<RoomScreen> {
                             ),
                           );
                         }).toList(),
+                      );
+                    } else if (state is RoomError) {
+                      return Center(
+                        child: Text(
+                          state.message,
+                          selectionColor: Colors.white,
+                        ),
                       );
                     } else {
                       return const Center(

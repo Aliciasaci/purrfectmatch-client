@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:purrfectmatch/blocs/room/room_bloc.dart';
+import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/user/profile/profile_screen.dart';
 import '../../blocs/auth_bloc.dart';
 import '../../models/user.dart';
@@ -8,6 +10,7 @@ import '../bottom_navigation_bar.dart';
 import '../form_add_annonce.dart';
 import '../login.dart';
 import '../swipe_card.dart';
+import './room/rooms_list_screen.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key, required this.title, this.user});
@@ -21,11 +24,12 @@ class UserHomePage extends StatefulWidget {
 class _UserHomePageState extends State<UserHomePage> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    SwipeCardsWidget(),
-    AnnoncesCatsMenu(),
-    AddAnnonce(),
-    ProfileScreen(),
+  static final List<Widget> _widgetOptions = <Widget>[
+    const SwipeCardsWidget(),
+    const AnnoncesCatsMenu(),
+    const AddAnnonce(),
+    const RoomsListScreen(),
+    const ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -41,7 +45,6 @@ class _UserHomePageState extends State<UserHomePage> {
       MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

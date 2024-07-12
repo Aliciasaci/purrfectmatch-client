@@ -23,7 +23,6 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   }
 
   Future<void> _onLoadRooms(LoadRooms event, Emitter<RoomState> emit) async {
-    emit(RoomInitial());
     try {
       final rooms = await apiService.getUserRooms();
       emit(RoomsLoaded(rooms: rooms));
@@ -40,15 +39,20 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
       emit(RoomHistoryLoaded(messages: messages));
 
       _channel = apiService.connectToRoom(event.roomID);
-      _messageSubscription = _channel!.stream.listen((message) {
-        final messageData = Message.fromJson(json.decode(message));
-        add(ReceiveMessage(messageData));
-      },
-          onError: (e) =>
-              emit(RoomError(message: 'Failed to receive message.')),
-          onDone: () => emit(RoomError(message: 'Connection closed.')));
+      if (_channel != null) {
+        _messageSubscription = _channel!.stream.listen((message) {
+          final messageData = Message.fromJson(json.decode(message));
+          add(ReceiveMessage(messageData));
+        },
+            onError: (e) =>
+                emit(RoomError(message: 'Failed to receive message.')),
+            onDone: () => emit(RoomError(message: 'Connection closed.')));
+      } else {
+        // Handle the case when _channel is null
+        emit(RoomError(message: 'WebSocket channel is not initialized.'));
+      }
     } catch (e) {
-      emit(RoomError(message: 'Failed to load chat history.'));
+      emit(RoomError(message: 'Failed to load chat history. $e'));
     }
   }
 

@@ -29,14 +29,19 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     List<Role> rolesList = [];
-    if (json['roles'] != null) {
-      rolesList = List<Role>.from(json['roles'].map((role) => Role.fromJson(role)));
+    if (json['Roles'] != null) {
+      rolesList =
+          List<Role>.from(json['Roles'].map((role) => Role.fromJson(role)));
     }
 
     return User(
       id: json['ID'],
-      createdAt: json['CreatedAt'] != null ? DateTime.parse(json['CreatedAt']).toIso8601String() : null,
-      updatedAt: json['UpdatedAt'] != null ? DateTime.parse(json['UpdatedAt']).toIso8601String() : null,
+      createdAt: json['CreatedAt'] != null
+          ? DateTime.parse(json['CreatedAt']).toIso8601String()
+          : null,
+      updatedAt: json['UpdatedAt'] != null
+          ? DateTime.parse(json['UpdatedAt']).toIso8601String()
+          : null,
       name: json['Name'] ?? '',
       email: json['Email'] ?? '',
       password: json['Password'] ?? '',

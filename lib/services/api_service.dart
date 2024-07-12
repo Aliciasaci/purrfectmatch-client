@@ -15,6 +15,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class ApiService {
   static String get baseUrl =>
       kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get wsUrl =>
+      kIsWeb ? dotenv.env['WEB_WS_URL']! : dotenv.env['MOBILE_WS_URL']!;
 
   Future<Cat> fetchCatByID(String? catID) async {
     final token = AuthService.authToken;
@@ -352,14 +354,21 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> roomsJson = jsonDecode(response.body);
-      return roomsJson.map((json) => Room.fromModifiedJson(json)).toList();
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Room> rooms = parsed.map((json) {
+          return Room.fromModifiedJson(json);
+        }).toList();
+        return rooms;
+      } else {
+        return [];
+      }
     } else {
       throw Exception('Failed to load rooms');
     }
   }
 
-  Future<List<Message>> getRoomMessages(String roomID) async {
+  Future<List<Message>> getRoomMessages(int roomID) async {
     final token = AuthService.authToken;
     final response = await http.get(
       Uri.parse('$baseUrl/rooms/$roomID'),
@@ -369,18 +378,25 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> messagesJson = jsonDecode(response.body);
-      return messagesJson.map((json) => Message.fromJson(json)).toList();
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Message> messages = parsed.map((json) {
+          return Message.fromJson(json);
+        }).toList();
+        return messages;
+      } else {
+        return [];
+      }
     } else {
       throw Exception('Failed to load messages');
     }
   }
 
-  IOWebSocketChannel connectToRoom(String roomID) {
+  IOWebSocketChannel connectToRoom(int roomID) {
     final token = AuthService.authToken;
-    return IOWebSocketChannel.connect(Uri.parse('$baseUrl/ws/$roomID'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        });
+    print("calling this $wsUrl/ws/$roomID");
+    return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
+      'Authorization': 'Bearer $token',
+    });
   }
 }

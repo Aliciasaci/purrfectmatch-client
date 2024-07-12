@@ -1,5 +1,5 @@
 class Room {
-  final String? id;
+  final int? id;
   final String user1Id;
   final String user2Id;
   final int? annonceID;
