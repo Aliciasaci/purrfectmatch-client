@@ -8,12 +8,10 @@ import 'package:purrfectmatch/views/cat/cat_details.dart';
 import 'package:purrfectmatch/views/user/user_public_profile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/blocs/auth_bloc.dart';
-
 import 'filter_modal.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
   const SwipeCardsWidget({super.key});
-
   @override
   _SwipeCardsWidgetState createState() => _SwipeCardsWidgetState();
 }
@@ -23,21 +21,34 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
   MatchEngine? _matchEngine;
   final ApiService apiService = ApiService();
+  User? currentUser;
 
   @override
   void initState() {
     super.initState();
-    _loadAnnonces();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    if (authState is AuthAuthenticated) {
+      setState(() {
+        currentUser = authState.user;
+      });
+      _loadAnnonces();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Utilisateur non authentifié"),
+        duration: const Duration(milliseconds: 1500),
+      ));
+    }
   }
 
   Future<void> _loadAnnonces() async {
-    final authState = BlocProvider.of<AuthBloc>(context).state;
-    if (authState is AuthAuthenticated) {
-      final currentUser = authState.user;
+    if (currentUser != null) {
       try {
         final annonces = await apiService.fetchAllAnnonces();
-        final filteredAnnonces =
-        annonces.where((annonce) => annonce.UserID != currentUser.id).toList();
+        final filteredAnnonces = annonces.where((annonce) => annonce.UserID != currentUser!.id).toList();
 
         for (var annonce in filteredAnnonces) {
           try {
@@ -60,15 +71,13 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 superlikeAction: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => CatDetails(cat: cat)),
+                    MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
                   );
                 },
               ));
             }
           } catch (error) {
-            print(
-                "Échec du chargement des données pour l'annonce ${annonce.ID}: $error");
+            print("Échec du chargement des données pour l'annonce ${annonce.ID}: $error");
           }
         }
 
@@ -81,19 +90,14 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           duration: const Duration(milliseconds: 1500),
         ));
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Utilisateur non authentifié"),
-        duration: const Duration(milliseconds: 1500),
-      ));
     }
   }
 
   Future<void> fetchCatsByFilters(String? age, String? catSex, int? race) async {
     try {
+      final apiService = ApiService();
       final List<Annonce> annoncesList = [];
-      final filteredAnnonce =
-      await apiService.fetchCatsByFilters(age, catSex, race);
+      final filteredAnnonce = await apiService.fetchCatsByFilters(age, catSex, race);
       for (var annonce in filteredAnnonce) {
         annoncesList.add(annonce);
       }
@@ -112,10 +116,11 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     for (var annonce in annonces) {
       try {
         Cat cat = await apiService.fetchCatByID(annonce.CatID);
-        User user = await apiService.fetchUserByID(annonce.UserID);
         _swipeItems.add(SwipeItem(
-          content: {'annonce': annonce, 'cat': cat, 'user': user},
+          content: {'annonce': annonce, 'cat': cat},
           likeAction: () {
+            print("annonceID");
+            print(annonce.ID);
             _handleLikeAction(annonce.ID, cat.name);
           },
           nopeAction: () {
@@ -262,9 +267,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                 onTap: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            UserPublicProfile(user: user)),
+                                    MaterialPageRoute(builder: (context) => UserPublicProfile(user: user)),
                                   );
                                 },
                                 child: Text(
@@ -275,8 +278,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                     decoration: TextDecoration.underline,
                                     decorationColor: Colors.white,
                                     decorationThickness: 2,
-                                    height:
-                                    1.5, // This will add some space between the text and the underline
+                                    height: 1.5, // This will add some space between the text and the underline
                                   ),
                                 ),
                               ),
