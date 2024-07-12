@@ -18,6 +18,7 @@ class RoomScreen extends StatefulWidget {
 class _RoomScreenState extends State<RoomScreen> {
   final TextEditingController _messageController = TextEditingController();
   String? _currentUserID;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -32,43 +33,59 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.annonceTitle),
-      ),
+          title: Text(widget.annonceTitle),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+              BlocProvider.of<RoomBloc>(context).add(LoadRooms());
+            },
+          )),
       body: Column(
         children: [
           Expanded(
             child: ListView(
+              controller: _scrollController,
               children: [
                 BlocBuilder<RoomBloc, RoomState>(
                   builder: (context, state) {
                     if (state is RoomHistoryLoaded) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _scrollController
+                            .jumpTo(_scrollController.position.maxScrollExtent);
+                      });
                       return Column(
                         children: state.messages.map((message) {
                           final isCurrentUser =
                               message.senderId == _currentUserID;
-
-                          final today = DateTime.now();
-                          final isToday =
-                              today.year == message.timestamp.year &&
-                                  today.month == message.timestamp.month &&
-                                  today.day == message.timestamp.day;
-
-                          final formattedDate = isToday
-                              ? DateFormat("HH:mm").format(message.timestamp)
-                              : DateFormat("dd/MM/yyyy")
-                                  .format(message.timestamp);
-
-                          return ListTile(
-                            title: Text(message.content),
-                            subtitle: Text(formattedDate,
-                                style: const TextStyle(fontSize: 12)),
-                            tileColor: isCurrentUser
-                                ? Colors.orange[100]
-                                : Colors.grey[200],
-                            contentPadding: EdgeInsets.only(
-                              left: isCurrentUser ? 50 : 16,
-                              right: isCurrentUser ? 16 : 50,
+                          return Align(
+                            alignment: isCurrentUser
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 16),
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: isCurrentUser
+                                    ? Colors.orange[100]
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(message.content),
+                                  Text(
+                                    DateFormat("HH:mm")
+                                        .format(message.timestamp),
+                                    style: const TextStyle(fontSize: 10),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         }).toList(),
@@ -77,7 +94,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       return Center(
                         child: Text(
                           state.message,
-                          selectionColor: Colors.white,
+                          style: const TextStyle(color: Colors.white),
                         ),
                       );
                     } else {
@@ -98,7 +115,7 @@ class _RoomScreenState extends State<RoomScreen> {
                   child: TextField(
                     controller: _messageController,
                     decoration: const InputDecoration(
-                      hintText: 'Enter your message',
+                      hintText: 'Entrez votre message',
                     ),
                   ),
                 ),

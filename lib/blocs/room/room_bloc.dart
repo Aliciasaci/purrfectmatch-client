@@ -14,12 +14,21 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   final ApiService apiService;
   StreamSubscription? _messageSubscription;
   IOWebSocketChannel? _channel;
+  List<Message> get currentMessages =>
+      (state is RoomHistoryLoaded) ? (state as RoomHistoryLoaded).messages : [];
 
   RoomBloc({required this.apiService}) : super(RoomInitial()) {
     on<LoadRooms>(_onLoadRooms);
     on<LoadChatHistory>(_onLoadChatHistory);
     on<SendMessage>(_onSendMessage);
     on<ReceiveMessage>(_onReceiveMessage);
+  }
+
+  void disconnectCurrentConnection() {
+    _messageSubscription?.cancel();
+    _channel?.sink.close();
+    _messageSubscription = null;
+    _channel = null;
   }
 
   Future<void> _onLoadRooms(LoadRooms event, Emitter<RoomState> emit) async {
@@ -33,7 +42,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
 
   Future<void> _onLoadChatHistory(
       LoadChatHistory event, Emitter<RoomState> emit) async {
-    emit(RoomInitial());
+    disconnectCurrentConnection();
     try {
       final messages = await apiService.getRoomMessages(event.roomID);
       emit(RoomHistoryLoaded(messages: messages));
@@ -60,7 +69,6 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
       SendMessage event, Emitter<RoomState> emit) async {
     if (_channel != null) {
       _channel!.sink.add(event.content);
-      emit(MessageSent());
     } else {
       emit(RoomError(message: 'Not connected to a room.'));
     }
@@ -68,16 +76,13 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
 
   Future<void> _onReceiveMessage(
       ReceiveMessage event, Emitter<RoomState> emit) async {
-    if (state is RoomHistoryLoaded) {
-      final currentMessages = (state as RoomHistoryLoaded).messages;
-      emit(RoomHistoryLoaded(messages: [...currentMessages, event.message]));
-    }
+    currentMessages.add(event.message);
+    emit(RoomHistoryLoaded(messages: currentMessages));
   }
 
   @override
   Future<void> close() {
-    _messageSubscription?.cancel();
-    _channel?.sink.close();
+    disconnectCurrentConnection();
     return super.close();
   }
 }
