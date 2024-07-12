@@ -5,6 +5,8 @@ import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/views/cat_detail_page.dart';
 
+import 'filter_modal.dart';
+
 class SwipeCardsWidget extends StatefulWidget {
   const SwipeCardsWidget({super.key});
   @override
@@ -12,6 +14,7 @@ class SwipeCardsWidget extends StatefulWidget {
 }
 
 class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
+  static List<Annonce> _annonceList = [];
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
   MatchEngine? _matchEngine;
   final ApiService apiService = ApiService();
@@ -20,42 +23,64 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   void initState() {
     super.initState();
     apiService.fetchAllAnnonces().then((annonces) async {
-      for (var annonce in annonces) {
-        try {
-          Cat cat = await apiService.fetchCatByID(annonce.CatID);
-          _swipeItems.add(SwipeItem(
-            content: {'annonce': annonce, 'cat': cat},
-            likeAction: () {
-              print("annonceID");
-              print(annonce.ID);
-              _handleLikeAction(annonce.ID, cat.name);
-            },
-            nopeAction: () {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Passed ${cat.name}"),
-                duration: const Duration(milliseconds: 500),
-              ));
-            },
-            superlikeAction: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
-              );
-            },
-          ));
-        } catch (error) {
-          print("Failed to load cat for annonce ${annonce.ID}: $error");
-        }
-      }
-
-      setState(() {
-        _matchEngine = MatchEngine(swipeItems: _swipeItems);
-      });
+      displayCats(annonces);
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Failed to load annonces: $error"),
         duration: const Duration(milliseconds: 1500),
       ));
+    });
+  }
+  Future<void> fetchCatsByFilters(String? age, String? catSex, int? race) async {
+    try {
+      final apiService = ApiService();
+      final List<Annonce> annoncesList = [];
+      final filteredAnnonce = await apiService.fetchCatsByFilters(age, catSex, race);
+      for (var annonce in filteredAnnonce) {
+        annoncesList.add(annonce);
+      }
+      setState(() {
+        _annonceList = annoncesList;
+        _matchEngine = null;
+      });
+      _swipeItems.clear();
+      displayCats(_annonceList);
+    } catch (e) {
+      print('Failed to load cats with filter: $e');
+    }
+  }
+  
+  Future<void> displayCats(List<Annonce> annonces) async {
+    for (var annonce in annonces) {
+      try {
+        Cat cat = await apiService.fetchCatByID(annonce.CatID);
+        _swipeItems.add(SwipeItem(
+          content: {'annonce': annonce, 'cat': cat},
+          likeAction: () {
+            print("annonceID");
+            print(annonce.ID);
+            _handleLikeAction(annonce.ID, cat.name);
+          },
+          nopeAction: () {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Passed ${cat.name}"),
+              duration: const Duration(milliseconds: 500),
+            ));
+          },
+          superlikeAction: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+            );
+          },
+        ));
+      } catch (error) {
+        print("Failed to load cat for annonce ${annonce.ID}: $error");
+      }
+    }
+
+    setState(() {
+      _matchEngine = MatchEngine(swipeItems: _swipeItems);
     });
   }
 
@@ -104,10 +129,11 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (_matchEngine == null)
-            CircularProgressIndicator()
+            const CircularProgressIndicator()
           else
+            FilterModalWidget(callback: fetchCatsByFilters),
             SizedBox(
-              height: 600,
+              height: 580,
               width: 360,
               child: SwipeCards(
                 matchEngine: _matchEngine!,
@@ -122,11 +148,11 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                         Image.network(
                           cat.picturesUrl.first,
                           fit: BoxFit.cover,
-                          height: 600,
+                          height: 580,
                           width: 360,
                         ),
                         Container(
-                          height: 600,
+                          height: 580,
                           width: 360,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -141,7 +167,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                         ),
                         Container(
                           padding: EdgeInsets.all(20),
-                          height: 600,
+                          height: 580,
                           width: 360,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
