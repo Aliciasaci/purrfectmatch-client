@@ -4,6 +4,7 @@ import 'package:http_parser/http_parser.dart';
 import '../models/association.dart';
 import '../models/cat.dart';
 import '../models/annonce.dart';
+import '../models/race.dart';
 import '../models/user.dart';
 import '../models/favoris.dart';
 import 'package:file_picker/file_picker.dart';
@@ -92,6 +93,25 @@ class ApiService {
       List<dynamic> catsJson = jsonDecode(response.body);
       print(response.body);
       return catsJson.map((json) => Cat.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cats');
+    }
+  }
+
+  Future<List<Annonce>> fetchCatsByFilters(age, catSex, race) async {
+    final token = AuthService.authToken;
+    final filters = {"age": age, "raceId": race.toString(), "sexe": catSex};
+    final response = await http.get(
+      Uri.parse('$baseUrl/cats/').replace(queryParameters: filters),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+    print('$baseUrl/cats/');
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List<dynamic> annonceJson = jsonDecode(response.body);
+      return annonceJson.map((json) => Annonce.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cats');
     }
@@ -432,6 +452,23 @@ class ApiService {
     }
   }
 
+  Future<List<Races>> fetchAllRaces() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/races'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    print('$baseUrl/races');
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List<dynamic> raceJson = jsonDecode(response.body);
+      return raceJson.map((json) => Races.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load races');
+    }
+  }
+
 }
-
-
