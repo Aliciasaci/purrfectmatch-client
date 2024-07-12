@@ -19,7 +19,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20.00),
+      margin: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(40.0)),
         boxShadow: [

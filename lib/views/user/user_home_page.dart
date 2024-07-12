@@ -7,7 +7,7 @@ import '../../blocs/auth_bloc.dart';
 import '../../models/user.dart';
 import '../annonces_cats_menu.dart';
 import '../bottom_navigation_bar.dart';
-import '../form_add_annonce.dart';
+import '../annonce/form_add_annonce.dart';
 import '../login.dart';
 import '../swipe_card.dart';
 import './room/rooms_list_screen.dart';

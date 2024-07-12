@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/annonce.dart';
-import '../models/cat.dart';
-import '../services/api_service.dart';
-import 'annonce_detail_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; // Assurez-vous d'importer flutter_bloc
+import '../../models/annonce.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
+import '../annonce/annonce_detail_page.dart';
+import '../../../../blocs/auth_bloc.dart'; // Import du bloc d'authentification
 
 class UserAnnoncesPage extends StatefulWidget {
   const UserAnnoncesPage({super.key});
@@ -16,6 +18,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
   Map<String, Cat> catsData = {};
   final ScrollController _scrollController = ScrollController();
   bool _loading = false;
+  bool _hasMore = true;
   int _page = 1;
 
   @override
@@ -25,7 +28,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent &&
-          !_loading) {
+          !_loading &&
+          _hasMore) {
         _fetchUserAnnonces();
       }
     });
@@ -38,18 +42,30 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
 
     try {
       final apiService = ApiService();
-      final newAnnonces = await apiService.fetchUserAnnonces();
-      for (var annonce in newAnnonces) {
-        if (annonce.CatID != null) {
-          final cat = await apiService.fetchCatByID(annonce.CatID!);
-          catsData[annonce.CatID!] = cat;
+      final authState = BlocProvider.of<AuthBloc>(context).state;
+      if (authState is AuthAuthenticated) {
+        final userId = authState.user.id;
+        if (userId != null) {
+          final newAnnonces = await apiService.fetchUserAnnonces(userId);
+          for (var annonce in newAnnonces) {
+            if (annonce.CatID != null) {
+              final cat = await apiService.fetchCatByID(annonce.CatID!);
+              catsData[annonce.CatID!] = cat;
+            }
+          }
+          setState(() {
+            userAnnoncesData.addAll(newAnnonces);
+            _loading = false;
+            _hasMore = newAnnonces.isNotEmpty;
+            _page++;
+          });
+        } else {
+          setState(() {
+            _loading = false;
+          });
+          print('User ID is null');
         }
       }
-      setState(() {
-        userAnnoncesData.addAll(newAnnonces);
-        _loading = false;
-        _page++;
-      });
     } catch (e) {
       setState(() {
         _loading = false;
@@ -85,6 +101,11 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
             if (index == userAnnoncesData.length) {
               return _loading
                   ? const Center(child: CircularProgressIndicator())
+                  : !_hasMore
+                  ? const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: Text('No more annonces')),
+              )
                   : const SizedBox.shrink();
             }
             final annonce = userAnnoncesData[index];
@@ -94,7 +115,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
               color: Colors.white,
               child: ListTile(
                 leading: cat != null && cat.picturesUrl.isNotEmpty
-                    ? Image.network(cat.picturesUrl.first, width: 50, height: 50, fit: BoxFit.cover)
+                    ? Image.network(cat.picturesUrl.first,
+                    width: 50, height: 50, fit: BoxFit.cover)
                     : const Icon(Icons.image, size: 50),
                 title: Text(annonce.Title),
                 subtitle: Text(

@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import '../models/annonce.dart';
-import '../models/cat.dart';
-import '../services/api_service.dart';
-import 'annonce_detail_page.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
+import 'cat_details.dart';
 
-class AnnoncesListPage extends StatefulWidget {
-  const AnnoncesListPage({super.key});
+class CatsListPage extends StatefulWidget {
+  const CatsListPage({super.key});
 
   @override
-  _AnnoncesListPageState createState() => _AnnoncesListPageState();
+  _CatsListPageState createState() => _CatsListPageState();
 }
 
-class _AnnoncesListPageState extends State<AnnoncesListPage> {
-  List<Annonce> annoncesData = [];
-  Map<String, Cat> catsData = {};
+class _CatsListPageState extends State<CatsListPage> {
+  List<Cat> catsData = [];
   final ScrollController _scrollController = ScrollController();
   bool _loading = false;
   int _page = 1;
@@ -21,32 +19,26 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
   @override
   void initState() {
     super.initState();
-    _fetchAnnonces();
+    _fetchCats();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent &&
           !_loading) {
-        _fetchAnnonces();
+        _fetchCats();
       }
     });
   }
 
-  Future<void> _fetchAnnonces() async {
+  Future<void> _fetchCats() async {
     setState(() {
       _loading = true;
     });
 
     try {
       final apiService = ApiService();
-      final newAnnonces = await apiService.fetchAllAnnonces();
-      for (var annonce in newAnnonces) {
-        if (annonce.CatID != null) {
-          final cat = await apiService.fetchCatByID(annonce.CatID!);
-          catsData[annonce.CatID!] = cat;
-        }
-      }
+      final newCats = await apiService.fetchAllCats();
       setState(() {
-        annoncesData.addAll(newAnnonces);
+        catsData.addAll(newCats);
         _loading = false;
         _page++;
       });
@@ -54,7 +46,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
       setState(() {
         _loading = false;
       });
-      print('Failed to load annonces: $e');
+      print('Failed to load cats: $e');
     }
   }
 
@@ -68,7 +60,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Liste des Annonces'),
+        title: const Text('Liste des Chats'),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -80,31 +72,30 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
         ),
         child: ListView.builder(
           controller: _scrollController,
-          itemCount: annoncesData.length + 1,
+          itemCount: catsData.length + 1,
           itemBuilder: (context, index) {
-            if (index == annoncesData.length) {
+            if (index == catsData.length) {
               return _loading
                   ? const Center(child: CircularProgressIndicator())
                   : const SizedBox.shrink();
             }
-            final annonce = annoncesData[index];
-            final cat = annonce.CatID != null ? catsData[annonce.CatID!] : null;
+            final cat = catsData[index];
             return Card(
               margin: const EdgeInsets.all(10),
               color: Colors.white,
               child: ListTile(
-                leading: cat != null && cat.picturesUrl.isNotEmpty
-                    ? Image.network(cat.picturesUrl.first, width: 50, height: 50, fit: BoxFit.cover)
-                    : const Icon(Icons.image, size: 50),
-                title: Text(annonce.Title),
+                leading: cat.picturesUrl.isNotEmpty
+                    ? Image.network(cat.picturesUrl[0])
+                    : const Icon(Icons.pets),
+                title: Text(cat.name),
                 subtitle: Text(
-                    'Description: ${annonce.Description}\nCat ID: ${annonce.CatID}'),
+                    'Race: ${cat.race}\nCouleur: ${cat.color}\nComportement: ${cat.behavior}\nRéservé: ${cat.reserved ? "Oui" : "Non"}'),
                 trailing: const Icon(Icons.arrow_forward),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AnnonceDetailPage(annonce: annonce),
+                      builder: (context) => CatDetails(cat: cat),
                     ),
                   );
                 },

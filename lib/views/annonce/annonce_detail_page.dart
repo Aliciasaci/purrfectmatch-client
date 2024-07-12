@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/annonce.dart';
-import '../models/cat.dart';
-import '../services/api_service.dart';
+import '../../models/annonce.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
 
 class AnnonceDetailPage extends StatefulWidget {
   final Annonce annonce;

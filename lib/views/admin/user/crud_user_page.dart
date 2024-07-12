@@ -103,7 +103,7 @@ class CrudUserPage extends StatelessWidget {
                                     IconButton(
                                       icon: const Icon(Icons.delete),
                                       onPressed: () {
-                                        CrudUserModalBottomSheets.showDeleteUserModalBottomSheet(context, user.id!);
+                                        CrudUserModalBottomSheets.showDeleteUserModalBottomSheet(context, user.id!, context);
                                       },
                                     ),
                                   ],
@@ -355,8 +355,8 @@ class CrudUserModalBottomSheets {
     );
   }
 
-  static void showDeleteUserModalBottomSheet(BuildContext context, String userId) {
-    final CrudUserBloc crudUserBloc = BlocProvider.of<CrudUserBloc>(context);
+  static void showDeleteUserModalBottomSheet(BuildContext context, String userId, BuildContext mainContext) {
+    final CrudUserBloc crudUserBloc = BlocProvider.of<CrudUserBloc>(mainContext);
 
     showModalBottomSheet(
       context: context,
@@ -382,7 +382,7 @@ class CrudUserModalBottomSheets {
                   ),
                   TextButton(
                     onPressed: () {
-                      crudUserBloc.add(DeleteUser(userId));
+                      crudUserBloc.add(DeleteUser(userId, mainContext));
                       Navigator.of(context).pop();
                     },
                     child: const Text('Valider'),

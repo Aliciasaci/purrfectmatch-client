@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../models/association.dart';
@@ -10,6 +11,7 @@ import '../models/annonce.dart';
 import '../models/race.dart';
 import '../models/user.dart';
 import '../models/favoris.dart';
+import '../models/rating.dart';
 import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -172,7 +174,7 @@ class ApiService {
     }
   }
 
-  //USER
+  // USER
   Future<List<User>> fetchAllUsers() async {
     final token = AuthService.authToken;
     final response = await http.get(
@@ -228,10 +230,9 @@ class ApiService {
     }
   }
 
-  Future<void> updateUserProfilePic(PlatformFile selectedFile) async {
+  Future<void> updateUserProfilePic(String userId, PlatformFile selectedFile) async {
     final token = AuthService.authToken;
-    var request = http.MultipartRequest(
-        'PUT', Uri.parse('$baseUrl/users/{id}/profile/pic'));
+    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/$userId/profile/pic'));
 
     request.headers['Authorization'] = 'Bearer $token';
     request.files.add(
@@ -264,10 +265,10 @@ class ApiService {
     }
   }
 
-  Future<void> deleteUserProfilePic() async {
+  Future<void> deleteUserProfilePic(String userId) async {
     final token = AuthService.authToken;
     final response = await http.delete(
-      Uri.parse('$baseUrl/users/{user.id}/profile/pic'),
+      Uri.parse('$baseUrl/users/$userId/profile/pic'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -278,10 +279,10 @@ class ApiService {
     }
   }
 
-  Future<List<Annonce>> fetchUserAnnonces() async {
+  Future<List<Annonce>> fetchUserAnnonces(String userId) async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/users/annonces/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+      Uri.parse('$baseUrl/users/annonces/$userId'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -297,11 +298,10 @@ class ApiService {
     }
   }
 
-  Future<List<Favoris>> fetchUserFavorites() async {
+  Future<List<Favoris>> fetchUserFavorites(String userId) async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse(
-          '$baseUrl/favorites/users/b7aadd15-ca69-4ea1-a92c-e93669ad0b22'),
+      Uri.parse('$baseUrl/favorites/users/$userId'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
@@ -366,68 +366,148 @@ class ApiService {
     }
   }
 
-  Future<List<Room>> getUserRooms() async {
+  // Ratings
+  Future<List<Rating>> fetchAllRatings() async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/rooms'),
+      Uri.parse('$baseUrl/ratings'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      var parsed = jsonDecode(response.body);
-      if (parsed is List<dynamic>) {
-        List<Room> rooms = parsed.map((json) {
-          return Room.fromModifiedJson(json);
-        }).toList();
-        return rooms;
-      } else {
-        return [];
-      }
+      List<dynamic> ratingsJson = jsonDecode(response.body);
+      return ratingsJson.map((json) => Rating.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load rooms');
+      throw Exception('Failed to load ratings');
     }
   }
 
-  Future<List<Message>> getRoomMessages(int roomID) async {
+  Future<List<Rating>> fetchUserRatings(String userId) async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/rooms/$roomID'),
+      Uri.parse('$baseUrl/ratings/user/$userId'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
       },
     );
 
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
     if (response.statusCode == 200) {
-      var parsed = jsonDecode(response.body);
-      if (parsed is List<dynamic>) {
-        List<Message> messages = parsed.map((json) {
-          return Message.fromJson(json);
-        }).toList();
-        return messages;
-      } else {
-        return [];
-      }
+      List<dynamic> ratingsJson = jsonDecode(response.body);
+      return ratingsJson.map((json) => Rating.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load messages');
+      throw Exception('Failed to load user ratings');
     }
   }
 
-  IOWebSocketChannel connectToRoom(int roomID) {
+  Future<Rating> createRating(Rating rating) async {
     final token = AuthService.authToken;
-    print("calling this $wsUrl/ws/$roomID");
-    return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
-      'Authorization': 'Bearer $token',
+
+    final body = jsonEncode({
+      'mark': rating.mark,
+      'comment': rating.comment,
+      'userID': rating.userId,
     });
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    print('Request Headers: $headers');
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/ratings'),
+      headers: headers,
+      body: body,
+    );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 201) {
+      final Map<String, dynamic> ratingJson = jsonDecode(response.body);
+      return Rating.fromJson(ratingJson);
+    } else {
+      throw Exception('Failed to create rating');
+    }
   }
 
-  //ASSOCIATION
+  Future<Rating> updateRating(Rating rating) async {
+    final token = AuthService.authToken;
+
+    final body = jsonEncode({
+      'mark': rating.mark,
+      'comment': rating.comment,
+    });
+
+    print('Request Body: $body');
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/ratings/${rating.id}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: body,
+    );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> ratingJson = jsonDecode(response.body);
+      return Rating.fromJson(ratingJson);
+    } else {
+      throw Exception('Failed to update rating');
+    }
+  }
+
+  Future<void> deleteRating(int ratingId) async {
+    final token = AuthService.authToken;
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/ratings/$ratingId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    print('Response status: ${response.statusCode}');
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete rating');
+    }
+  }
+
+  Future<User> fetchUserByID(String? userID) async {
+    print("USERID");
+    print(userID);
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/users/$userID'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> userJson = jsonDecode(response.body);
+      return User.fromJson(userJson);
+    } else {
+      throw Exception('Failed to load user for ID: $userID');
+    }
+  }
+
+  // ASSOCIATION
   Future<void> createAssociation(
       Association association, String filePath, String fileName) async {
     final token = AuthService.authToken;
     final request =
-        http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+    http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
 
     association.toJson().forEach((key, value) {
       request.fields[key] = value.toString();
@@ -539,5 +619,62 @@ class ApiService {
     } else {
       throw Exception('Failed to load races');
     }
+  }
+
+  // Chat
+  Future<List<Room>> getUserRooms() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Room> rooms = parsed.map((json) {
+          return Room.fromModifiedJson(json);
+        }).toList();
+        return rooms;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load rooms');
+    }
+  }
+
+  Future<List<Message>> getRoomMessages(int roomID) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms/$roomID'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Message> messages = parsed.map((json) {
+          return Message.fromJson(json);
+        }).toList();
+        return messages;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load messages');
+    }
+  }
+
+  IOWebSocketChannel connectToRoom(int roomID) {
+    final token = AuthService.authToken;
+    print("calling this $wsUrl/ws/$roomID");
+    return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
+      'Authorization': 'Bearer $token',
+    });
   }
 }

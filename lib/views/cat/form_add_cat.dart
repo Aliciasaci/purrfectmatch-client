@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../models/cat.dart';
-import '../services/api_service.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
 
 class AddCat extends StatefulWidget {
   const AddCat({super.key});
