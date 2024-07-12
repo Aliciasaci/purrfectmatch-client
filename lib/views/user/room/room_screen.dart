@@ -81,7 +81,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                   Text(message.content),
                                   Text(
                                     DateFormat("HH:mm")
-                                        .format(message.timestamp),
+                                        .format(message.timestamp.toLocal()),
                                     style: const TextStyle(fontSize: 10),
                                   ),
                                 ],
