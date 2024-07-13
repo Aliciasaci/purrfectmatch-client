@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
-import '../blocs/auth_bloc.dart';
+import '../blocs/auth/auth_bloc.dart';
 import 'register.dart';
 
 class LoginPage extends StatefulWidget {

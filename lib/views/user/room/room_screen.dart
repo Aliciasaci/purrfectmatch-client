@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:purrfectmatch/blocs/auth_bloc.dart';
+import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'package:purrfectmatch/blocs/room/room_bloc.dart';
 
 class RoomScreen extends StatefulWidget {

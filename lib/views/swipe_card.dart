@@ -9,7 +9,7 @@ import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/views/cat/cat_details.dart';
 import 'package:purrfectmatch/views/user/user_public_profile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/blocs/auth_bloc.dart';
+import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'filter_modal.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
@@ -59,8 +59,6 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
             Cat cat = await apiService.fetchCatByID(annonce.CatID);
             if (!cat.reserved) {
               User user = await apiService.fetchUserByID(annonce.UserID);
-              print(annonce.UserID);
-
               _swipeItems.add(SwipeItem(
                 content: {'annonce': annonce, 'cat': cat, 'user': user},
                 likeAction: () {
@@ -112,8 +110,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       setState(() {
         _annonceList = annoncesList;
         _matchEngine = null;
+        _swipeItems.clear();
       });
-      _swipeItems.clear();
       displayCats(_annonceList);
     } catch (e) {
       print('Failed to load cats with filter: $e');
@@ -124,11 +122,10 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     for (var annonce in annonces) {
       try {
         Cat cat = await apiService.fetchCatByID(annonce.CatID);
+        User user = await apiService.fetchUserByID(annonce.UserID);
         _swipeItems.add(SwipeItem(
-          content: {'annonce': annonce, 'cat': cat},
+          content: {'annonce': annonce, 'cat': cat, 'user': user},
           likeAction: () {
-            print("annonceID");
-            print(annonce.ID);
             _handleLikeAction(annonce.ID, cat.name);
           },
           nopeAction: () {
@@ -200,16 +197,15 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
         children: [
           if (_matchEngine == null)
             const SizedBox(
-                height: 560,
-                width: 360,
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ))
+              height: 580,
+              width: 360,
+              child: Center(child: CircularProgressIndicator()),
+            )
           else
             FilterModalWidget(callback: fetchCatsByFilters),
           if (_matchEngine != null)
             SizedBox(
-              height: 560,
+              height: 580,
               width: 360,
               child: SwipeCards(
                 matchEngine: _matchEngine!,
@@ -243,7 +239,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.all(20),
                           height: 580,
                           width: 360,
                           child: Column(
@@ -329,7 +325,6 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   var itemContent = item.content as Map;
                   Annonce annonce = itemContent['annonce'] as Annonce;
                   Cat cat = itemContent['cat'] as Cat;
-                  print("item: ${cat.name}, index: $index");
                 },
                 leftSwipeAllowed: true,
                 rightSwipeAllowed: true,
