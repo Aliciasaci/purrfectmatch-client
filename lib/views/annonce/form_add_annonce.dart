@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:purrfectmatch/services/api_service.dart';
-import '../../models/annonce.dart';
-import 'annonce_detail_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cat/form_add_cat.dart';
-import '../annonces_cats_menu.dart';
+import 'annonce_detail_page.dart';
+import '../../models/annonce.dart';
 
 class AddAnnonce extends StatefulWidget {
   const AddAnnonce({super.key});
@@ -15,22 +18,46 @@ class AddAnnonce extends StatefulWidget {
 class _AddAnnonceState extends State<AddAnnonce> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _catIdController = TextEditingController();
+  List<Cat> _userCats = [];
+  Cat? _selectedCat;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserCats();
+  }
+
+  Future<void> _loadUserCats() async {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    if (authState is AuthAuthenticated) {
+      final userId = authState.user.id;
+      if (userId != null) {
+        try {
+          final cats = await ApiService().fetchCatsByUser(userId);
+          setState(() {
+            _userCats = cats;
+          });
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur lors du chargement des chats: $e')),
+          );
+        }
+      }
+    }
+  }
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _catIdController.dispose();
     super.dispose();
   }
 
   Future<void> _sendData() async {
     final String title = _titleController.text;
     final String description = _descriptionController.text;
-    final String catID = _catIdController.text;
 
-    if (title.isEmpty || description.isEmpty || catID.isEmpty) {
+    if (title.isEmpty || description.isEmpty || _selectedCat == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez remplir tous les champs')),
       );
@@ -39,16 +66,12 @@ class _AddAnnonceState extends State<AddAnnonce> {
 
     Annonce annonce = Annonce(
       Title: title,
-      Description: description,
-      CatID: catID,
-      UserID: '',
+      Description: description.isNotEmpty ? description : '',
+      CatID: _selectedCat!.ID.toString(),
     );
-
-    print('Sending annonce: ${annonce.toString()}');
 
     try {
       final createdAnnonce = await ApiService().createAnnonce(annonce);
-      print('Received annonce: ${createdAnnonce.toString()}');
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Annonce créée avec succès')),
@@ -121,12 +144,23 @@ class _AddAnnonceState extends State<AddAnnonce> {
                           ),
                         ),
                         const SizedBox(height: 15),
-                        TextFormField(
-                          controller: _catIdController,
+                        DropdownButtonFormField<Cat>(
                           decoration: const InputDecoration(
-                            labelText: "ID du chat",
+                            labelText: "Sélectionner un chat",
                             border: OutlineInputBorder(),
                           ),
+                          items: _userCats.map((Cat cat) {
+                            return DropdownMenuItem<Cat>(
+                              value: cat,
+                              child: Text(cat.name),
+                            );
+                          }).toList(),
+                          onChanged: (Cat? newValue) {
+                            setState(() {
+                              _selectedCat = newValue;
+                            });
+                          },
+                          value: _selectedCat,
                         ),
                         const SizedBox(height: 15),
                         ElevatedButton(

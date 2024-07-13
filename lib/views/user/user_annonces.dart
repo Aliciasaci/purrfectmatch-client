@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart'; // Assurez-vous d'importer flutter_bloc
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/annonce.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../annonce/annonce_detail_page.dart';
-import '../../blocs/auth/auth_bloc.dart'; // Import du bloc d'authentification
+import '../../blocs/auth/auth_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserAnnoncesPage extends StatefulWidget {
   const UserAnnoncesPage({super.key});
@@ -46,13 +47,17 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
       if (authState is AuthAuthenticated) {
         final userId = authState.user.id;
         if (userId != null) {
+          print('Fetching annonces for user ID: $userId');
           final newAnnonces = await apiService.fetchUserAnnonces(userId);
+          print('Fetched ${newAnnonces.length} annonces: $newAnnonces');
+
           for (var annonce in newAnnonces) {
             if (annonce.CatID != null) {
-              final cat = await apiService.fetchCatByID(annonce.CatID!);
-              catsData[annonce.CatID!] = cat;
+              final cat = await apiService.fetchCatByID(annonce.CatID);
+              catsData[annonce.CatID] = cat;
             }
           }
+
           setState(() {
             userAnnoncesData.addAll(newAnnonces);
             _loading = false;
@@ -74,6 +79,22 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     }
   }
 
+  Future<void> _deleteAnnonce(String annonceId) async {
+    try {
+      await ApiService().deleteAnnonce(annonceId);
+      setState(() {
+        userAnnoncesData.removeWhere((annonce) => annonce.ID == annonceId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Annonce supprimée avec succès')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de la suppression de l\'annonce: $e')),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -84,7 +105,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes annonces'),
+        title: Text(AppLocalizations.of(context)!.myAnnouncements),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -109,7 +130,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
                   : const SizedBox.shrink();
             }
             final annonce = userAnnoncesData[index];
-            final cat = annonce.CatID != null ? catsData[annonce.CatID!] : null;
+            final cat = annonce.CatID != null ? catsData[annonce.CatID] : null;
             return Card(
               margin: const EdgeInsets.all(10),
               color: Colors.white,
@@ -121,7 +142,18 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
                 title: Text(annonce.Title),
                 subtitle: Text(
                     'Description: ${annonce.Description}\nCat ID: ${annonce.CatID}'),
-                trailing: const Icon(Icons.arrow_forward),
+                trailing: Wrap(
+                  spacing: 12,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        _deleteAnnonce(annonce.ID.toString());
+                      },
+                    ),
+                    const Icon(Icons.arrow_forward),
+                  ],
+                ),
                 onTap: () {
                   Navigator.push(
                     context,

@@ -247,5 +247,40 @@
   "storagePermissionDenied": "Storage permission denied",
   "@storagePermissionDenied": {
     "description": "Message displayed when storage permission is denied"
-  }
+  },
+  "userNotAuthenticated": "User not authenticated",
+  "@userNotAuthenticated": {
+    "description": "Message displayed when the user is not authenticated"
+  },
+  "annonceDetailsTitle": "Annonce Details",
+  "@annonceDetailsTitle": {
+    "description": "Title for the annonce details page"
+  },
+  "annonceTitle": "Title of the Annonce",
+  "@annonceTitle": {
+    "description": "Label for the title of the annonce"
+  },
+  "catId": "Cat ID",
+  "@catId": {
+    "description": "Label for the cat ID"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Text for the back button"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Text for the save button"
+  },
+  "noCatInfoAvailable": "No cat information available",
+  "@noCatInfoAvailable": {
+    "description": "Message displayed when no cat information is available"
+  },
+  "seeMore" : "Voir plus",
+  "@seeMore" : {
+    "description": "See more"
+  },
+  "myCats" : "Mes chats",
+  "global" : "Global",
+  "modificationSuccess" : "Successfuly modified"
 }

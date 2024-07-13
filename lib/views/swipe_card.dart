@@ -9,6 +9,7 @@ import 'package:purrfectmatch/views/user/user_public_profile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'filter_modal.dart';
+import '../views/annonce/annonce_detail_page.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
   const SwipeCardsWidget({super.key});
@@ -69,7 +70,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 superlikeAction: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+                    MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)), // Navigate to AnnonceDetailPage
                   );
                 },
               ));
@@ -129,7 +130,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           superlikeAction: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+              MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
             );
           },
         ));
@@ -193,8 +194,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
             )
           else
             FilterModalWidget(callback: fetchCatsByFilters),
-            if (_matchEngine != null)
-              SizedBox(
+          if (_matchEngine != null)
+            SizedBox(
               height: 580,
               width: 360,
               child: SwipeCards(
@@ -319,57 +320,57 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 fillSpace: true,
               ),
             ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      _matchEngine!.currentItem?.nope();
-                    },
-                    icon: const Icon(Icons.close),
-                    iconSize: 40,
-                    color: Colors.red.withOpacity(0.8),
-                    tooltip: 'Passer',
-                  ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
                 ),
-                Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      _matchEngine!.currentItem?.superLike();
-                    },
-                    icon: const Icon(Icons.visibility),
-                    iconSize: 40,
-                    color: Colors.orange.withOpacity(0.8),
-                    tooltip: 'Voir',
-                  ),
+                child: IconButton(
+                  onPressed: () {
+                    _matchEngine!.currentItem?.nope();
+                  },
+                  icon: const Icon(Icons.close),
+                  iconSize: 40,
+                  color: Colors.red.withOpacity(0.8),
+                  tooltip: 'Passer',
                 ),
-                Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      _matchEngine!.currentItem?.like();
-                    },
-                    icon: const Icon(Icons.favorite),
-                    iconSize: 40,
-                    color: Colors.green.withOpacity(0.8),
-                    tooltip: 'Favoris',
-                  ),
+              ),
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
                 ),
-              ],
-            )
+                child: IconButton(
+                  onPressed: () {
+                    _matchEngine!.currentItem?.superLike();
+                  },
+                  icon: const Icon(Icons.visibility),
+                  iconSize: 40,
+                  color: Colors.orange.withOpacity(0.8),
+                  tooltip: 'Voir',
+                ),
+              ),
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    _matchEngine!.currentItem?.like();
+                  },
+                  icon: const Icon(Icons.favorite),
+                  iconSize: 40,
+                  color: Colors.green.withOpacity(0.8),
+                  tooltip: 'Favoris',
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );

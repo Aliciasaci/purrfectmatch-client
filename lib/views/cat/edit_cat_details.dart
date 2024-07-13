@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/cat.dart';
+import '../../services/api_service.dart';
 
 class EditCatDetails extends StatefulWidget {
   final Cat cat;
@@ -21,13 +22,19 @@ class _EditCatDetailsState extends State<EditCatDetails> {
   final TextEditingController _raceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _sexeController = TextEditingController();
-  final TextEditingController _sterilizedController = TextEditingController();
-  final TextEditingController _reservedController = TextEditingController();
+  late bool _sterilized;
+  late bool _reserved;
 
   @override
   void initState() {
     super.initState();
     _populateFields();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _initializeLocalizationFields();
   }
 
   void _populateFields() {
@@ -40,24 +47,57 @@ class _EditCatDetailsState extends State<EditCatDetails> {
     _raceController.text = widget.cat.race;
     _descriptionController.text = widget.cat.description;
     _sexeController.text = widget.cat.sexe;
-    _sterilizedController.text = widget.cat.sterilized ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no;
-    _reservedController.text = widget.cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no;
+    _sterilized = widget.cat.sterilized;
+    _reserved = widget.cat.reserved;
   }
 
-  void _saveChanges() {
-    // For now, just print the values to console
-    print('Name: ${_nameController.text}');
-    print('Birth Date: ${_birthDateController.text}');
-    print('Last Vaccine Date: ${_lastVaccineDateController.text}');
-    print('Last Vaccine Name: ${_lastVaccineNameController.text}');
-    print('Color: ${_colorController.text}');
-    print('Behavior: ${_behaviorController.text}');
-    print('Race: ${_raceController.text}');
-    print('Description: ${_descriptionController.text}');
-    print('Sexe: ${_sexeController.text}');
-    print('Sterilized: ${_sterilizedController.text}');
-    print('Reserved: ${_reservedController.text}');
-    Navigator.pop(context); // Navigate back to the details page after saving changes
+  void _initializeLocalizationFields() {
+    setState(() {
+      // Update the sterilized and reserved status based on localization
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      controller.text = picked.toIso8601String().split('T').first;
+    }
+  }
+
+  void _saveChanges() async {
+    Cat updatedCat = Cat(
+      ID: widget.cat.ID,
+      name: _nameController.text,
+      birthDate: _birthDateController.text,
+      lastVaccineDate: _lastVaccineDateController.text,
+      lastVaccineName: _lastVaccineNameController.text,
+      color: _colorController.text,
+      behavior: _behaviorController.text,
+      sterilized: _sterilized,
+      race: _raceController.text,
+      description: _descriptionController.text,
+      sexe: _sexeController.text,
+      reserved: _reserved,
+      picturesUrl: widget.cat.picturesUrl,
+      userId: widget.cat.userId,
+    );
+
+    try {
+      await ApiService().updateCat(updatedCat);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.modificationSuccess)),
+      );
+      Navigator.pop(context, true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.registrationFailed)),
+      );
+    }
   }
 
   @override
@@ -97,16 +137,22 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.birthDate,
                         border: const OutlineInputBorder(),
+                        suffixIcon: const Icon(Icons.calendar_today),
                       ),
                       controller: _birthDateController,
+                      readOnly: true,
+                      onTap: () => _selectDate(context, _birthDateController),
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.lastVaccineDate,
                         border: const OutlineInputBorder(),
+                        suffixIcon: const Icon(Icons.calendar_today),
                       ),
                       controller: _lastVaccineDateController,
+                      readOnly: true,
+                      onTap: () => _selectDate(context, _lastVaccineDateController),
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -157,20 +203,23 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       controller: _sexeController,
                     ),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.sterilized,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _sterilizedController,
+                    SwitchListTile(
+                      title: Text(AppLocalizations.of(context)!.sterilized),
+                      value: _sterilized,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _sterilized = value;
+                        });
+                      },
                     ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.reserved,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _reservedController,
+                    SwitchListTile(
+                      title: Text(AppLocalizations.of(context)!.reserved),
+                      value: _reserved,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _reserved = value;
+                        });
+                      },
                     ),
                     const SizedBox(height: 20),
                     Align(

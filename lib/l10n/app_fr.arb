@@ -2,25 +2,25 @@
   "@@locale": "fr",
   "helloWorld": "Bonjour le monde!",
   "@helloWorld": {
-    "description": "Le salut conventionnel pour les nouveaux programmeurs"
+    "description": "Le message de bienvenue conventionnel pour les programmeurs débutants"
   },
   "login": "Connexion",
   "@login": {
-    "description": "Le texte du bouton de connexion"
+    "description": "Texte du bouton de connexion"
   },
-  "email": "Email",
+  "email": "E-mail",
   "@email": {
-    "description": "Texte de l'étiquette de l'email"
+    "description": "Texte du libellé de l'e-mail"
   },
   "password": "Mot de passe",
   "@password": {
-    "description": "Texte de l'étiquette du mot de passe"
+    "description": "Texte du libellé du mot de passe"
   },
   "loginSuccessful": "Connexion réussie!",
   "@loginSuccessful": {
     "description": "Message affiché lorsque la connexion est réussie"
   },
-  "register": "Pas encore de compte ? Inscrivez-vous",
+  "register": "Vous n'avez pas de compte? Inscrivez-vous",
   "@register": {
     "description": "Texte du lien pour s'inscrire"
   },
@@ -32,25 +32,25 @@
   "@enterPassword": {
     "description": "Message d'erreur lorsque le mot de passe n'est pas entré"
   },
-  "invalidEmail": "Veuillez entrer une adresse email valide",
+  "invalidEmail": "Veuillez entrer une adresse e-mail valide",
   "@invalidEmail": {
-    "description": "Message d'erreur lorsque le format de l'email est invalide"
+    "description": "Message d'erreur lorsque le format de l'e-mail est invalide"
   },
-  "enterEmail": "Veuillez entrer votre email",
+  "enterEmail": "Veuillez entrer votre e-mail",
   "@enterEmail": {
-    "description": "Message d'erreur lorsque l'email n'est pas entré"
+    "description": "Message d'erreur lorsque l'e-mail n'est pas entré"
   },
   "registerPage": "Page d'inscription",
   "@registerPage": {
-    "description": "Titre pour la page d'inscription"
+    "description": "Titre de la page d'inscription"
   },
   "registerSuccessful": "Inscription réussie!",
   "@registerSuccessful": {
     "description": "Message affiché lorsque l'inscription est réussie"
   },
-  "tokenRetrievalFailed": "Échec de la récupération du token",
+  "tokenRetrievalFailed": "Échec de la récupération du jeton",
   "@tokenRetrievalFailed": {
-    "description": "Message affiché lorsque la récupération du token échoue"
+    "description": "Message affiché lorsque la récupération du jeton échoue"
   },
   "registrationFailed": "Échec de l'inscription",
   "@registrationFailed": {
@@ -58,7 +58,7 @@
   },
   "name": "Nom",
   "@name": {
-    "description": "Texte de l'étiquette du nom"
+    "description": "Texte du libellé du nom"
   },
   "enterName": "Veuillez entrer votre nom",
   "@enterName": {
@@ -66,7 +66,7 @@
   },
   "addressRue": "Adresse Rue",
   "@addressRue": {
-    "description": "Texte de l'étiquette de l'adresse rue"
+    "description": "Texte du libellé de l'adresse Rue"
   },
   "enterAddress": "Veuillez entrer votre adresse",
   "@enterAddress": {
@@ -74,7 +74,7 @@
   },
   "postalCode": "Code Postal",
   "@postalCode": {
-    "description": "Texte de l'étiquette du code postal"
+    "description": "Texte du libellé du code postal"
   },
   "enterPostalCode": "Veuillez entrer votre code postal",
   "@enterPostalCode": {
@@ -86,19 +86,19 @@
   },
   "city": "Ville",
   "@city": {
-    "description": "Texte de l'étiquette de la ville"
+    "description": "Texte du libellé de la ville"
   },
   "enterCity": "Veuillez entrer votre ville",
   "@enterCity": {
     "description": "Message d'erreur lorsque la ville n'est pas entrée"
   },
-  "alreadyHaveAccount": "Déjà un compte ? Connectez-vous",
+  "alreadyHaveAccount": "Vous avez déjà un compte? Connectez-vous",
   "@alreadyHaveAccount": {
-    "description": "Texte du lien pour se connecter pour les utilisateurs existants"
+    "description": "Texte du lien de connexion pour les utilisateurs existants"
   },
   "cats": "Chats",
   "@cats": {
-    "description": "Titre pour la section des chats"
+    "description": "Titre de la section des chats"
   },
   "viewAllCats": "Voir tous les chats",
   "@viewAllCats": {
@@ -110,7 +110,7 @@
   },
   "announcements": "Annonces",
   "@announcements": {
-    "description": "Titre pour la section des annonces"
+    "description": "Titre de la section des annonces"
   },
   "viewAllAnnouncements": "Voir toutes les annonces",
   "@viewAllAnnouncements": {
@@ -122,7 +122,7 @@
   },
   "user": "Utilisateur",
   "@user": {
-    "description": "Titre pour la section utilisateur"
+    "description": "Titre de la section des utilisateurs"
   },
   "myAnnouncements": "Mes annonces",
   "@myAnnouncements": {
@@ -132,27 +132,27 @@
   "@myFavorites": {
     "description": "Texte pour voir les favoris de l'utilisateur"
   },
-  "search": "Chercher",
+  "search": "Recherche",
   "@search": {
     "description": "Libellé pour l'onglet de recherche"
   },
-  "adopt": "Faire adopter",
+  "adopt": "Adopter",
   "@adopt": {
     "description": "Libellé pour l'onglet d'adoption"
   },
   "conversations": "Conversations",
   "@conversations": {
-    "description": "Libellé pour l'onglet de conversations"
+    "description": "Libellé pour l'onglet des conversations"
   },
-  "profile": "Mon profil",
+  "profile": "Profil",
   "@profile": {
-    "description": "Libellé pour l'onglet de profil"
+    "description": "Libellé pour l'onglet du profil"
   },
   "catDetailsTitle": "Détails du chat",
   "@catDetailsTitle": {
-    "description": "Titre pour la page des détails du chat"
+    "description": "Titre de la page des détails du chat"
   },
-  "birthDate": "Date de Naissance",
+  "birthDate": "Date de naissance",
   "@birthDate": {
     "description": "Libellé pour la date de naissance"
   },
@@ -184,9 +184,9 @@
   "@description": {
     "description": "Libellé pour la description"
   },
-  "gender": "Genre",
+  "gender": "Sexe",
   "@gender": {
-    "description": "Libellé pour le genre"
+    "description": "Libellé pour le sexe"
   },
   "sterilized": "Stérilisé",
   "@sterilized": {
@@ -206,25 +206,25 @@
   },
   "edit": "Modifier",
   "@edit": {
-    "description": "Texte du bouton Modifier"
+    "description": "Texte du bouton de modification"
   },
-  "catListTitle": "Liste des Chats",
+  "catListTitle": "Liste des chats",
   "@catListTitle": {
-    "description": "Titre pour la page de la liste des chats"
+    "description": "Titre de la page de liste des chats"
   },
   "editCatDetailsTitle": "Modifier les détails du chat",
   "@editCatDetailsTitle": {
-    "description": "Titre pour la page de modification des détails du chat"
+    "description": "Titre de la page de modification des détails du chat"
   },
   "createCatProfile": "Créer un profil de chat",
   "@createCatProfile": {
-    "description": "Titre pour la création d'un profil de chat"
+    "description": "Titre pour créer un profil de chat"
   },
-  "selectGender": "Sélectionnez un genre",
+  "selectGender": "Sélectionnez un sexe",
   "@selectGender": {
-    "description": "Texte d'indication pour sélectionner le genre"
+    "description": "Texte d'invite pour sélectionner le sexe"
   },
-  "selectPhoto": "Sélectionnez une photo",
+  "selectPhoto": "Sélectionner une photo",
   "@selectPhoto": {
     "description": "Texte du bouton pour sélectionner une photo"
   },
@@ -234,18 +234,47 @@
   },
   "send": "Envoyer",
   "@send": {
-    "description": "Texte du bouton pour envoyer les données"
+    "description": "Texte du bouton pour envoyer des données"
   },
   "dataSentSuccessfully": "Données envoyées avec succès",
   "@dataSentSuccessfully": {
     "description": "Message affiché lorsque les données sont envoyées avec succès"
   },
-  "dataSendError": "Erreur lors de l'envoi des données",
+  "dataSendError": "Erreur d'envoi des données",
   "@dataSendError": {
-    "description": "Message affiché en cas d'erreur lors de l'envoi des données"
+    "description": "Message affiché lorsqu'il y a une erreur d'envoi des données"
   },
   "storagePermissionDenied": "Permission de stockage refusée",
   "@storagePermissionDenied": {
     "description": "Message affiché lorsque la permission de stockage est refusée"
-  }
+  },
+  "userNotAuthenticated": "Utilisateur non authentifié",
+  "@userNotAuthenticated": {
+    "description": "Message affiché lorsque l'utilisateur n'est pas authentifié"
+  },
+  "annonceDetailsTitle": "Détails de l'annonce",
+  "@annonceDetailsTitle": {
+    "description": "Titre de la page des détails de l'annonce"
+  },
+  "annonceTitle": "Titre de l'annonce",
+  "@annonceTitle": {
+    "description": "Libellé pour le titre de l'annonce"
+  },
+  "catId": "ID du chat",
+  "@catId": {
+    "description": "Libellé pour l'ID du chat"
+  },
+  "back": "Retour",
+  "@back": {
+    "description": "Texte pour le bouton de retour"
+  },
+  "save": "Enregistrer",
+  "@save": {
+    "description": "Texte pour le bouton de sauvegarde"
+  },
+  "noCatInfoAvailable": "Aucune information sur le chat disponible",
+  "@noCatInfoAvailable": {
+    "description": "Message affiché lorsque aucune information sur le chat n'est disponible"
+  },
+  "global" : "Global"
 }

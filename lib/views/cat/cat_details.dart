@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/cat.dart';
-import 'edit_cat_details.dart';
+import '../../services/api_service.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import './edit_cat_details.dart';
 
 class CatDetails extends StatelessWidget {
   final Cat cat;
@@ -30,6 +33,9 @@ class CatDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    final currentUser = authState is AuthAuthenticated ? authState.user : null;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.catDetailsTitle),
@@ -54,7 +60,9 @@ class CatDetails extends StatelessWidget {
                   children: [
                     Center(
                       child: Image.network(
-                        cat.picturesUrl.isNotEmpty ? cat.picturesUrl.first : 'https://via.placeholder.com/300',
+                        cat.picturesUrl.isNotEmpty
+                            ? cat.picturesUrl.first
+                            : 'https://via.placeholder.com/300',
                         height: 300,
                         fit: BoxFit.cover,
                       ),
@@ -123,20 +131,21 @@ class CatDetails extends StatelessWidget {
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.center,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditCatDetails(cat: cat),
-                            ),
-                          );
-                        },
-                        child: Text(AppLocalizations.of(context)!.edit),
+                    if (currentUser != null && cat.userId == currentUser.id)
+                      Align(
+                        alignment: Alignment.center,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditCatDetails(cat: cat),
+                              ),
+                            );
+                          },
+                          child: Text(AppLocalizations.of(context)!.edit),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),

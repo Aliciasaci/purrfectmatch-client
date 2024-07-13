@@ -14,11 +14,7 @@ import 'package:purrfectmatch/views/not_found_page.dart';
 import 'package:purrfectmatch/views/user/profile/create_association.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-<<<<<<< HEAD
 import 'blocs/auth/auth_bloc.dart';
-=======
-import 'blocs/auth_bloc.dart';
->>>>>>> 471413687d6fb6eac3ed570abea33d6c45cd945b
 import 'services/auth_service.dart';
 import 'views/login.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -119,29 +115,6 @@ class MyApp extends StatelessWidget {
             );
           },
         ),
-<<<<<<< HEAD
-=======
-        routes: {
-          '/admin': (context) => const AdminHomePage(title: ''),
-          '/admin/users': (context) => BlocProvider(
-            create: (context) => CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
-            child: const CrudUserPage(),
-          ),
-          '/admin/races': (context) => BlocProvider(
-            create: (context) => CrudRaceBloc(apiService: ApiService())..add(LoadRaces()),
-            child: const CrudRacePage(),
-          ),
-          '/admin/associations': (context) => BlocProvider(
-            create: (context) => AssociationBloc(apiService: ApiService())
-              ..add(LoadAssociations()),
-            child: const ListAssociation(),
-          ),
-          '/not-found': (context) =>
-            const NotFoundPage(title: 'Page not found'),
-          '/user': (context) => const UserHomePage(title: ''),
-          '/user/create-association': (context) => const CreateAssociation(),
-        },
->>>>>>> 471413687d6fb6eac3ed570abea33d6c45cd945b
       ),
     );
   }

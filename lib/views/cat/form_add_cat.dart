@@ -5,6 +5,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../models/user.dart';
 
 class AddCat extends StatefulWidget {
   const AddCat({super.key});
@@ -29,6 +32,7 @@ class _AddCatState extends State<AddCat> {
   PlatformFile? _selectedFile;
   Map<int?, String> raceList = {};
   int? _dropdownValue;
+  late User currentUser;
 
   @override
   void dispose() {
@@ -46,6 +50,16 @@ class _AddCatState extends State<AddCat> {
   void initState() {
     super.initState();
     _fetchCatRaces();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    if (authState is AuthAuthenticated) {
+      setState(() {
+        currentUser = authState.user;
+      });
+    }
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -101,12 +115,13 @@ class _AddCatState extends State<AddCat> {
       lastVaccineName: _lastVaccineNameController.text,
       color: _colorController.text,
       behavior: _behaviorController.text,
-      race: _dropdownValue.toString(),
+      race: _dropdownValue?.toString() ?? '',
       description: _descriptionController.text,
       sexe: _selectedValue ?? '',
       sterilized: _sterilized,
       reserved: _reserved,
       picturesUrl: _selectedFile != null ? [_selectedFile!.name] : [],
+      userId: currentUser.id ?? '',
     );
 
     try {
