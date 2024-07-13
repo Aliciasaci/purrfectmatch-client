@@ -174,6 +174,21 @@ class ApiService {
     }
   }
 
+  Future<String> getUserAddressFromAnnonceID(userID) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/annonce/address/$userID'),
+      headers: <String, String>{
+      'Authorization': 'Bearer $token',
+    },
+    );
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to load address');
+    }
+  }
+
   // USER
   Future<List<User>> fetchAllUsers() async {
     final token = AuthService.authToken;

@@ -16,10 +16,13 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
   bool _isEditing = false;
   Cat? _cat;
   bool _loadingCat = true;
+  String _annonceAddress = "";
+  final ApiService apiService = ApiService();
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _catIDController = TextEditingController();
+  final TextEditingController _annonceAddressController = TextEditingController();
 
   @override
   void initState() {
@@ -40,10 +43,13 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
       try {
         final apiService = ApiService();
         final cat = await apiService.fetchCatByID(widget.annonce.CatID!);
+        final annonceAddress = await apiService.getUserAddressFromAnnonceID(widget.annonce.UserID);
         setState(() {
           _cat = cat;
           _loadingCat = false;
+          _annonceAddress = annonceAddress;
         });
+        _annonceAddressController.text = _annonceAddress;
       } catch (e) {
         print('Failed to load cat details: $e');
         setState(() {
@@ -136,6 +142,15 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                       enabled: _isEditing,
                       decoration: const InputDecoration(
                         labelText: "ID du chat",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextFormField(
+                      controller: _annonceAddressController,
+                      enabled: _isEditing,
+                      decoration: const InputDecoration(
+                        labelText: "Adresse du chat",
                         border: OutlineInputBorder(),
                       ),
                     ),
