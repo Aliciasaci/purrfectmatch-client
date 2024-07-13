@@ -177,15 +177,17 @@ class ApiService {
   Future<String> getUserAddressFromAnnonceID(userID) async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/user/address/$userID'),
+      Uri.parse('$baseUrl/users/$userID'),
       headers: <String, String>{
       'Authorization': 'Bearer $token',
     },
     );
     if (response.statusCode == 200) {
-      return response.body;
+      final Map<String, dynamic> userJson = jsonDecode(response.body);
+      final user = User.fromJson(userJson);
+      return "${user.addressRue} ${user.cp} ${user.ville}";
     } else {
-      throw Exception('Failed to load address');
+      throw Exception('Failed to load user for ID: $userID');
     }
   }
 
