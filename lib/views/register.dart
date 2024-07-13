@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:purrfectmatch/views/user/user_home_page.dart';
 import '../services/auth_service.dart';
-import '../main.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -42,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (AuthService.authToken != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const MyHomePage(title: '')),
+          MaterialPageRoute(builder: (context) => const UserHomePage(title: '')),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Inscription réussie!')),
@@ -72,43 +72,45 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
+        color: Colors.white,
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: SingleChildScrollView(
-              child: Card(
-                color: Colors.white,
-                elevation: 4.0,
-                margin: const EdgeInsets.all(20.0),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Image(
-                          image: AssetImage('assets/logo.png'),
-                          height: 50,
-                          width: 50,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Image(
+                        image: AssetImage('assets/paw.png'),
+                        height: 50,
+                        width: 50,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Inscription',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Inscription',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
                           ),
+                          borderRadius: BorderRadius.circular(40),
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: TextFormField(
                           controller: _nameController,
                           decoration: const InputDecoration(
                             labelText: 'Nom',
-                            border: OutlineInputBorder(),
+                            border: InputBorder.none,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -117,30 +119,47 @@ class _RegisterPageState extends State<RegisterPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: TextFormField(
                           controller: _emailController,
                           decoration: const InputDecoration(
                             labelText: 'Email',
-                            border: OutlineInputBorder(),
+                            border: InputBorder.none,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Veuillez entrer votre email';
                             }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
-                                .hasMatch(value)) {
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                               return 'Veuillez entrer une adresse email valide';
                             }
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: TextFormField(
                           controller: _passwordController,
                           decoration: const InputDecoration(
                             labelText: 'Mot de passe',
-                            border: OutlineInputBorder(),
+                            border: InputBorder.none,
                           ),
                           obscureText: true,
                           validator: (value) {
@@ -150,12 +169,21 @@ class _RegisterPageState extends State<RegisterPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: TextFormField(
                           controller: _addressRueController,
                           decoration: const InputDecoration(
                             labelText: 'Adresse Rue',
-                            border: OutlineInputBorder(),
+                            border: InputBorder.none,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -164,12 +192,21 @@ class _RegisterPageState extends State<RegisterPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: TextFormField(
                           controller: _cpController,
                           decoration: const InputDecoration(
                             labelText: 'Code Postal',
-                            border: OutlineInputBorder(),
+                            border: InputBorder.none,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -181,12 +218,21 @@ class _RegisterPageState extends State<RegisterPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: TextFormField(
                           controller: _villeController,
                           decoration: const InputDecoration(
                             labelText: 'Ville',
-                            border: OutlineInputBorder(),
+                            border: InputBorder.none,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -195,27 +241,34 @@ class _RegisterPageState extends State<RegisterPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-                        _isLoading
-                            ? const CircularProgressIndicator()
-                            : ElevatedButton(
-                                onPressed: _register,
-                                child: const Text('Inscription'),
-                              ),
-                        const SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Déjà un compte ? Connectez-vous',
-                            style: TextStyle(
-                              color: Colors.blue,
-                            ),
+                      ),
+                      const SizedBox(height: 20),
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : SizedBox(
+                              width: double.infinity,
+                            child: TextButton(
+                                                    style: TextButton.styleFrom(
+                            backgroundColor: Colors.orange[100],
+                            padding: const EdgeInsets.all(15),
+                                                    ),
+                                                    onPressed: _register,
+                                                    child: const Text('Inscription'),
+                                                  ),
+                          ),
+                      const SizedBox(height: 20),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Déjà un compte ? Connectez-vous',
+                          style: TextStyle(
+                            color: Colors.orange[200],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
