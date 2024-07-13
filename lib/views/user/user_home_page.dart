@@ -49,7 +49,7 @@ class _UserHomePageState extends State<UserHomePage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Colors.blue,
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -85,7 +85,6 @@ class _UserHomePageState extends State<UserHomePage> {
           selectedIndex: _selectedIndex,
           onItemTapped: _onItemTapped,
         ),
-        backgroundColor: Colors.transparent,
       ),
     );
   }
