@@ -6,7 +6,7 @@ import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../annonce/annonce_detail_page.dart';
 import '../cat/chat_page.dart';
-import '../../../../blocs/auth_bloc.dart';
+import '../../blocs/auth/auth_bloc.dart';
 
 
 class UserFavorisPage extends StatefulWidget {

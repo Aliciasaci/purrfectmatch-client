@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import '../models/user.dart';
-import '../services/auth_service.dart';
+import '../../models/user.dart';
+import '../../services/auth_service.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 

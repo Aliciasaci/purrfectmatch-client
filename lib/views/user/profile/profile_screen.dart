@@ -6,7 +6,7 @@ import 'package:purrfectmatch/constants/image_strings.dart';
 import 'package:purrfectmatch/constants/text_strings.dart';
 import 'package:purrfectmatch/views/user/profile/edit_profile_screen.dart';
 import 'package:purrfectmatch/models/user.dart';
-import '../../../blocs/auth_bloc.dart';
+import '../../../blocs/auth/auth_bloc.dart';
 import '../../login.dart';
 
 class ProfileScreen extends StatefulWidget {
