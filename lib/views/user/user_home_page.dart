@@ -49,37 +49,26 @@ class _UserHomePageState extends State<UserHomePage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-        ),
-      ),
+      color: Colors.white,
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           title: Stack(
             children: [
-              const Center(
-                child: Image(
-                  image: AssetImage('assets/logo.png'),
-                  height: 30,
-                  width: 30,
-                ),
+              const Image(
+                image: AssetImage('assets/paw.png'),
+                height: 30,
+                width: 30,
               ),
-              Center(
-                child: Text(
-                  widget.title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    overflow: TextOverflow.ellipsis,
-                  ),
+              Text(
+                widget.title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          backgroundColor: Colors.transparent,
           elevation: 0,
           actions: [
             IconButton(

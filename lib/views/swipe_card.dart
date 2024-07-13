@@ -194,149 +194,153 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
         MediaQuery.of(context).padding.top -
         MediaQuery.of(context).padding.bottom;
     return SizedBox(
-      //color: Colors.red,
       height: availableHeight,
-      width: MediaQuery.of(context).size.width,
       child: Stack(
-        alignment: Alignment.center,
+        alignment: Alignment.topCenter,
         children: [
           if (_matchEngine == null)
-            const CircularProgressIndicator()
+            const SizedBox(
+                height: 560,
+                width: 360,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ))
           else
             FilterModalWidget(callback: fetchCatsByFilters),
-          SizedBox(
-            height: 580,
-            width: 360,
-            child: SwipeCards(
-              matchEngine: _matchEngine!,
-              itemBuilder: (BuildContext context, int index) {
-                var item = _swipeItems[index].content as Map;
-                Annonce annonce = item['annonce'] as Annonce;
-                Cat cat = item['cat'] as Cat;
-                User user = item['user'] as User;
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Stack(
-                    children: [
-                      Image.network(
-                        cat.picturesUrl.first,
-                        fit: BoxFit.cover,
-                        height: 580,
-                        width: 360,
-                      ),
-                      Container(
-                        height: 580,
-                        width: 360,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.5),
-                              Colors.transparent
-                            ],
+          if (_matchEngine != null)
+            SizedBox(
+              height: 560,
+              width: 360,
+              child: SwipeCards(
+                matchEngine: _matchEngine!,
+                itemBuilder: (BuildContext context, int index) {
+                  var item = _swipeItems[index].content as Map;
+                  Annonce annonce = item['annonce'] as Annonce;
+                  Cat cat = item['cat'] as Cat;
+                  User user = item['user'] as User;
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          cat.picturesUrl.first,
+                          fit: BoxFit.cover,
+                          height: 580,
+                          width: 360,
+                        ),
+                        Container(
+                          height: 580,
+                          width: 360,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.5),
+                                Colors.transparent
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        height: 580,
-                        width: 360,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              cat.name,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          height: 580,
+                          width: 360,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                cat.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "${calculateAge(cat.birthDate)} ans",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
+                              Text(
+                                "${calculateAge(cat.birthDate)} ans",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "Sexe: ${cat.sexe}",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
+                              Text(
+                                "Sexe: ${cat.sexe}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "Race: ${cat.race}",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
+                              Text(
+                                "Race: ${cat.race}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
                               ),
-                            ),
-                            MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            UserPublicProfile(user: user)),
-                                  );
-                                },
-                                child: Text(
-                                  "Mise en ligne par: ${user.name}",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Colors.white,
-                                    decorationThickness: 2,
-                                    height:
-                                        1.5, // This will add some space between the text and the underline
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              UserPublicProfile(user: user)),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Mise en ligne par: ${user.name}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 2,
+                                      height:
+                                          1.5, // This will add some space between the text and the underline
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              "Disponible",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                              Text(
+                                "Disponible",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              onStackFinished: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Pile terminée"),
-                  duration: Duration(milliseconds: 500),
-                ));
-              },
-              itemChanged: (SwipeItem item, int index) {
-                var itemContent = item.content as Map;
-                Annonce annonce = itemContent['annonce'] as Annonce;
-                Cat cat = itemContent['cat'] as Cat;
-                print("item: ${cat.name}, index: $index");
-              },
-              leftSwipeAllowed: true,
-              rightSwipeAllowed: true,
-              upSwipeAllowed: true,
-              fillSpace: true,
+                      ],
+                    ),
+                  );
+                },
+                onStackFinished: () {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Pile terminée"),
+                    duration: Duration(milliseconds: 500),
+                  ));
+                },
+                itemChanged: (SwipeItem item, int index) {
+                  var itemContent = item.content as Map;
+                  Annonce annonce = itemContent['annonce'] as Annonce;
+                  Cat cat = itemContent['cat'] as Cat;
+                  print("item: ${cat.name}, index: $index");
+                },
+                leftSwipeAllowed: true,
+                rightSwipeAllowed: true,
+                upSwipeAllowed: true,
+                fillSpace: true,
+              ),
             ),
-          ),
           Positioned(
             bottom: 10,
-            width: MediaQuery.of(context).size.width,
-            height: 150,
+            width: MediaQuery.of(context).size.width / 1.2,
+            height: 100,
             child: Stack(
               alignment: Alignment.bottomCenter,
               children: [
@@ -361,7 +365,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                           _matchEngine!.currentItem?.nope();
                         },
                         icon: const Icon(Icons.close),
-                        iconSize: 60,
+                        iconSize: 30,
                         color: Colors.white,
                         tooltip: 'Passer',
                         padding: const EdgeInsets.all(20),
@@ -372,10 +376,17 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 Positioned(
                   bottom: 10,
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.orange,
-                      boxShadow: [
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.orange[200]!,
+                          Colors.orange[400]!,
+                        ],
+                      ),
+                      boxShadow: const [
                         BoxShadow(
                           color: Colors.orangeAccent,
                           blurRadius: 6,
@@ -388,7 +399,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                         _matchEngine!.currentItem?.superLike();
                       },
                       icon: const Icon(Icons.visibility),
-                      iconSize: 60,
+                      iconSize: 30,
                       color: Colors.white,
                       tooltip: 'Voir',
                       padding: const EdgeInsets.all(20),
@@ -416,7 +427,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                           _matchEngine!.currentItem?.like();
                         },
                         icon: const Icon(Icons.favorite),
-                        iconSize: 60,
+                        iconSize: 30,
                         padding: const EdgeInsets.all(20),
                         color: Colors.white,
                         tooltip: 'Favoris',
