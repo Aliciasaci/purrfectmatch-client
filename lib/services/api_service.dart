@@ -177,7 +177,7 @@ class ApiService {
   Future<String> getUserAddressFromAnnonceID(userID) async {
     final token = AuthService.authToken;
     final response = await http.get(
-      Uri.parse('$baseUrl/annonce/address/$userID'),
+      Uri.parse('$baseUrl/user/address/$userID'),
       headers: <String, String>{
       'Authorization': 'Bearer $token',
     },
