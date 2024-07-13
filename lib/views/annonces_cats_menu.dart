@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'annonce/annonces_liste.dart';
 import 'cat/cats_liste.dart';
 import 'annonce/form_add_annonce.dart';
@@ -17,55 +18,55 @@ class AnnoncesCatsMenu extends StatelessWidget {
         children: [
           _buildCard(
             context,
-            title: 'Chats',
+            title: AppLocalizations.of(context)!.cats,
             children: [
               _buildListTile(
                 context,
                 icon: Icons.pets,
-                text: 'Voir tous les chats',
-                page: CatsListPage(),
+                text: AppLocalizations.of(context)!.viewAllCats,
+                page: const CatsListPage(),
               ),
               _buildListTile(
                 context,
                 icon: Icons.add,
-                text: 'Ajouter un chat',
-                page: AddCat(),
+                text: AppLocalizations.of(context)!.addCat,
+                page: const AddCat(),
               ),
             ],
           ),
           _buildCard(
             context,
-            title: 'Annonces',
+            title: AppLocalizations.of(context)!.announcements,
             children: [
               _buildListTile(
                 context,
                 icon: Icons.list,
-                text: 'Voir toutes les annonces',
-                page: AnnoncesListPage(),
+                text: AppLocalizations.of(context)!.viewAllAnnouncements,
+                page: const AnnoncesListPage(),
               ),
               _buildListTile(
                 context,
                 icon: Icons.add,
-                text: 'Créer une annonce',
-                page: AddAnnonce(),
+                text: AppLocalizations.of(context)!.createAnnouncement,
+                page: const AddAnnonce(),
               ),
             ],
           ),
           _buildCard(
             context,
-            title: 'Utilisateur',
+            title: AppLocalizations.of(context)!.user,
             children: [
               _buildListTile(
                 context,
                 icon: Icons.assignment,
-                text: 'Mes annonces',
-                page: UserAnnoncesPage(),
+                text: AppLocalizations.of(context)!.myAnnouncements,
+                page: const UserAnnoncesPage(),
               ),
               _buildListTile(
                 context,
                 icon: Icons.favorite,
-                text: 'Mes favoris',
-                page: UserFavorisPage(),
+                text: AppLocalizations.of(context)!.myFavorites,
+                page: const UserFavorisPage(),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import 'cat_details.dart';
@@ -60,7 +61,7 @@ class _CatsListPageState extends State<CatsListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Liste des Chats'),
+        title: Text(AppLocalizations.of(context)!.catListTitle),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -89,7 +90,7 @@ class _CatsListPageState extends State<CatsListPage> {
                     : const Icon(Icons.pets),
                 title: Text(cat.name),
                 subtitle: Text(
-                    'Race: ${cat.race}\nCouleur: ${cat.color}\nComportement: ${cat.behavior}\nRéservé: ${cat.reserved ? "Oui" : "Non"}'),
+                    '${AppLocalizations.of(context)!.race}: ${cat.race}\n${AppLocalizations.of(context)!.color}: ${cat.color}\n${AppLocalizations.of(context)!.behavior}: ${cat.behavior}\n${AppLocalizations.of(context)!.reserved}: ${cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}'),
                 trailing: const Icon(Icons.arrow_forward),
                 onTap: () {
                   Navigator.push(

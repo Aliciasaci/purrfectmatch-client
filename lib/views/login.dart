@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
-import '../blocs/auth_bloc.dart';
 import '../locale_provider.dart';
 import 'package:provider/provider.dart';
 import '../views/register.dart';
+import '../blocs/auth/auth_bloc.dart';
+import 'register.dart';
+import '../views/language_switcher.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -159,10 +161,10 @@ class _LoginPageState extends State<LoginPage> {
                                     const SizedBox(height: 20),
                                     GestureDetector(
                                       onTap: () {
-                                         Navigator.push(
+                                        Navigator.push(
                                           context,
                                           MaterialPageRoute(builder: (context) => const RegisterPage()),
-                                         );
+                                        );
                                       },
                                       child: Text(
                                         AppLocalizations.of(context)!
@@ -183,26 +185,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              Positioned(
+              const Positioned(
                 top: 40,
                 right: 20,
-                child: GestureDetector(
-                  onTap: () {
-                    if (localeProvider.locale == const Locale('en')) {
-                      localeProvider.setLocale(const Locale('fr'));
-                    } else {
-                      localeProvider.setLocale(const Locale('en'));
-                    }
-                  },
-                  child: CircleAvatar(
-                    radius: 15,
-                    backgroundImage: AssetImage(
-                      localeProvider.locale == const Locale('en')
-                          ? 'assets/images/flag_uk.png'
-                          : 'assets/images/flag_fr.png',
-                    ),
-                  ),
-                ),
+                child: LanguageSwitcher(),
               ),
             ],
           );

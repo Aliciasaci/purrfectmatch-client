@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/cat.dart';
 
 class EditCatDetails extends StatefulWidget {
@@ -39,8 +40,8 @@ class _EditCatDetailsState extends State<EditCatDetails> {
     _raceController.text = widget.cat.race;
     _descriptionController.text = widget.cat.description;
     _sexeController.text = widget.cat.sexe;
-    _sterilizedController.text = widget.cat.sterilized ? 'Oui' : 'Non';
-    _reservedController.text = widget.cat.reserved ? 'Oui' : 'Non';
+    _sterilizedController.text = widget.cat.sterilized ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no;
+    _reservedController.text = widget.cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no;
   }
 
   void _saveChanges() {
@@ -63,7 +64,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Modifier les détails du chat'),
+        title: Text(AppLocalizations.of(context)!.editCatDetailsTitle),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -86,88 +87,88 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Nom',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.name,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _nameController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Date de Naissance',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.birthDate,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _birthDateController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Date du dernier vaccin',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.lastVaccineDate,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _lastVaccineDateController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Nom du dernier vaccin',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.lastVaccineName,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _lastVaccineNameController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Couleur',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.color,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _colorController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Comportement',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.behavior,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _behaviorController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Race',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.race,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _raceController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Description',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.description,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _descriptionController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Genre',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.gender,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _sexeController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Stérilisé',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.sterilized,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _sterilizedController,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Réservé',
-                        border: OutlineInputBorder(),
+                        labelText: AppLocalizations.of(context)!.reserved,
+                        border: const OutlineInputBorder(),
                       ),
                       controller: _reservedController,
                     ),
@@ -176,7 +177,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       alignment: Alignment.center,
                       child: ElevatedButton(
                         onPressed: _saveChanges,
-                        child: const Text('Valider'),
+                        child: Text(AppLocalizations.of(context)!.edit),
                       ),
                     ),
                   ],

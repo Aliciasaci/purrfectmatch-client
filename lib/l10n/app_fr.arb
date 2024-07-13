@@ -95,5 +95,157 @@
   "alreadyHaveAccount": "Déjà un compte ? Connectez-vous",
   "@alreadyHaveAccount": {
     "description": "Texte du lien pour se connecter pour les utilisateurs existants"
+  },
+  "cats": "Chats",
+  "@cats": {
+    "description": "Titre pour la section des chats"
+  },
+  "viewAllCats": "Voir tous les chats",
+  "@viewAllCats": {
+    "description": "Texte pour voir tous les chats"
+  },
+  "addCat": "Ajouter un chat",
+  "@addCat": {
+    "description": "Texte pour ajouter un nouveau chat"
+  },
+  "announcements": "Annonces",
+  "@announcements": {
+    "description": "Titre pour la section des annonces"
+  },
+  "viewAllAnnouncements": "Voir toutes les annonces",
+  "@viewAllAnnouncements": {
+    "description": "Texte pour voir toutes les annonces"
+  },
+  "createAnnouncement": "Créer une annonce",
+  "@createAnnouncement": {
+    "description": "Texte pour créer une nouvelle annonce"
+  },
+  "user": "Utilisateur",
+  "@user": {
+    "description": "Titre pour la section utilisateur"
+  },
+  "myAnnouncements": "Mes annonces",
+  "@myAnnouncements": {
+    "description": "Texte pour voir les annonces de l'utilisateur"
+  },
+  "myFavorites": "Mes favoris",
+  "@myFavorites": {
+    "description": "Texte pour voir les favoris de l'utilisateur"
+  },
+  "search": "Chercher",
+  "@search": {
+    "description": "Libellé pour l'onglet de recherche"
+  },
+  "adopt": "Faire adopter",
+  "@adopt": {
+    "description": "Libellé pour l'onglet d'adoption"
+  },
+  "conversations": "Conversations",
+  "@conversations": {
+    "description": "Libellé pour l'onglet de conversations"
+  },
+  "profile": "Mon profil",
+  "@profile": {
+    "description": "Libellé pour l'onglet de profil"
+  },
+  "catDetailsTitle": "Détails du chat",
+  "@catDetailsTitle": {
+    "description": "Titre pour la page des détails du chat"
+  },
+  "birthDate": "Date de Naissance",
+  "@birthDate": {
+    "description": "Libellé pour la date de naissance"
+  },
+  "age": "Âge",
+  "@age": {
+    "description": "Libellé pour l'âge"
+  },
+  "lastVaccineDate": "Date du dernier vaccin",
+  "@lastVaccineDate": {
+    "description": "Libellé pour la date du dernier vaccin"
+  },
+  "lastVaccineName": "Nom du dernier vaccin",
+  "@lastVaccineName": {
+    "description": "Libellé pour le nom du dernier vaccin"
+  },
+  "color": "Couleur",
+  "@color": {
+    "description": "Libellé pour la couleur"
+  },
+  "behavior": "Comportement",
+  "@behavior": {
+    "description": "Libellé pour le comportement"
+  },
+  "race": "Race",
+  "@race": {
+    "description": "Libellé pour la race"
+  },
+  "description": "Description",
+  "@description": {
+    "description": "Libellé pour la description"
+  },
+  "gender": "Genre",
+  "@gender": {
+    "description": "Libellé pour le genre"
+  },
+  "sterilized": "Stérilisé",
+  "@sterilized": {
+    "description": "Libellé pour le statut de stérilisation"
+  },
+  "reserved": "Réservé",
+  "@reserved": {
+    "description": "Libellé pour le statut de réservation"
+  },
+  "yes": "Oui",
+  "@yes": {
+    "description": "Libellé Oui"
+  },
+  "no": "Non",
+  "@no": {
+    "description": "Libellé Non"
+  },
+  "edit": "Modifier",
+  "@edit": {
+    "description": "Texte du bouton Modifier"
+  },
+  "catListTitle": "Liste des Chats",
+  "@catListTitle": {
+    "description": "Titre pour la page de la liste des chats"
+  },
+  "editCatDetailsTitle": "Modifier les détails du chat",
+  "@editCatDetailsTitle": {
+    "description": "Titre pour la page de modification des détails du chat"
+  },
+  "createCatProfile": "Créer un profil de chat",
+  "@createCatProfile": {
+    "description": "Titre pour la création d'un profil de chat"
+  },
+  "selectGender": "Sélectionnez un genre",
+  "@selectGender": {
+    "description": "Texte d'indication pour sélectionner le genre"
+  },
+  "selectPhoto": "Sélectionnez une photo",
+  "@selectPhoto": {
+    "description": "Texte du bouton pour sélectionner une photo"
+  },
+  "photoSelected": "Photo sélectionnée",
+  "@photoSelected": {
+    "description": "Texte affiché lorsqu'une photo est sélectionnée"
+  },
+  "send": "Envoyer",
+  "@send": {
+    "description": "Texte du bouton pour envoyer les données"
+  },
+  "dataSentSuccessfully": "Données envoyées avec succès",
+  "@dataSentSuccessfully": {
+    "description": "Message affiché lorsque les données sont envoyées avec succès"
+  },
+  "dataSendError": "Erreur lors de l'envoi des données",
+  "@dataSendError": {
+    "description": "Message affiché en cas d'erreur lors de l'envoi des données"
+  },
+  "storagePermissionDenied": "Permission de stockage refusée",
+  "@storagePermissionDenied": {
+    "description": "Message affiché lorsque la permission de stockage est refusée"
   }
 }

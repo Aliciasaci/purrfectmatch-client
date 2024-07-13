@@ -95,5 +95,157 @@
   "alreadyHaveAccount": "Already have an account? Log in",
   "@alreadyHaveAccount": {
     "description": "Login link text for existing users"
+  },
+  "cats": "Cats",
+  "@cats": {
+    "description": "Title for the cats section"
+  },
+  "viewAllCats": "View all cats",
+  "@viewAllCats": {
+    "description": "Text for viewing all cats"
+  },
+  "addCat": "Add a cat",
+  "@addCat": {
+    "description": "Text for adding a new cat"
+  },
+  "announcements": "Announcements",
+  "@announcements": {
+    "description": "Title for the announcements section"
+  },
+  "viewAllAnnouncements": "View all announcements",
+  "@viewAllAnnouncements": {
+    "description": "Text for viewing all announcements"
+  },
+  "createAnnouncement": "Create an announcement",
+  "@createAnnouncement": {
+    "description": "Text for creating a new announcement"
+  },
+  "user": "User",
+  "@user": {
+    "description": "Title for the user section"
+  },
+  "myAnnouncements": "My announcements",
+  "@myAnnouncements": {
+    "description": "Text for viewing user's own announcements"
+  },
+  "myFavorites": "My favorites",
+  "@myFavorites": {
+    "description": "Text for viewing user's favorite items"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Label for the search tab"
+  },
+  "adopt": "Adopt",
+  "@adopt": {
+    "description": "Label for the adopt tab"
+  },
+  "conversations": "Conversations",
+  "@conversations": {
+    "description": "Label for the conversations tab"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Label for the profile tab"
+  },
+  "catDetailsTitle": "Cat Details",
+  "@catDetailsTitle": {
+    "description": "Title for the cat details page"
+  },
+  "birthDate": "Birth Date",
+  "@birthDate": {
+    "description": "Label for the birth date"
+  },
+  "age": "Age",
+  "@age": {
+    "description": "Label for the age"
+  },
+  "lastVaccineDate": "Last Vaccine Date",
+  "@lastVaccineDate": {
+    "description": "Label for the last vaccine date"
+  },
+  "lastVaccineName": "Last Vaccine Name",
+  "@lastVaccineName": {
+    "description": "Label for the last vaccine name"
+  },
+  "color": "Color",
+  "@color": {
+    "description": "Label for the color"
+  },
+  "behavior": "Behavior",
+  "@behavior": {
+    "description": "Label for the behavior"
+  },
+  "race": "Race",
+  "@race": {
+    "description": "Label for the race"
+  },
+  "description": "Description",
+  "@description": {
+    "description": "Label for the description"
+  },
+  "gender": "Gender",
+  "@gender": {
+    "description": "Label for the gender"
+  },
+  "sterilized": "Sterilized",
+  "@sterilized": {
+    "description": "Label for the sterilized status"
+  },
+  "reserved": "Reserved",
+  "@reserved": {
+    "description": "Label for the reserved status"
+  },
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes label"
+  },
+  "no": "No",
+  "@no": {
+    "description": "No label"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "catListTitle": "List of Cats",
+  "@catListTitle": {
+    "description": "Title for the cat list page"
+  },
+  "editCatDetailsTitle": "Edit Cat Details",
+  "@editCatDetailsTitle": {
+    "description": "Title for the edit cat details page"
+  },
+  "createCatProfile": "Create a Cat Profile",
+  "@createCatProfile": {
+    "description": "Title for creating a cat profile"
+  },
+  "selectGender": "Select a gender",
+  "@selectGender": {
+    "description": "Hint text for selecting gender"
+  },
+  "selectPhoto": "Select a photo",
+  "@selectPhoto": {
+    "description": "Button text for selecting a photo"
+  },
+  "photoSelected": "Photo selected",
+  "@photoSelected": {
+    "description": "Text displayed when a photo is selected"
+  },
+  "send": "Send",
+  "@send": {
+    "description": "Button text for sending data"
+  },
+  "dataSentSuccessfully": "Data sent successfully",
+  "@dataSentSuccessfully": {
+    "description": "Message displayed when data is sent successfully"
+  },
+  "dataSendError": "Error sending data",
+  "@dataSendError": {
+    "description": "Message displayed when there is an error sending data"
+  },
+  "storagePermissionDenied": "Storage permission denied",
+  "@storagePermissionDenied": {
+    "description": "Message displayed when storage permission is denied"
   }
 }

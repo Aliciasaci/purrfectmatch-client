@@ -7,7 +7,7 @@ import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/views/cat/cat_details.dart';
 import 'package:purrfectmatch/views/user/user_public_profile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/blocs/auth_bloc.dart';
+import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'filter_modal.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
@@ -55,8 +55,6 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
             Cat cat = await apiService.fetchCatByID(annonce.CatID);
             if (!cat.reserved) {
               User user = await apiService.fetchUserByID(annonce.UserID);
-              print(annonce.UserID);
-
               _swipeItems.add(SwipeItem(
                 content: {'annonce': annonce, 'cat': cat, 'user': user},
                 likeAction: () {
@@ -104,8 +102,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       setState(() {
         _annonceList = annoncesList;
         _matchEngine = null;
+        _swipeItems.clear();
       });
-      _swipeItems.clear();
       displayCats(_annonceList);
     } catch (e) {
       print('Failed to load cats with filter: $e');
@@ -116,11 +114,10 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     for (var annonce in annonces) {
       try {
         Cat cat = await apiService.fetchCatByID(annonce.CatID);
+        User user = await apiService.fetchUserByID(annonce.UserID);
         _swipeItems.add(SwipeItem(
-          content: {'annonce': annonce, 'cat': cat},
+          content: {'annonce': annonce, 'cat': cat, 'user': user},
           likeAction: () {
-            print("annonceID");
-            print(annonce.ID);
             _handleLikeAction(annonce.ID, cat.name);
           },
           nopeAction: () {
@@ -187,186 +184,192 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (_matchEngine == null)
-            const CircularProgressIndicator()
+            const SizedBox(
+              height: 580,
+              width: 360,
+              child:  Center(
+                  child: CircularProgressIndicator()
+              ),
+            )
           else
             FilterModalWidget(callback: fetchCatsByFilters),
-          SizedBox(
-            height: 580,
-            width: 360,
-            child: SwipeCards(
-              matchEngine: _matchEngine!,
-              itemBuilder: (BuildContext context, int index) {
-                var item = _swipeItems[index].content as Map;
-                Annonce annonce = item['annonce'] as Annonce;
-                Cat cat = item['cat'] as Cat;
-                User user = item['user'] as User;
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Stack(
-                    children: [
-                      Image.network(
-                        cat.picturesUrl.first,
-                        fit: BoxFit.cover,
-                        height: 580,
-                        width: 360,
-                      ),
-                      Container(
-                        height: 580,
-                        width: 360,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.5),
-                              Colors.transparent
-                            ],
+            if (_matchEngine != null)
+              SizedBox(
+              height: 580,
+              width: 360,
+              child: SwipeCards(
+                matchEngine: _matchEngine!,
+                itemBuilder: (BuildContext context, int index) {
+                  var item = _swipeItems[index].content as Map;
+                  Annonce annonce = item['annonce'] as Annonce;
+                  Cat cat = item['cat'] as Cat;
+                  User user = item['user'] as User;
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          cat.picturesUrl.first,
+                          fit: BoxFit.cover,
+                          height: 580,
+                          width: 360,
+                        ),
+                        Container(
+                          height: 580,
+                          width: 360,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.5),
+                                Colors.transparent
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(20),
-                        height: 580,
-                        width: 360,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              cat.name,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                        Container(
+                          padding: EdgeInsets.all(20),
+                          height: 580,
+                          width: 360,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                cat.name,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "${calculateAge(cat.birthDate)} ans",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
+                              Text(
+                                "${calculateAge(cat.birthDate)} ans",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "Sexe: ${cat.sexe}",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
+                              Text(
+                                "Sexe: ${cat.sexe}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "Race: ${cat.race}",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
+                              Text(
+                                "Race: ${cat.race}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
                               ),
-                            ),
-                            MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => UserPublicProfile(user: user)),
-                                  );
-                                },
-                                child: Text(
-                                  "Mise en ligne par: ${user.name}",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Colors.white,
-                                    decorationThickness: 2,
-                                    height: 1.5, // This will add some space between the text and the underline
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => UserPublicProfile(user: user)),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Mise en ligne par: ${user.name}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 2,
+                                      height: 1.5, // This will add some space between the text and the underline
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              "Disponible",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                              Text(
+                                "Disponible",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              onStackFinished: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Pile terminée"),
-                  duration: Duration(milliseconds: 500),
-                ));
-              },
-              itemChanged: (SwipeItem item, int index) {
-                var itemContent = item.content as Map;
-                Annonce annonce = itemContent['annonce'] as Annonce;
-                Cat cat = itemContent['cat'] as Cat;
-                print("item: ${cat.name}, index: $index");
-              },
-              leftSwipeAllowed: true,
-              rightSwipeAllowed: true,
-              upSwipeAllowed: true,
-              fillSpace: true,
+                      ],
+                    ),
+                  );
+                },
+                onStackFinished: () {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Pile terminée"),
+                    duration: Duration(milliseconds: 500),
+                  ));
+                },
+                itemChanged: (SwipeItem item, int index) {
+                  var itemContent = item.content as Map;
+                  Annonce annonce = itemContent['annonce'] as Annonce;
+                  Cat cat = itemContent['cat'] as Cat;
+                },
+                leftSwipeAllowed: true,
+                rightSwipeAllowed: true,
+                upSwipeAllowed: true,
+                fillSpace: true,
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      _matchEngine!.currentItem?.nope();
+                    },
+                    icon: const Icon(Icons.close),
+                    iconSize: 40,
+                    color: Colors.red.withOpacity(0.8),
+                    tooltip: 'Passer',
+                  ),
                 ),
-                child: IconButton(
-                  onPressed: () {
-                    _matchEngine!.currentItem?.nope();
-                  },
-                  icon: const Icon(Icons.close),
-                  iconSize: 40,
-                  color: Colors.red.withOpacity(0.8),
-                  tooltip: 'Passer',
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      _matchEngine!.currentItem?.superLike();
+                    },
+                    icon: const Icon(Icons.visibility),
+                    iconSize: 40,
+                    color: Colors.orange.withOpacity(0.8),
+                    tooltip: 'Voir',
+                  ),
                 ),
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      _matchEngine!.currentItem?.like();
+                    },
+                    icon: const Icon(Icons.favorite),
+                    iconSize: 40,
+                    color: Colors.green.withOpacity(0.8),
+                    tooltip: 'Favoris',
+                  ),
                 ),
-                child: IconButton(
-                  onPressed: () {
-                    _matchEngine!.currentItem?.superLike();
-                  },
-                  icon: const Icon(Icons.visibility),
-                  iconSize: 40,
-                  color: Colors.orange.withOpacity(0.8),
-                  tooltip: 'Voir',
-                ),
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    _matchEngine!.currentItem?.like();
-                  },
-                  icon: const Icon(Icons.favorite),
-                  iconSize: 40,
-                  color: Colors.green.withOpacity(0.8),
-                  tooltip: 'Favoris',
-                ),
-              ),
-            ],
-          )
+              ],
+            )
         ],
       ),
     );

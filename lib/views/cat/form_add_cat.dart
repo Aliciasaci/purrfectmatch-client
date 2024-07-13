@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 
@@ -20,7 +21,6 @@ class _AddCatState extends State<AddCat> {
   final TextEditingController _lastVaccineNameController = TextEditingController();
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _behaviorController = TextEditingController();
-  // final TextEditingController _raceController = DropdownButtonFormField(items: items, onChanged: onChanged);
   final TextEditingController _descriptionController = TextEditingController();
   String? _selectedValue;
   bool _sterilized = false;
@@ -38,7 +38,6 @@ class _AddCatState extends State<AddCat> {
     _lastVaccineNameController.dispose();
     _colorController.dispose();
     _behaviorController.dispose();
-    // _raceController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
@@ -73,9 +72,8 @@ class _AddCatState extends State<AddCat> {
         });
       }
     } else {
-      // Handle the case where the user denied the permission
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Permission de stockage refusée')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.storagePermissionDenied)),
       );
     }
   }
@@ -95,7 +93,6 @@ class _AddCatState extends State<AddCat> {
     }
   }
 
-
   Future<void> _sendData() async {
     Cat cat = Cat(
       name: _nameController.text,
@@ -105,7 +102,6 @@ class _AddCatState extends State<AddCat> {
       color: _colorController.text,
       behavior: _behaviorController.text,
       race: _dropdownValue.toString(),
-      // race: _raceController.text,
       description: _descriptionController.text,
       sexe: _selectedValue ?? '',
       sterilized: _sterilized,
@@ -116,11 +112,11 @@ class _AddCatState extends State<AddCat> {
     try {
       await ApiService().createCat(cat, _selectedFile);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Données envoyées avec succès')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.dataSentSuccessfully)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de l\'envoi des données: $e')),
+        SnackBar(content: Text('${AppLocalizations.of(context)!.dataSendError}: $e')),
       );
     }
   }
@@ -135,7 +131,7 @@ class _AddCatState extends State<AddCat> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Ajouter un chat'),
+        title: Text(AppLocalizations.of(context)!.addCat),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -159,44 +155,43 @@ class _AddCatState extends State<AddCat> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'Créer un profil de chat',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.createCatProfile,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 20),
-                      buildTextFormField(_nameController, "Nom*"),
+                      buildTextFormField(_nameController, AppLocalizations.of(context)!.name),
                       const SizedBox(height: 10),
-                      buildTextFormFieldWithDatepicker(_birthDateController, "Date de Naissance*", context),
+                      buildTextFormFieldWithDatepicker(_birthDateController, AppLocalizations.of(context)!.birthDate, context),
                       const SizedBox(height: 10),
-                      buildTextFormFieldWithDatepicker(_lastVaccineDateController, "Date du dernier vaccin", context),
+                      buildTextFormFieldWithDatepicker(_lastVaccineDateController, AppLocalizations.of(context)!.lastVaccineDate, context),
                       const SizedBox(height: 10),
-                      buildTextFormField(_lastVaccineNameController, "Nom du dernier vaccin"),
+                      buildTextFormField(_lastVaccineNameController, AppLocalizations.of(context)!.lastVaccineName),
                       const SizedBox(height: 10),
-                      buildTextFormField(_colorController, "Couleur*"),
+                      buildTextFormField(_colorController, AppLocalizations.of(context)!.color),
                       const SizedBox(height: 10),
-                      buildTextFormField(_behaviorController, "Comportement*"),
+                      buildTextFormField(_behaviorController, AppLocalizations.of(context)!.behavior),
                       const SizedBox(height: 10),
-                      // buildTextFormField(_raceController, "Race*"),
-                      buildRaceSelectFormField(raceList, 'Race'),
+                      buildRaceSelectFormField(raceList, AppLocalizations.of(context)!.race),
                       const SizedBox(height: 10),
-                      buildDescriptionFormField(_descriptionController),
+                      buildDescriptionFormField(_descriptionController, AppLocalizations.of(context)!.description),
                       const SizedBox(height: 10),
-                      buildSexeDropdown(),
+                      buildSexeDropdown(AppLocalizations.of(context)!.selectGender),
                       const SizedBox(height: 10),
-                      buildSwitchTile("Stérilisé*", _sterilized, (value) => setState(() => _sterilized = value)),
-                      buildSwitchTile("Réservé*", _reserved, (value) => setState(() => _reserved = value)),
+                      buildSwitchTile(AppLocalizations.of(context)!.sterilized, _sterilized, (value) => setState(() => _sterilized = value)),
+                      buildSwitchTile(AppLocalizations.of(context)!.reserved, _reserved, (value) => setState(() => _reserved = value)),
                       const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: _pickFile,
-                        child: Text(_selectedFile == null ? 'Sélectionnez une photo' : 'Photo sélectionnée: ${_selectedFile!.name}'),
+                        child: Text(_selectedFile == null ? AppLocalizations.of(context)!.selectPhoto : '${AppLocalizations.of(context)!.photoSelected}: ${_selectedFile!.name}'),
                       ),
                       const SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: _sendData,
-                        child: const Text('Envoyer'),
+                        child: Text(AppLocalizations.of(context)!.send),
                       ),
                       const SizedBox(height: 15),
                     ],
@@ -229,18 +224,18 @@ class _AddCatState extends State<AddCat> {
     onTap: () => _selectDate(context, controller),
   );
 
-  Widget buildDescriptionFormField(TextEditingController controller) => TextFormField(
+  Widget buildDescriptionFormField(TextEditingController controller, String label) => TextFormField(
     controller: controller,
     maxLines: 3,
-    decoration: const InputDecoration(
-      labelText: "Description",
-      border: OutlineInputBorder(),
+    decoration: InputDecoration(
+      labelText: label,
+      border: const OutlineInputBorder(),
     ),
   );
 
-  Widget buildSexeDropdown() => DropdownButton<String>(
+  Widget buildSexeDropdown(String hint) => DropdownButton<String>(
     value: _selectedValue,
-    hint: const Text('Sélectionnez un genre'),
+    hint: Text(hint),
     items: _options.map((String value) {
       return DropdownMenuItem<String>(
         value: value,
@@ -261,22 +256,19 @@ class _AddCatState extends State<AddCat> {
     onChanged: onChanged,
   );
 
-  Widget buildRaceSelectFormField(Map items, String hint) => DropdownButton(
-  hint: Text(hint),
-  items: items.entries.map((entry) {
-  return DropdownMenuItem<dynamic>(
-  value: entry.key,
-  child: Text(entry.value),
+  Widget buildRaceSelectFormField(Map<int?, String> items, String hint) => DropdownButton(
+    hint: Text(hint),
+    items: items.entries.map((entry) {
+      return DropdownMenuItem<dynamic>(
+        value: entry.key,
+        child: Text(entry.value),
+      );
+    }).toList(),
+    value: _dropdownValue,
+    onChanged: (dynamic newValue) {
+      setState(() {
+        _dropdownValue = newValue;
+      });
+    },
   );
-  }).toList(),
-  value: _dropdownValue,
-  onChanged: (dynamic newValue) {
-  if (newValue != null) {
-    print('DropdownValue: $_dropdownValue');
-    print('NewValue: $newValue');
-  setState(() {
-    _dropdownValue = newValue;
-  });
-  }
-  });
 }

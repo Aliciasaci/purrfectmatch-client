@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/cat.dart';
 import 'edit_cat_details.dart';
 
@@ -31,7 +32,7 @@ class CatDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Détails du chat'),
+        title: Text(AppLocalizations.of(context)!.catDetailsTitle),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -68,57 +69,57 @@ class CatDetails extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Date de Naissance: ${cat.birthDate}',
+                      '${AppLocalizations.of(context)!.birthDate}: ${cat.birthDate}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Âge: ${calculateAge(cat.birthDate)} ans',
+                      '${AppLocalizations.of(context)!.age}: ${calculateAge(cat.birthDate)} ans',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Date du dernier vaccin: ${cat.lastVaccineDate}',
+                      '${AppLocalizations.of(context)!.lastVaccineDate}: ${cat.lastVaccineDate}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Nom du dernier vaccin: ${cat.lastVaccineName}',
+                      '${AppLocalizations.of(context)!.lastVaccineName}: ${cat.lastVaccineName}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Couleur: ${cat.color}',
+                      '${AppLocalizations.of(context)!.color}: ${cat.color}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Comportement: ${cat.behavior}',
+                      '${AppLocalizations.of(context)!.behavior}: ${cat.behavior}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Race: ${cat.race}',
+                      '${AppLocalizations.of(context)!.race}: ${cat.race}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Description: ${cat.description}',
+                      '${AppLocalizations.of(context)!.description}: ${cat.description}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Genre: ${cat.sexe}',
+                      '${AppLocalizations.of(context)!.gender}: ${cat.sexe}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Stérilisé: ${cat.sterilized ? 'Oui' : 'Non'}',
+                      '${AppLocalizations.of(context)!.sterilized}: ${cat.sterilized ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Réservé: ${cat.reserved ? 'Oui' : 'Non'}',
+                      '${AppLocalizations.of(context)!.reserved}: ${cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 20),
@@ -133,7 +134,7 @@ class CatDetails extends StatelessWidget {
                             ),
                           );
                         },
-                        child: const Text('Modifier'),
+                        child: Text(AppLocalizations.of(context)!.edit),
                       ),
                     ),
                   ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final int selectedIndex;
@@ -42,23 +43,19 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: _buildIcon(Icons.search, 0, Colors.green),
-              label: 'Chercher',
+              label: AppLocalizations.of(context)!.search,
             ),
             BottomNavigationBarItem(
               icon: _buildIcon(Icons.pets, 1, Colors.pink),
-              label: 'Faire adopter',
+              label: AppLocalizations.of(context)!.adopt,
             ),
             BottomNavigationBarItem(
-              icon: _buildIcon(Icons.supervised_user_circle, 2, Colors.amber),
-              label: 'Chats',
+              icon: _buildIcon(Icons.chat, 2, Colors.deepPurple),
+              label: AppLocalizations.of(context)!.conversations,
             ),
             BottomNavigationBarItem(
-              icon: _buildIcon(Icons.chat, 3, Colors.deepPurple),
-              label: 'Conversations',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildIcon(Icons.person, 4, Colors.blueAccent),
-              label: 'Mon profil',
+              icon: _buildIcon(Icons.person, 3, Colors.blueAccent),
+              label: AppLocalizations.of(context)!.profile,
             ),
           ],
           currentIndex: widget.selectedIndex,
