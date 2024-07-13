@@ -6,6 +6,8 @@ import '../blocs/auth_bloc.dart';
 import '../locale_provider.dart';
 import 'package:provider/provider.dart';
 import '../views/register.dart';
+import '../blocs/auth/auth_bloc.dart';
+import 'register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

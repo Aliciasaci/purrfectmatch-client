@@ -4,7 +4,7 @@ import '../../models/annonce.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../annonce/annonce_detail_page.dart';
-import '../../../../blocs/auth_bloc.dart'; // Import du bloc d'authentification
+import '../../blocs/auth/auth_bloc.dart'; // Import du bloc d'authentification
 
 class UserAnnoncesPage extends StatefulWidget {
   const UserAnnoncesPage({super.key});

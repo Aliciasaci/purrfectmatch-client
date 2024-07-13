@@ -6,7 +6,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:purrfectmatch/models/association.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 
-import '../../../blocs/auth_bloc.dart';
+import '../../../blocs/auth/auth_bloc.dart';
 
 class CreateAssociation extends StatefulWidget {
   const CreateAssociation({super.key});

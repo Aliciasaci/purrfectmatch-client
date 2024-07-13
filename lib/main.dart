@@ -6,8 +6,11 @@ import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/admin/admin_home_page.dart';
 import 'package:purrfectmatch/views/admin/association/blocs/association_bloc.dart';
 import 'package:purrfectmatch/views/admin/association/list_association.dart';
+import 'package:purrfectmatch/views/admin/race/blocs/crud_race_bloc.dart';
+import 'package:purrfectmatch/views/admin/race/crud_race_page.dart';
 import 'package:purrfectmatch/views/admin/user/blocs/crud_user_bloc.dart';
 import 'package:purrfectmatch/views/admin/user/crud_user_page.dart';
+import 'package:purrfectmatch/views/admin/race/crud_race_page.dart';
 import 'package:purrfectmatch/views/not_found_page.dart';
 import 'package:purrfectmatch/views/user/profile/create_association.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
@@ -107,6 +110,26 @@ class MyApp extends StatelessWidget {
             );
           },
         ),
+        routes: {
+          '/admin': (context) => const AdminHomePage(title: ''),
+          '/admin/users': (context) => BlocProvider(
+            create: (context) => CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
+            child: const CrudUserPage(),
+          ),
+          '/admin/races': (context) => BlocProvider(
+            create: (context) => CrudRaceBloc(apiService: ApiService())..add(LoadRaces()),
+            child: const CrudRacePage(),
+          ),
+          '/admin/associations': (context) => BlocProvider(
+            create: (context) => AssociationBloc(apiService: ApiService())
+              ..add(LoadAssociations()),
+            child: const ListAssociation(),
+          ),
+          '/not-found': (context) =>
+            const NotFoundPage(title: 'Page not found'),
+          '/user': (context) => const UserHomePage(title: ''),
+          '/user/create-association': (context) => const CreateAssociation(),
+        },
       ),
     );
   }

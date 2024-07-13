@@ -1,16 +1,16 @@
-class Races {
-  final int id;
+class Race {
+  final int? id;
   final String raceName;
   final String? cats;
 
-  Races({
-    required this.id,
+  Race({
+    this.id,
     required this.raceName,
     this.cats
   });
 
-  factory Races.fromJson(Map<String, dynamic> json) {
-    return Races(
+  factory Race.fromJson(Map<String, dynamic> json) {
+    return Race(
       id : json['ID'],
       raceName: json['RaceName'],
       cats: json['Cats'] ?? ''
