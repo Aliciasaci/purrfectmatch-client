@@ -116,7 +116,8 @@ class _LoginPageState extends State<LoginPage> {
                               decoration: InputDecoration(
                                 labelText: 'Mot de passe',
                                 border: InputBorder.none,
-                                icon: Icon(Icons.lock, color: Colors.orange[100]),
+                                icon:
+                                    Icon(Icons.lock, color: Colors.orange[100]),
                               ),
                               obscureText: true,
                               validator: (value) {
@@ -140,7 +141,8 @@ class _LoginPageState extends State<LoginPage> {
                                           padding: const EdgeInsets.all(15),
                                         ),
                                         onPressed: () {
-                                          if (_formKey.currentState!.validate()) {
+                                          if (_formKey.currentState!
+                                              .validate()) {
                                             BlocProvider.of<AuthBloc>(context)
                                                 .add(
                                               LoginRequested(

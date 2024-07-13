@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import '../models/favoris.dart';
-import '../models/annonce.dart';
-import '../models/cat.dart';
-import '../services/api_service.dart';
-import 'annonce_detail_page.dart';
-import 'chat_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/favoris.dart';
+import '../../models/annonce.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
+import '../annonce/annonce_detail_page.dart';
+import '../cat/chat_page.dart';
+import '../../../../blocs/auth_bloc.dart';
 
 class UserFavorisPage extends StatefulWidget {
   const UserFavorisPage({super.key});
@@ -39,15 +41,26 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
 
     try {
       final apiService = ApiService();
-      final newFavoris = await apiService.fetchUserFavorites();
-      for (var favori in newFavoris) {
-        final annonce = await apiService.fetchAnnonceByID(favori.AnnonceID);
-        annoncesData[favori.AnnonceID] = annonce;
+      final authState = BlocProvider.of<AuthBloc>(context).state;
+      if (authState is AuthAuthenticated) {
+        final userId = authState.user.id;
+        if (userId != null) {
+          final newFavoris = await apiService.fetchUserFavorites(userId);
+          for (var favori in newFavoris) {
+            final annonce = await apiService.fetchAnnonceByID(favori.AnnonceID);
+            annoncesData[favori.AnnonceID] = annonce;
+          }
+          setState(() {
+            userFavorisData.addAll(newFavoris);
+            _loading = false;
+          });
+        } else {
+          setState(() {
+            _loading = false;
+          });
+          print('User ID is null');
+        }
       }
-      setState(() {
-        userFavorisData.addAll(newFavoris);
-        _loading = false;
-      });
     } catch (e) {
       setState(() {
         _loading = false;
@@ -69,8 +82,12 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
         title: const Text('Mes favoris'),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+          ),
         ),
         child: ListView.builder(
           controller: _scrollController,

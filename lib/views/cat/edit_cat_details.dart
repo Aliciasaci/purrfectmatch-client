@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import '../models/cat.dart';
+import '../../models/cat.dart';
 
-class CatDetails extends StatefulWidget {
+class EditCatDetails extends StatefulWidget {
   final Cat cat;
 
-  const CatDetails({super.key, required this.cat});
+  const EditCatDetails({super.key, required this.cat});
 
   @override
-  _CatDetailsState createState() => _CatDetailsState();
+  _EditCatDetailsState createState() => _EditCatDetailsState();
 }
 
-class _CatDetailsState extends State<CatDetails> {
-  bool _isEditing = false;
-
+class _EditCatDetailsState extends State<EditCatDetails> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
   final TextEditingController _lastVaccineDateController =
@@ -47,12 +45,6 @@ class _CatDetailsState extends State<CatDetails> {
     _reservedController.text = widget.cat.reserved ? 'Oui' : 'Non';
   }
 
-  void _toggleEditing() {
-    setState(() {
-      _isEditing = !_isEditing;
-    });
-  }
-
   void _saveChanges() {
     // For now, just print the values to console
     print('Name: ${_nameController.text}');
@@ -66,14 +58,14 @@ class _CatDetailsState extends State<CatDetails> {
     print('Sexe: ${_sexeController.text}');
     print('Sterilized: ${_sterilizedController.text}');
     print('Reserved: ${_reservedController.text}');
-    _toggleEditing(); // Switch back to non-editing mode
+    Navigator.pop(context); // Navigate back to the details page after saving changes
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil du chat'),
+        title: const Text('Modifier les détails du chat'),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -96,7 +88,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _nameController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -105,7 +96,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _birthDateController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -114,7 +104,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _lastVaccineDateController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -123,7 +112,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _lastVaccineNameController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -132,7 +120,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _colorController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -141,7 +128,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _behaviorController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -150,7 +136,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _raceController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -159,7 +144,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _descriptionController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -168,7 +152,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _sexeController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -177,7 +160,6 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _sterilizedController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -186,14 +168,13 @@ class _CatDetailsState extends State<CatDetails> {
                         border: OutlineInputBorder(),
                       ),
                       controller: _reservedController,
-                      enabled: _isEditing,
                     ),
                     const SizedBox(height: 20),
                     Align(
                       alignment: Alignment.center,
                       child: ElevatedButton(
-                        onPressed: _isEditing ? _saveChanges : _toggleEditing,
-                        child: Text(_isEditing ? 'Valider' : 'Modifier'),
+                        onPressed: _saveChanges,
+                        child: const Text('Valider'),
                       ),
                     ),
                   ],

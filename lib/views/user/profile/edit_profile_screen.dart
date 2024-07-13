@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/constants/color.dart';
 import 'package:purrfectmatch/constants/image_strings.dart';
 import 'package:purrfectmatch/constants/text_strings.dart';
-import '../../blocs/auth_bloc.dart';
-import '../../models/user.dart';
+import '../../../blocs/auth_bloc.dart';
+import '../../../models/user.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -50,7 +50,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _updateUser() async {
+  void _updateUser() {
     final updatedUser = User(
       id: _currentUser!.id,
       name: _nameController.text,
@@ -60,27 +60,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ville: _villeController.text,
     );
 
-    final success = await BlocProvider.of<AuthBloc>(context).updateProfile(updatedUser);
-
-    if (success) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Profile updated successfully"),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Failed to update profile"),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    }
+    BlocProvider.of<AuthBloc>(context).add(UpdateProfileRequested(updatedUser));
   }
 
   @override
@@ -102,6 +82,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _cpController.text = _currentUser!.cp;
               _villeController.text = _currentUser!.ville;
             });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Profile updated successfully"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          } else if (state is AuthError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Failed to update profile"),
+                duration: Duration(seconds: 2),
+              ),
+            );
           }
         },
         child: SingleChildScrollView(

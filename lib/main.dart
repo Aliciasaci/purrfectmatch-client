@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/views/profile/profile_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:purrfectmatch/blocs/room/room_bloc.dart';
+import 'package:purrfectmatch/services/api_service.dart';
+import 'package:purrfectmatch/views/admin/admin_home_page.dart';
+import 'package:purrfectmatch/views/admin/association/blocs/association_bloc.dart';
+import 'package:purrfectmatch/views/admin/association/list_association.dart';
+import 'package:purrfectmatch/views/admin/user/blocs/crud_user_bloc.dart';
+import 'package:purrfectmatch/views/admin/user/crud_user_page.dart';
+import 'package:purrfectmatch/views/not_found_page.dart';
+import 'package:purrfectmatch/views/user/profile/create_association.dart';
+import 'package:purrfectmatch/views/user/user_home_page.dart';
 import 'blocs/auth_bloc.dart';
-import 'models/user.dart';
 import 'services/auth_service.dart';
-import 'views/bottom_navigation_bar.dart';
-import 'views/swipe_card.dart';
-import 'views/form_add_annonce.dart';
 import 'views/login.dart';
-import 'views/annonces_cats_menu.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 
@@ -20,95 +27,72 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthBloc(authService: authService),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(authService: authService),
+        ),
+        BlocProvider<RoomBloc>(
+          create: (context) => RoomBloc(apiService: ApiService()),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: '',
         theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-        home: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
+        home: BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
             if (state is AuthAuthenticated) {
-              return MyHomePage(title: '', user: state.user);
-            } else {
-              return const LoginPage();
+              if (state.user.roles.any((role) => role.name == 'ADMIN')) {
+                Navigator.of(context).pushReplacementNamed('/admin');
+              } else if (state.user.roles.any((role) => role.name == 'USER')) {
+                Navigator.of(context).pushReplacementNamed('/user');
+              } else if (state.user.roles.any((role) => role.name == 'ASSO')) {
+                Navigator.of(context).pushReplacementNamed('/asso');
+              } else {
+                Navigator.of(context).pushReplacementNamed('/not-found');
+              }
             }
           },
-        ),
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, this.user});
-  final String title;
-  final User? user;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _widgetOptions = <Widget>[
-    SwipeCardsWidget(),
-    AnnoncesCatsMenu(),
-    AddAnnonce(),
-    ProfileScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  void _logout() {
-    BlocProvider.of<AuthBloc>(context).logout();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Stack(
-          children: [
-            const Image(
-              image: AssetImage('assets/logo.png'),
-              height: 30,
-              width: 30,
-            ),
-            Text(
-              widget.title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-            tooltip: 'Logout',
+          child: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              if (state is AuthInitial) {
+                return const LoginPage();
+              } else if (state is AuthLoading) {
+                return const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (state is AuthError) {
+                return Scaffold(
+                  body: Center(
+                    child: Text(state.message),
+                  ),
+                );
+              } else {
+                return const LoginPage();
+              }
+            },
           ),
-        ],
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+        ),
+        routes: {
+          '/admin': (context) => const AdminHomePage(title: ''),
+          '/admin/users': (context) => BlocProvider(
+                create: (context) =>
+                    CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
+                child: const CrudUserPage(),
+              ),
+          '/admin/associations': (context) => BlocProvider(
+                create: (context) => AssociationBloc(apiService: ApiService())
+                  ..add(LoadAssociations()),
+                child: const ListAssociation(),
+              ),
+          '/not-found': (context) =>
+              const NotFoundPage(title: 'Page not found'),
+          '/user': (context) => const UserHomePage(title: ''),
+          '/user/create-association': (context) => const CreateAssociation(),
+        },
       ),
     );
   }

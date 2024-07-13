@@ -36,6 +36,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
             label: 'Chats',
           ),
           BottomNavigationBarItem(
+            icon: _buildIcon(Icons.chat, 3, Colors.deepPurple),
+            label: 'Conversations',
+          ),
+          BottomNavigationBarItem(
             icon: _buildIcon(Icons.person, 3, Colors.blueAccent),
             label: 'Mon profil',
           ),

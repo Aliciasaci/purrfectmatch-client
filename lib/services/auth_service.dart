@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/user.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
   static String? authToken;
 
   Future<void> login(String email, String password) async {
     try {
-      final response = await http.post(
+        final response = await http.post(
         Uri.parse('$baseUrl/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
@@ -17,16 +18,15 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        print("Response body: $responseBody");
+
         if (responseBody['token'] == null) {
           throw Exception('Le token est absent dans la réponse');
         }
         authToken = responseBody['token'];
-        print("authToken: $authToken");
+        await getCurrentUser();
       } else if (response.statusCode == 401) {
         throw AuthException("Connexion refusée. Coordonnées invalides.");
       } else if (response.statusCode == 404) {
-
         throw AuthException("Connexion refusée. Utilisateur introuvable.");
       } else {
         throw AuthException('Échec de la connexion avec le code d\'état ${response.statusCode}');
@@ -55,11 +55,8 @@ class AuthService {
         }),
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       final responseBody = jsonDecode(response.body);
-      print(responseBody);
+
       if (response.statusCode == 200) {
         if (responseBody['token'] == null) {
           throw Exception('Le token est absent dans la réponse');
@@ -90,6 +87,7 @@ class AuthService {
       throw Exception('Failed to fetch current user data');
     }
   }
+
   Future<User> updateProfile(User user) async {
     final token = AuthService.authToken;
     final response = await http.put(
