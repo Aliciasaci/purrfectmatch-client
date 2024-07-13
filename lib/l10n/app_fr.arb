@@ -1,0 +1,99 @@
+{
+  "@@locale": "fr",
+  "helloWorld": "Bonjour le monde!",
+  "@helloWorld": {
+    "description": "Le salut conventionnel pour les nouveaux programmeurs"
+  },
+  "login": "Connexion",
+  "@login": {
+    "description": "Le texte du bouton de connexion"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Texte de l'étiquette de l'email"
+  },
+  "password": "Mot de passe",
+  "@password": {
+    "description": "Texte de l'étiquette du mot de passe"
+  },
+  "loginSuccessful": "Connexion réussie!",
+  "@loginSuccessful": {
+    "description": "Message affiché lorsque la connexion est réussie"
+  },
+  "register": "Pas encore de compte ? Inscrivez-vous",
+  "@register": {
+    "description": "Texte du lien pour s'inscrire"
+  },
+  "switchLanguage": "Changer de langue",
+  "@switchLanguage": {
+    "description": "Texte du bouton pour changer de langue"
+  },
+  "enterPassword": "Veuillez entrer votre mot de passe",
+  "@enterPassword": {
+    "description": "Message d'erreur lorsque le mot de passe n'est pas entré"
+  },
+  "invalidEmail": "Veuillez entrer une adresse email valide",
+  "@invalidEmail": {
+    "description": "Message d'erreur lorsque le format de l'email est invalide"
+  },
+  "enterEmail": "Veuillez entrer votre email",
+  "@enterEmail": {
+    "description": "Message d'erreur lorsque l'email n'est pas entré"
+  },
+  "registerPage": "Page d'inscription",
+  "@registerPage": {
+    "description": "Titre pour la page d'inscription"
+  },
+  "registerSuccessful": "Inscription réussie!",
+  "@registerSuccessful": {
+    "description": "Message affiché lorsque l'inscription est réussie"
+  },
+  "tokenRetrievalFailed": "Échec de la récupération du token",
+  "@tokenRetrievalFailed": {
+    "description": "Message affiché lorsque la récupération du token échoue"
+  },
+  "registrationFailed": "Échec de l'inscription",
+  "@registrationFailed": {
+    "description": "Message affiché lorsque l'inscription échoue"
+  },
+  "name": "Nom",
+  "@name": {
+    "description": "Texte de l'étiquette du nom"
+  },
+  "enterName": "Veuillez entrer votre nom",
+  "@enterName": {
+    "description": "Message d'erreur lorsque le nom n'est pas entré"
+  },
+  "addressRue": "Adresse Rue",
+  "@addressRue": {
+    "description": "Texte de l'étiquette de l'adresse rue"
+  },
+  "enterAddress": "Veuillez entrer votre adresse",
+  "@enterAddress": {
+    "description": "Message d'erreur lorsque l'adresse n'est pas entrée"
+  },
+  "postalCode": "Code Postal",
+  "@postalCode": {
+    "description": "Texte de l'étiquette du code postal"
+  },
+  "enterPostalCode": "Veuillez entrer votre code postal",
+  "@enterPostalCode": {
+    "description": "Message d'erreur lorsque le code postal n'est pas entré"
+  },
+  "invalidPostalCode": "Veuillez entrer un code postal valide",
+  "@invalidPostalCode": {
+    "description": "Message d'erreur lorsque le format du code postal est invalide"
+  },
+  "city": "Ville",
+  "@city": {
+    "description": "Texte de l'étiquette de la ville"
+  },
+  "enterCity": "Veuillez entrer votre ville",
+  "@enterCity": {
+    "description": "Message d'erreur lorsque la ville n'est pas entrée"
+  },
+  "alreadyHaveAccount": "Déjà un compte ? Connectez-vous",
+  "@alreadyHaveAccount": {
+    "description": "Texte du lien pour se connecter pour les utilisateurs existants"
+  }
+}

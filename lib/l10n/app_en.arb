@@ -1,0 +1,99 @@
+{
+  "@@locale": "en",
+  "helloWorld": "Hello World!",
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "The login button text"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email label text"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password label text"
+  },
+  "loginSuccessful": "Login successful!",
+  "@loginSuccessful": {
+    "description": "Message displayed when login is successful"
+  },
+  "register": "Don't have an account? Sign up",
+  "@register": {
+    "description": "Register link text"
+  },
+  "switchLanguage": "Switch Language",
+  "@switchLanguage": {
+    "description": "Button text to switch languages"
+  },
+  "enterPassword": "Please enter your password",
+  "@enterPassword": {
+    "description": "Error message when password is not entered"
+  },
+  "invalidEmail": "Please enter a valid email address",
+  "@invalidEmail": {
+    "description": "Error message when email format is invalid"
+  },
+  "enterEmail": "Please enter your email",
+  "@enterEmail": {
+    "description": "Error message when email is not entered"
+  },
+  "registerPage": "Register Page",
+  "@registerPage": {
+    "description": "Title for the Register Page"
+  },
+  "registerSuccessful": "Registration successful!",
+  "@registerSuccessful": {
+    "description": "Message displayed when registration is successful"
+  },
+  "tokenRetrievalFailed": "Failed to retrieve token",
+  "@tokenRetrievalFailed": {
+    "description": "Message displayed when token retrieval fails"
+  },
+  "registrationFailed": "Registration failed",
+  "@registrationFailed": {
+    "description": "Message displayed when registration fails"
+  },
+  "name": "Name",
+  "@name": {
+    "description": "Name label text"
+  },
+  "enterName": "Please enter your name",
+  "@enterName": {
+    "description": "Error message when name is not entered"
+  },
+  "addressRue": "Address Rue",
+  "@addressRue": {
+    "description": "Address Rue label text"
+  },
+  "enterAddress": "Please enter your address",
+  "@enterAddress": {
+    "description": "Error message when address is not entered"
+  },
+  "postalCode": "Postal Code",
+  "@postalCode": {
+    "description": "Postal Code label text"
+  },
+  "enterPostalCode": "Please enter your postal code",
+  "@enterPostalCode": {
+    "description": "Error message when postal code is not entered"
+  },
+  "invalidPostalCode": "Please enter a valid postal code",
+  "@invalidPostalCode": {
+    "description": "Error message when postal code format is invalid"
+  },
+  "city": "City",
+  "@city": {
+    "description": "City label text"
+  },
+  "enterCity": "Please enter your city",
+  "@enterCity": {
+    "description": "Error message when city is not entered"
+  },
+  "alreadyHaveAccount": "Already have an account? Log in",
+  "@alreadyHaveAccount": {
+    "description": "Login link text for existing users"
+  }
+}

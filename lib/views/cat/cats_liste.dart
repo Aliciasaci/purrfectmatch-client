@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/cat.dart';
-import '../services/api_service.dart';
-import './cat_detail_page.dart';
+import '../../models/cat.dart';
+import '../../services/api_service.dart';
+import 'cat_details.dart';
 
 class CatsListPage extends StatefulWidget {
   const CatsListPage({super.key});

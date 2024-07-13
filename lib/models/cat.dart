@@ -1,4 +1,5 @@
 class Cat {
+  final int? ID;
   final String name;
   final String birthDate;
   final String sexe;
@@ -13,6 +14,7 @@ class Cat {
   final List<String> picturesUrl;
 
   Cat({
+    this.ID,
     required this.name,
     required this.birthDate,
     required this.sexe,
@@ -29,15 +31,16 @@ class Cat {
 
   factory Cat.fromJson(Map<String, dynamic> json) {
     return Cat(
+      ID : json['ID'],
       name: json['Name'],
       birthDate: json['BirthDate'],
       sexe: json['Sexe'],
-      lastVaccineDate: json['LastVaccineDate'] ?? '',
+      lastVaccineDate: json['LastVaccine'] ?? '',
       lastVaccineName: json['LastVaccineName'] ?? '',
       color: json['Color'],
       behavior: json['Behavior'],
       sterilized: json['Sterilized'],
-      race: json['Race'],
+      race: json['RaceID'],
       description: json['Description'] ?? '',
       reserved: json['Reserved'],
       picturesUrl: List<String>.from(json['PicturesURL'] ?? []),

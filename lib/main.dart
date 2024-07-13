@@ -1,112 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:purrfectmatch/blocs/room/room_bloc.dart';
+import 'package:purrfectmatch/services/api_service.dart';
+import 'package:purrfectmatch/views/admin/admin_home_page.dart';
+import 'package:purrfectmatch/views/admin/association/blocs/association_bloc.dart';
+import 'package:purrfectmatch/views/admin/association/list_association.dart';
+import 'package:purrfectmatch/views/admin/user/blocs/crud_user_bloc.dart';
+import 'package:purrfectmatch/views/admin/user/crud_user_page.dart';
+import 'package:purrfectmatch/views/not_found_page.dart';
+import 'package:purrfectmatch/views/user/profile/create_association.dart';
+import 'package:purrfectmatch/views/user/user_home_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'blocs/auth_bloc.dart';
 import 'services/auth_service.dart';
-import 'views/bottom_navigation_bar.dart';
-import 'views/swipe_card.dart';
-import 'views/form_add_annonce.dart';
 import 'views/login.dart';
-import 'views/annonces_cats_menu.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'locale_provider.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: '',
-      theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
-      home: AuthService.authToken == null ? const LoginPage() : const MyHomePage(title: ''),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
-
-  // List of widgets for each tab
-  static const List<Widget> _widgetOptions = <Widget>[
-    SwipeCardsWidget(),
-    AnnoncesCatsMenu(),
-    AddAnnonce(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  void _logout() {
-    AuthService().logout();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(authService: authService),
         ),
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Stack(
-            children: [
-              const Center(
-                child: Image(
-                  image: AssetImage('assets/logo.png'),
-                  height: 30,
-                  width: 30,
+        BlocProvider<RoomBloc>(
+          create: (context) => RoomBloc(apiService: ApiService()),
+        ),
+      ],
+      child: ChangeNotifierProvider(
+        create: (context) => LocaleProvider(),
+        child: Consumer<LocaleProvider>(
+          builder: (context, localeProvider, child) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: '',
+              theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: localeProvider.locale,
+              home: BlocListener<AuthBloc, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthAuthenticated) {
+                    if (state.user.roles.any((role) => role.name == 'ADMIN')) {
+                      Navigator.of(context).pushReplacementNamed('/admin');
+                    } else if (state.user.roles.any((role) => role.name == 'USER')) {
+                      Navigator.of(context).pushReplacementNamed('/user');
+                    } else if (state.user.roles.any((role) => role.name == 'ASSO')) {
+                      Navigator.of(context).pushReplacementNamed('/asso');
+                    } else {
+                      Navigator.of(context).pushReplacementNamed('/not-found');
+                    }
+                  }
+                },
+                child: BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    if (state is AuthInitial) {
+                      return const LoginPage();
+                    } else if (state is AuthLoading) {
+                      return const Scaffold(
+                        body: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    } else if (state is AuthError) {
+                      return Scaffold(
+                        body: Center(
+                          child: Text(state.message),
+                        ),
+                      );
+                    } else {
+                      return const LoginPage();
+                    }
+                  },
                 ),
               ),
-              Center(
-                child: Text(
-                  widget.title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    overflow: TextOverflow.ellipsis,
-                  ),
+              routes: {
+                '/admin': (context) => const AdminHomePage(title: ''),
+                '/admin/users': (context) => BlocProvider(
+                  create: (context) =>
+                  CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
+                  child: const CrudUserPage(),
                 ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: _logout,
-              tooltip: 'Logout',
-            ),
-          ],
+                '/admin/associations': (context) => BlocProvider(
+                  create: (context) => AssociationBloc(apiService: ApiService())
+                    ..add(LoadAssociations()),
+                  child: const ListAssociation(),
+                ),
+                '/not-found': (context) =>
+                const NotFoundPage(title: 'Page not found'),
+                '/user': (context) => const UserHomePage(title: ''),
+                '/user/create-association': (context) => const CreateAssociation(),
+              },
+            );
+          },
         ),
-        body: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
-        ),
-        bottomNavigationBar: CustomBottomNavigationBar(
-          selectedIndex: _selectedIndex,
-          onItemTapped: _onItemTapped,
-        ),
-        backgroundColor: Colors.transparent,
       ),
     );
   }

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
-import '../main.dart';
-import 'register.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:purrfectmatch/views/user/user_home_page.dart';
+import '../blocs/auth_bloc.dart';
+import '../locale_provider.dart';
+import 'package:provider/provider.dart';
+import '../views/register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,156 +20,193 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      AuthService authService = AuthService();
-      await authService.login(
-        _emailController.text,
-        _passwordController.text,
-      );
-
-      if (AuthService.authToken != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MyHomePage(title: '')),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Connexion réussie!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Échec de la récupération du token')),
-        );
-      }
-    } catch (e) {
-      String errorMessage = 'Impossible de se connecter.';
-      if (e is AuthException) {
-        errorMessage = e.message;
-      }
-      print("Exception pendant la connexion: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    var localeProvider = Provider.of<LocaleProvider>(context);
+
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: SingleChildScrollView(
-              child: Card(
-                color: Colors.white,
-                elevation: 4.0,
-                margin: const EdgeInsets.all(20.0),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Image(
-                          image: AssetImage('assets/logo.png'),
-                          height: 50,
-                          width: 50,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Connexion',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre email';
-                            }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                              return 'Veuillez entrer une adresse email valide';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          controller: _passwordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Mot de passe',
-                            border: OutlineInputBorder(),
-                          ),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre mot de passe';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        _isLoading
-                            ? const CircularProgressIndicator()
-                            : Column(
-                          children: [
-                            ElevatedButton(
-                              onPressed: _login,
-                              child: const Text('Connexion'),
-                            ),
-                            const SizedBox(height: 20),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const RegisterPage()),
-                                );
-                              },
-                              child: const Text(
-                                'Pas encore de compte ? Inscris-toi',
-                                style: TextStyle(
-                                  color: Colors.blue,
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthLoading) {
+            setState(() {
+              _isLoading = true;
+            });
+          } else {
+            setState(() {
+              _isLoading = false;
+            });
+            if (state is AuthError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            } else if (state is AuthAuthenticated) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const UserHomePage(title: '')),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content:
+                    Text(AppLocalizations.of(context)!.loginSuccessful)),
+              );
+            }
+          }
+        },
+        builder: (context, state) {
+          return Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.amberAccent, Colors.orange],
+                  ),
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SingleChildScrollView(
+                      child: Card(
+                        color: Colors.white,
+                        elevation: 4.0,
+                        margin: const EdgeInsets.all(20.0),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Image(
+                                  image: AssetImage('assets/logo.png'),
+                                  height: 50,
+                                  width: 50,
                                 ),
-                              ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  AppLocalizations.of(context)!.login,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                TextFormField(
+                                  controller: _emailController,
+                                  decoration: InputDecoration(
+                                    labelText: AppLocalizations.of(context)!
+                                        .email,
+                                    border: const OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return AppLocalizations.of(context)!
+                                          .enterEmail;
+                                    }
+                                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                        .hasMatch(value)) {
+                                      return AppLocalizations.of(context)!
+                                          .invalidEmail;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                TextFormField(
+                                  controller: _passwordController,
+                                  decoration: InputDecoration(
+                                    labelText: AppLocalizations.of(context)!
+                                        .password,
+                                    border: const OutlineInputBorder(),
+                                  ),
+                                  obscureText: true,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return AppLocalizations.of(context)!
+                                          .enterPassword;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                _isLoading
+                                    ? const CircularProgressIndicator()
+                                    : Column(
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        if (_formKey.currentState!
+                                            .validate()) {
+                                          BlocProvider.of<AuthBloc>(
+                                              context)
+                                              .add(
+                                            LoginRequested(
+                                              email: _emailController
+                                                  .text,
+                                              password:
+                                              _passwordController
+                                                  .text,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Text(
+                                          AppLocalizations.of(context)!
+                                              .login),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    GestureDetector(
+                                      onTap: () {
+                                         Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => const RegisterPage()),
+                                         );
+                                      },
+                                      child: Text(
+                                        AppLocalizations.of(context)!
+                                            .register,
+                                        style: const TextStyle(
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
+              Positioned(
+                top: 40,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () {
+                    if (localeProvider.locale == const Locale('en')) {
+                      localeProvider.setLocale(const Locale('fr'));
+                    } else {
+                      localeProvider.setLocale(const Locale('en'));
+                    }
+                  },
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundImage: AssetImage(
+                      localeProvider.locale == const Locale('en')
+                          ? 'assets/images/flag_uk.png'
+                          : 'assets/images/flag_fr.png',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

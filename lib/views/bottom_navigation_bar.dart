@@ -19,7 +19,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20.00),
+      margin: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(40.0)),
         boxShadow: [
@@ -41,7 +41,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         child: BottomNavigationBar(
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon:_buildIcon(Icons.search, 0, Colors.green),
+              icon: _buildIcon(Icons.search, 0, Colors.green),
               label: 'Chercher',
             ),
             BottomNavigationBarItem(
@@ -49,9 +49,16 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               label: 'Faire adopter',
             ),
             BottomNavigationBarItem(
-              icon: _buildIcon(
-                  Icons.supervised_user_circle, 2, Colors.amber),
+              icon: _buildIcon(Icons.supervised_user_circle, 2, Colors.amber),
               label: 'Chats',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildIcon(Icons.chat, 3, Colors.deepPurple),
+              label: 'Conversations',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildIcon(Icons.person, 4, Colors.blueAccent),
+              label: 'Mon profil',
             ),
           ],
           currentIndex: widget.selectedIndex,
