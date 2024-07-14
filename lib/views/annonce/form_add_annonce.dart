@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cat/form_add_cat.dart';
 import 'annonce_detail_page.dart';
 import '../../models/annonce.dart';
+import '../user/user_annonces.dart';
 
 class AddAnnonce extends StatefulWidget {
   const AddAnnonce({super.key});
@@ -75,13 +76,6 @@ class _AddAnnonceState extends State<AddAnnonce> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Annonce créée avec succès')),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AnnonceDetailPage(annonce: createdAnnonce),
-        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

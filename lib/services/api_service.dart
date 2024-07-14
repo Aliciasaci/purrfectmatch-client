@@ -53,6 +53,9 @@ class ApiService {
   Future<void> createCat(Cat cat, PlatformFile? selectedFile) async {
     var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/cats'));
 
+    final token = AuthService.authToken;
+    request.headers['Authorization'] = 'Bearer $token';
+
     request.fields['name'] = cat.name;
     request.fields['sexe'] = cat.sexe;
     request.fields['birthDate'] = cat.birthDate;
@@ -66,6 +69,12 @@ class ApiService {
     request.fields['reserved'] = cat.reserved.toString();
     request.fields['userId'] = cat.userId;
 
+    // Afficher les champs de la requête
+    print('Request Fields:');
+    request.fields.forEach((key, value) {
+      print('$key: $value');
+    });
+
     if (selectedFile != null) {
       request.files.add(
         http.MultipartFile(
@@ -75,9 +84,25 @@ class ApiService {
           filename: selectedFile.name,
         ),
       );
+
+      // Afficher les informations du fichier
+      print('Selected File:');
+      print('Name: ${selectedFile.name}');
+      print('Size: ${selectedFile.size}');
     }
 
+    // Afficher les en-têtes de la requête
+    print('Request Headers:');
+    request.headers.forEach((key, value) {
+      print('$key: $value');
+    });
+
     var response = await request.send();
+
+    // Afficher la réponse
+    print('Response Status: ${response.statusCode}');
+    print('Response Headers: ${response.headers}');
+    print('Response Content: ${await response.stream.bytesToString()}');
 
     if (response.statusCode != 200) {
       throw Exception('Failed to create cat profile');
@@ -737,6 +762,9 @@ class ApiService {
   }
 
   Future<void> deleteAnnonce(String annonceId) async {
+
+
+    print(annonceId);
     final token = AuthService.authToken;
     final response = await http.delete(
       Uri.parse('$baseUrl/annonces/$annonceId'),

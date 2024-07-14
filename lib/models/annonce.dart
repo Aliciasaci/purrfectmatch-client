@@ -15,10 +15,11 @@ class Annonce {
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
     return Annonce(
-      Title: json['Title'],
+      ID: json['ID'],
+      Title: json['Title'] ?? '',
       Description: json['Description'] ?? '',
-      UserID: json['UserID'],
-      CatID: json['CatID'],
+      UserID: json['UserID'] ?? '',
+      CatID: json['CatID'] ?? '',
     );
   }
 
@@ -38,6 +39,6 @@ class Annonce {
 
   @override
   String toString() {
-    return 'Title: $Title, Description: $Description, UserID: $UserID, CatID: $CatID}';
+    return 'ID: $ID, Title: $Title, Description: $Description, UserID: $UserID, CatID: $CatID}';
   }
 }

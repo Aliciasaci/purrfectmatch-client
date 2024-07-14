@@ -80,10 +80,12 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
   }
 
   Future<void> _deleteAnnonce(String annonceId) async {
+    print(annonceId);
     try {
       await ApiService().deleteAnnonce(annonceId);
       setState(() {
-        userAnnoncesData.removeWhere((annonce) => annonce.ID == annonceId);
+        userAnnoncesData.removeWhere((annonce) => annonce.ID.toString() == annonceId);
+        _reloadUserAnnonces();
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Annonce supprimée avec succès')),
@@ -93,6 +95,16 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
         SnackBar(content: Text('Erreur lors de la suppression de l\'annonce: $e')),
       );
     }
+  }
+
+  void _reloadUserAnnonces() async {
+    setState(() {
+      userAnnoncesData.clear();
+      catsData.clear();
+      _page = 1;
+      _hasMore = true;
+    });
+    await _fetchUserAnnonces();
   }
 
   @override
@@ -148,7 +160,15 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () {
-                        _deleteAnnonce(annonce.ID.toString());
+                        print(annonce);
+                        print(annonce.ID);
+                        if (annonce.ID != null) {
+                          _deleteAnnonce(annonce.ID.toString());
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('ID de l\'annonce invalide')),
+                          );
+                        }
                       },
                     ),
                     const Icon(Icons.arrow_forward),

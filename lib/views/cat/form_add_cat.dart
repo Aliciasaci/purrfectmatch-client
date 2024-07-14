@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../models/user.dart';
 
@@ -75,9 +76,7 @@ class _AddCatState extends State<AddCat> {
   }
 
   Future<void> _pickFile() async {
-    var status = await Permission.storage.request();
-
-    if (status.isGranted) {
+    if (await Permission.storage.request().isGranted) {
       FilePickerResult? result = await FilePicker.platform.pickFiles();
 
       if (result != null) {
@@ -87,7 +86,7 @@ class _AddCatState extends State<AddCat> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.storagePermissionDenied)),
+        const SnackBar(content: Text('Storage permission denied')),
       );
     }
   }
@@ -127,11 +126,11 @@ class _AddCatState extends State<AddCat> {
     try {
       await ApiService().createCat(cat, _selectedFile);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.dataSentSuccessfully)),
+        const SnackBar(content: Text('Data sent successfully')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${AppLocalizations.of(context)!.dataSendError}: $e')),
+        SnackBar(content: Text('Error sending data: $e')),
       );
     }
   }
@@ -146,7 +145,7 @@ class _AddCatState extends State<AddCat> {
             Navigator.pop(context);
           },
         ),
-        title: Text(AppLocalizations.of(context)!.addCat),
+        title: const Text('Add Cat'),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -170,43 +169,43 @@ class _AddCatState extends State<AddCat> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        AppLocalizations.of(context)!.createCatProfile,
-                        style: const TextStyle(
+                      const Text(
+                        'Create Cat Profile',
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 20),
-                      buildTextFormField(_nameController, AppLocalizations.of(context)!.name),
+                      buildTextFormField(_nameController, 'Name'),
                       const SizedBox(height: 10),
-                      buildTextFormFieldWithDatepicker(_birthDateController, AppLocalizations.of(context)!.birthDate, context),
+                      buildTextFormFieldWithDatepicker(_birthDateController, 'Birth Date', context),
                       const SizedBox(height: 10),
-                      buildTextFormFieldWithDatepicker(_lastVaccineDateController, AppLocalizations.of(context)!.lastVaccineDate, context),
+                      buildTextFormFieldWithDatepicker(_lastVaccineDateController, 'Last Vaccine Date', context),
                       const SizedBox(height: 10),
-                      buildTextFormField(_lastVaccineNameController, AppLocalizations.of(context)!.lastVaccineName),
+                      buildTextFormField(_lastVaccineNameController, 'Last Vaccine Name'),
                       const SizedBox(height: 10),
-                      buildTextFormField(_colorController, AppLocalizations.of(context)!.color),
+                      buildTextFormField(_colorController, 'Color'),
                       const SizedBox(height: 10),
-                      buildTextFormField(_behaviorController, AppLocalizations.of(context)!.behavior),
+                      buildTextFormField(_behaviorController, 'Behavior'),
                       const SizedBox(height: 10),
-                      buildRaceSelectFormField(raceList, AppLocalizations.of(context)!.race),
+                      buildRaceSelectFormField(raceList, 'Race'),
                       const SizedBox(height: 10),
-                      buildDescriptionFormField(_descriptionController, AppLocalizations.of(context)!.description),
+                      buildDescriptionFormField(_descriptionController, 'Description'),
                       const SizedBox(height: 10),
-                      buildSexeDropdown(AppLocalizations.of(context)!.selectGender),
+                      buildSexeDropdown('Select Gender'),
                       const SizedBox(height: 10),
-                      buildSwitchTile(AppLocalizations.of(context)!.sterilized, _sterilized, (value) => setState(() => _sterilized = value)),
-                      buildSwitchTile(AppLocalizations.of(context)!.reserved, _reserved, (value) => setState(() => _reserved = value)),
+                      buildSwitchTile('Sterilized', _sterilized, (value) => setState(() => _sterilized = value)),
+                      buildSwitchTile('Reserved', _reserved, (value) => setState(() => _reserved = value)),
                       const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: _pickFile,
-                        child: Text(_selectedFile == null ? AppLocalizations.of(context)!.selectPhoto : '${AppLocalizations.of(context)!.photoSelected}: ${_selectedFile!.name}'),
+                        child: Text(_selectedFile == null ? 'Select Photo' : 'Photo Selected: ${_selectedFile!.name}'),
                       ),
                       const SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: _sendData,
-                        child: Text(AppLocalizations.of(context)!.send),
+                        child: const Text('Send'),
                       ),
                       const SizedBox(height: 15),
                     ],
