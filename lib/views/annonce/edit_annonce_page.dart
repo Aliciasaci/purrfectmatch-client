@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/annonce.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../cat/form_add_cat.dart';
-import '../../models/annonce.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class AddAnnonce extends StatefulWidget {
-  const AddAnnonce({super.key});
+class EditAnnoncePage extends StatefulWidget {
+  final Annonce annonce;
+
+  const EditAnnoncePage({super.key, required this.annonce});
 
   @override
-  _AddAnnonceState createState() => _AddAnnonceState();
+  _EditAnnoncePageState createState() => _EditAnnoncePageState();
 }
 
-class _AddAnnonceState extends State<AddAnnonce> {
+class _EditAnnoncePageState extends State<EditAnnoncePage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  bool _isLoading = false;
   List<Cat> _userCats = [];
   Cat? _selectedCat;
 
   @override
   void initState() {
     super.initState();
+    _titleController.text = widget.annonce.Title;
+    _descriptionController.text = widget.annonce.Description ?? '';
     _loadUserCats();
   }
 
@@ -35,6 +39,9 @@ class _AddAnnonceState extends State<AddAnnonce> {
           final cats = await ApiService().fetchCatsByUser(userId);
           setState(() {
             _userCats = cats;
+            _selectedCat = cats.firstWhere(
+                  (cat) => cat.ID.toString() == widget.annonce.CatID,
+            );
           });
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -52,7 +59,7 @@ class _AddAnnonceState extends State<AddAnnonce> {
     super.dispose();
   }
 
-  Future<void> _sendData() async {
+  Future<void> _updateAnnonce() async {
     final String title = _titleController.text;
     final String description = _descriptionController.text;
 
@@ -63,22 +70,30 @@ class _AddAnnonceState extends State<AddAnnonce> {
       return;
     }
 
-    Annonce annonce = Annonce(
+    final updatedAnnonce = widget.annonce.copyWith(
       Title: title,
-      Description: description.isNotEmpty ? description : '',
+      Description: description,
       CatID: _selectedCat!.ID.toString(),
     );
 
-    try {
-      final createdAnnonce = await ApiService().createAnnonce(annonce);
+    setState(() {
+      _isLoading = true;
+    });
 
+    try {
+      await ApiService().updateAnnonce(updatedAnnonce);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Annonce créée avec succès')),
+        const SnackBar(content: Text('Annonce mise à jour avec succès')),
       );
+      Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la création de l\'annonce: $e')),
+        SnackBar(content: Text('Erreur lors de la mise à jour de l\'annonce: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -135,7 +150,7 @@ class _AddAnnonceState extends State<AddAnnonce> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ajouter une nouvelle annonce'),
+        title: const Text('Modifier l\'annonce'),
         backgroundColor: Colors.orange[100],
       ),
       body: Stack(
@@ -199,40 +214,15 @@ class _AddAnnonceState extends State<AddAnnonce> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: _sendData,
+                              onPressed: _isLoading ? null : _updateAnnonce,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange[100],
                                 padding: const EdgeInsets.all(15),
                               ),
-                              child: Text(
-                                AppLocalizations.of(context)!.add,
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Divider(
-                            color: Colors.grey,
-                            height: 20,
-                            thickness: 1,
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange[100],
-                                padding: const EdgeInsets.all(15),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const AddCat()),
-                                );
-                              },
-                              child: Text(
-                                AppLocalizations.of(context)!.addCat,
+                              child: _isLoading
+                                  ? const CircularProgressIndicator()
+                                  : Text(
+                                AppLocalizations.of(context)!.save,
                                 style: const TextStyle(color: Colors.black),
                               ),
                             ),

@@ -12,6 +12,7 @@ class Cat {
   final String description;
   final bool reserved;
   final List<String> picturesUrl;
+  final String userId;
 
   Cat({
     this.ID,
@@ -27,11 +28,12 @@ class Cat {
     required this.description,
     required this.reserved,
     required this.picturesUrl,
+    required this.userId,
   });
 
   factory Cat.fromJson(Map<String, dynamic> json) {
     return Cat(
-      ID : json['ID'],
+      ID: json['ID'],
       name: json['Name'],
       birthDate: json['BirthDate'],
       sexe: json['Sexe'],
@@ -44,6 +46,26 @@ class Cat {
       description: json['Description'] ?? '',
       reserved: json['Reserved'],
       picturesUrl: List<String>.from(json['PicturesURL'] ?? []),
+      userId: json['UserID'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ID': ID,
+      'Name': name,
+      'BirthDate': birthDate,
+      'Sexe': sexe,
+      'LastVaccine': lastVaccineDate,
+      'LastVaccineName': lastVaccineName,
+      'Color': color,
+      'Behavior': behavior,
+      'Sterilized': sterilized,
+      'RaceID': race,
+      'Description': description,
+      'Reserved': reserved,
+      'PicturesURL': picturesUrl,
+      'UserID': userId,
+    };
   }
 }

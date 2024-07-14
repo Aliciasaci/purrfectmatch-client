@@ -34,8 +34,6 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> catJson = jsonDecode(response.body);
-      print(response.body);
-
       return Cat.fromJson(catJson);
     } else {
       throw Exception('Failed to load cat for ID: $catID');
@@ -55,6 +53,9 @@ class ApiService {
   Future<void> createCat(Cat cat, PlatformFile? selectedFile) async {
     var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/cats'));
 
+    final token = AuthService.authToken;
+    request.headers['Authorization'] = 'Bearer $token';
+
     request.fields['name'] = cat.name;
     request.fields['sexe'] = cat.sexe;
     request.fields['birthDate'] = cat.birthDate;
@@ -64,9 +65,15 @@ class ApiService {
     request.fields['behavior'] = cat.behavior;
     request.fields['race'] = cat.race;
     request.fields['description'] = cat.description;
-    request.fields['sexe'] = cat.sexe;
     request.fields['sterilized'] = cat.sterilized.toString();
     request.fields['reserved'] = cat.reserved.toString();
+    request.fields['userId'] = cat.userId;
+
+    // Afficher les champs de la requête
+    print('Request Fields:');
+    request.fields.forEach((key, value) {
+      print('$key: $value');
+    });
 
     if (selectedFile != null) {
       request.files.add(
@@ -77,12 +84,58 @@ class ApiService {
           filename: selectedFile.name,
         ),
       );
+
+      // Afficher les informations du fichier
+      print('Selected File:');
+      print('Name: ${selectedFile.name}');
+      print('Size: ${selectedFile.size}');
     }
+
+    // Afficher les en-têtes de la requête
+    print('Request Headers:');
+    request.headers.forEach((key, value) {
+      print('$key: $value');
+    });
 
     var response = await request.send();
 
+    // Afficher la réponse
+    print('Response Status: ${response.statusCode}');
+    print('Response Headers: ${response.headers}');
+    print('Response Content: ${await response.stream.bytesToString()}');
+
     if (response.statusCode != 200) {
       throw Exception('Failed to create cat profile');
+    }
+  }
+
+  Future<void> updateCat(Cat cat) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/cats/${cat.ID}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(cat.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update cat.');
+    }
+  }
+
+  Future<void> deleteCat(int catId) async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/cats/$catId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete cat');
     }
   }
 
@@ -95,11 +148,8 @@ class ApiService {
       },
     );
 
-    print('$baseUrl/cats');
-    print(response.statusCode);
     if (response.statusCode == 200) {
       List<dynamic> catsJson = jsonDecode(response.body);
-      print(response.body);
       return catsJson.map((json) => Cat.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cats');
@@ -115,8 +165,7 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
     );
-    print('$baseUrl/cats/');
-    print(response.statusCode);
+
     if (response.statusCode == 200) {
       List<dynamic> annonceJson = jsonDecode(response.body);
       return annonceJson.map((json) => Annonce.fromJson(json)).toList();
@@ -134,8 +183,6 @@ class ApiService {
       },
     );
 
-    print('$baseUrl/annonces');
-    print(response.statusCode);
     if (response.statusCode == 200) {
       List<dynamic> annoncesJson = jsonDecode(response.body);
       return annoncesJson.map((json) => Annonce.fromJson(json)).toList();
@@ -146,6 +193,10 @@ class ApiService {
 
   Future<Annonce> createAnnonce(Annonce annonce) async {
     final token = AuthService.authToken;
+
+    // Afficher l'objet JSON avant de l'envoyer
+    print('JSON envoyé au serveur: ${jsonEncode(annonce.toJson())}');
+
     final response = await http.post(
       Uri.parse('$baseUrl/annonces'),
       headers: <String, String>{
@@ -155,12 +206,8 @@ class ApiService {
       body: jsonEncode(annonce.toJson()),
     );
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
     if (response.statusCode == 201) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-      print(responseData);
       return Annonce.fromJson(responseData);
     } else if (response.statusCode == 400) {
       throw Exception('Champs manquants ou invalides dans la requête');
@@ -288,9 +335,8 @@ class ApiService {
       },
     );
 
-    print('$baseUrl/users/annonces');
-    print(response.statusCode);
     if (response.statusCode == 200) {
+      print(response.body);
       List<dynamic> annoncesJson = jsonDecode(response.body);
       return annoncesJson.map((json) => Annonce.fromJson(json)).toList();
     } else {
@@ -307,8 +353,6 @@ class ApiService {
       },
     );
 
-    print('$baseUrl/user/favorites');
-    print(response.statusCode);
     if (response.statusCode == 200) {
       List<dynamic> favorisJson = jsonDecode(response.body);
       return favorisJson.map((json) => Favoris.fromJson(json)).toList();
@@ -345,9 +389,6 @@ class ApiService {
       body: jsonEncode({'annonceID': annonceID.toString()}),
     );
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
     if (response.statusCode == 201) {
       try {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -358,7 +399,6 @@ class ApiService {
           throw Exception('Failed to create favorite');
         }
       } catch (e) {
-        print('Error decoding JSON: $e');
         throw Exception('Failed to parse response');
       }
     } else {
@@ -393,9 +433,6 @@ class ApiService {
       },
     );
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
     if (response.statusCode == 200) {
       List<dynamic> ratingsJson = jsonDecode(response.body);
       return ratingsJson.map((json) => Rating.fromJson(json)).toList();
@@ -417,16 +454,12 @@ class ApiService {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
     };
-    print('Request Headers: $headers');
 
     final response = await http.post(
       Uri.parse('$baseUrl/ratings'),
       headers: headers,
       body: body,
     );
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
 
     if (response.statusCode == 201) {
       final Map<String, dynamic> ratingJson = jsonDecode(response.body);
@@ -444,8 +477,6 @@ class ApiService {
       'comment': rating.comment,
     });
 
-    print('Request Body: $body');
-
     final response = await http.put(
       Uri.parse('$baseUrl/ratings/${rating.id}'),
       headers: {
@@ -454,9 +485,6 @@ class ApiService {
       },
       body: body,
     );
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> ratingJson = jsonDecode(response.body);
@@ -476,16 +504,12 @@ class ApiService {
       },
     );
 
-    print('Response status: ${response.statusCode}');
-
     if (response.statusCode != 204) {
       throw Exception('Failed to delete rating');
     }
   }
 
   Future<User> fetchUserByID(String? userID) async {
-    print("USERID");
-    print(userID);
     final token = AuthService.authToken;
     final response = await http.get(
       Uri.parse('$baseUrl/users/$userID'),
@@ -528,12 +552,11 @@ class ApiService {
 
     var response = await request.send();
     final responseString = await response.stream.bytesToString();
-    print('Response string: $responseString');
 
     if (response.statusCode == 201) {
       print('Association created successfully');
     } else {
-      print('Failed to create association');
+      throw Exception('Failed to create association');
     }
   }
 
@@ -720,12 +743,64 @@ class ApiService {
     }
   }
 
+
+  Future<List<Cat>> fetchCatsByUser(String userId) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/cats/user/$userId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> catsJson = jsonDecode(response.body);
+      return catsJson.map((json) => Cat.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cats for user');
+    }
+  }
+
+  Future<void> deleteAnnonce(String annonceId) async {
+
+
+    print(annonceId);
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/annonces/$annonceId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete annonce');
+    }
+  }
+
+
+  Future<void> updateAnnonce(Annonce annonce) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/annonces/${annonce.ID}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(annonce.toJson()),
+    );
+
+    print(annonce.toJson());
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update annonce.');
+    }
+  }
+
+
   IOWebSocketChannel connectToRoom(int roomID) {
     final token = AuthService.authToken;
-    print("calling this $wsUrl/ws/$roomID");
     return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
       'Authorization': 'Bearer $token',
     });
   }
-
 }

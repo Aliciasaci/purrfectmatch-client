@@ -1,16 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
+import 'package:purrfectmatch/models/favoris.dart';
 import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/views/cat/cat_details.dart';
 import 'package:purrfectmatch/views/user/user_public_profile.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'filter_modal.dart';
+import 'package:purrfectmatch/views/annonce/annonce_detail_page.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
   const SwipeCardsWidget({super.key});
@@ -40,18 +40,21 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       _loadAnnonces();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Utilisateur non authentifié"),
+        content: const Text("Utilisateur non authentifié"),
         duration: const Duration(milliseconds: 1500),
       ));
     }
   }
 
   Future<void> _loadAnnonces() async {
-    if (currentUser != null) {
+    if (currentUser != null && currentUser!.id != null) {
       try {
         final annonces = await apiService.fetchAllAnnonces();
+        final userFavorites = await apiService.fetchUserFavorites(currentUser!.id!);
+        final favoriteAnnonceIds = userFavorites.map((favoris) => favoris.AnnonceID).toSet();
+
         final filteredAnnonces = annonces
-            .where((annonce) => annonce.UserID != currentUser!.id)
+            .where((annonce) => annonce.UserID != currentUser!.id && !favoriteAnnonceIds.contains(annonce.ID))
             .toList();
 
         for (var annonce in filteredAnnonces) {
@@ -73,8 +76,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 superlikeAction: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => CatDetails(cat: cat)),
+                    MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
                   );
                 },
               ));
@@ -103,7 +105,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
       final filteredAnnonce =
-          await apiService.fetchCatsByFilters(age, catSex, race);
+      await apiService.fetchCatsByFilters(age, catSex, race);
       for (var annonce in filteredAnnonce) {
         annoncesList.add(annonce);
       }
@@ -137,7 +139,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           superlikeAction: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => CatDetails(cat: cat)),
+              MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
             );
           },
         ));
@@ -239,7 +241,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             height: 580,
                             width: 360,
                             child: Column(
@@ -263,14 +265,14 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                 ),
                                 Text(
                                   "Sexe: ${cat.sexe}",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
                                   ),
                                 ),
                                 Text(
                                   "Race: ${cat.race}",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
                                   ),
@@ -288,19 +290,19 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                     },
                                     child: Text(
                                       "Mise en ligne par: ${user.name}",
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
                                         decoration: TextDecoration.underline,
                                         decorationColor: Colors.white,
                                         decorationThickness: 2,
                                         height:
-                                            1.5, // This will add some space between the text and the underline
+                                        1.5, // This will add some space between the text and the underline
                                       ),
                                     ),
                                   ),
                                 ),
-                                Text(
+                                const Text(
                                   "Disponible",
                                   style: TextStyle(
                                     color: Colors.green,

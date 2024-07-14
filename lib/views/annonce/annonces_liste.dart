@@ -24,7 +24,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
     _fetchAnnonces();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-              _scrollController.position.maxScrollExtent &&
+          _scrollController.position.maxScrollExtent &&
           !_loading) {
         _fetchAnnonces();
       }
@@ -41,8 +41,8 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
       final newAnnonces = await apiService.fetchAllAnnonces();
       for (var annonce in newAnnonces) {
         if (annonce.CatID != null) {
-          final cat = await apiService.fetchCatByID(annonce.CatID!);
-          catsData[annonce.CatID!] = cat;
+          final cat = await apiService.fetchCatByID(annonce.CatID);
+          catsData[annonce.CatID] = cat;
         }
       }
       setState(() {
@@ -69,10 +69,15 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Liste des Annonces'),
+        backgroundColor: Colors.orange[100],
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
+          ),
         ),
         child: ListView.builder(
           controller: _scrollController,
@@ -84,19 +89,41 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
                   : const SizedBox.shrink();
             }
             final annonce = annoncesData[index];
-            final cat = annonce.CatID != null ? catsData[annonce.CatID!] : null;
+            final cat = annonce.CatID != null ? catsData[annonce.CatID] : null;
             return Card(
               margin: const EdgeInsets.all(10),
               color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              elevation: 4,
               child: ListTile(
                 leading: cat != null && cat.picturesUrl.isNotEmpty
-                    ? Image.network(cat.picturesUrl.first,
-                        width: 50, height: 50, fit: BoxFit.cover)
+                    ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.network(
+                    cat.picturesUrl.first,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                )
                     : const Icon(Icons.image, size: 50),
-                title: Text(annonce.Title),
+                title: Text(
+                  annonce.Title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 subtitle: Text(
-                    'Description: ${annonce.Description}\nCat ID: ${annonce.CatID}'),
-                trailing: const Icon(Icons.arrow_forward),
+                  'Description: ${annonce.Description}\nChat: ${cat?.name ?? 'Unknown'}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+                trailing: const Icon(Icons.arrow_forward, color: Colors.orange),
                 onTap: () {
                   Navigator.push(
                     context,

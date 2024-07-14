@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/annonce.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../cat/cat_details.dart';
+import 'edit_annonce_page.dart';
 
 class AnnonceDetailPage extends StatefulWidget {
   final Annonce annonce;
@@ -19,20 +24,17 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _catIDController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _populateFields();
     _fetchCatDetails();
-    print('====>Annonce créée : ${widget.annonce}');
   }
 
   void _populateFields() {
     _titleController.text = widget.annonce.Title;
-    _descriptionController.text = widget.annonce.Description;
-    _catIDController.text = widget.annonce.CatID ?? '';
+    _descriptionController.text = widget.annonce.Description ?? '';
   }
 
   Future<void> _fetchCatDetails() async {
@@ -64,137 +66,215 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
   }
 
   void _saveChanges() {
-    // Implement the save functionality here, for example, calling an API to save the changes
-    // For now, just print the values to console
     print('Title: ${_titleController.text}');
     print('Description: ${_descriptionController.text}');
-    print('Cat ID: ${_catIDController.text}');
-    _toggleEditing(); // Switch back to non-editing mode
+    _toggleEditing();
+  }
+
+  void _navigateToEditAnnonce() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditAnnoncePage(annonce: widget.annonce),
+      ),
+    ).then((result) {
+      if (result == true) {
+        // Refresh annonce details
+        _fetchCatDetails();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    final currentUser = authState is AuthAuthenticated ? authState.user : null;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Détails de l\'annonce'),
+        title: Text(AppLocalizations.of(context)!.annonceDetailsTitle),
+        backgroundColor: Colors.orange[100],
       ),
-      body: Container(
-        color: Colors.white,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _loadingCat
-                  ? const Center(child: CircularProgressIndicator())
-                  : _cat != null && _cat!.picturesUrl.isNotEmpty
-                  ? Image.network(
-                _cat!.picturesUrl.first,
-                width: double.infinity,
-                height: 250,
-                fit: BoxFit.cover,
-              )
-                  : Container(
-                width: double.infinity,
-                height: 250,
-                color: Colors.grey,
-                child: const Icon(Icons.image, size: 100),
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.orange[100]!, Colors.orange[200]!],
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Détails de l\'annonce',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _titleController,
-                      enabled: _isEditing,
-                      decoration: const InputDecoration(
-                        labelText: "Titre de l'annonce",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    TextFormField(
-                      controller: _descriptionController,
-                      maxLines: 2,
-                      enabled: _isEditing,
-                      decoration: const InputDecoration(
-                        labelText: "Description",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    TextFormField(
-                      controller: _catIDController,
-                      enabled: _isEditing,
-                      decoration: const InputDecoration(
-                        labelText: "ID du chat",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Retour'),
-                        ),
-                        const SizedBox(width: 7),
-                        ElevatedButton(
-                          onPressed: _isEditing ? _saveChanges : _toggleEditing,
-                          child: Text(_isEditing ? 'Valider' : 'Modifier'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    _cat != null
-                        ? Card(
-                      elevation: 4.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Informations sur le chat',
-                              style: TextStyle(
-                                fontSize: 20,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _loadingCat
+                              ? const Center(child: CircularProgressIndicator())
+                              : _cat != null && _cat!.picturesUrl.isNotEmpty
+                              ? Image.network(
+                            _cat!.picturesUrl.first,
+                            height: 300,
+                            fit: BoxFit.cover,
+                          )
+                              : Container(
+                            height: 300,
+                            color: Colors.grey,
+                            child: const Icon(Icons.image, size: 100),
+                          ),
+                          const SizedBox(height: 20),
+                          if (_isEditing)
+                            TextFormField(
+                              controller: _titleController,
+                              decoration: InputDecoration(
+                                labelText: AppLocalizations.of(context)!.title,
+                                border: const OutlineInputBorder(),
+                              ),
+                            )
+                          else
+                            Text(
+                              widget.annonce.Title,
+                              style: const TextStyle(
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.orange,
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            Text('Nom: ${_cat!.name}'),
-                            Text('Date de naissance: ${_cat!.birthDate}'),
-                            Text('Sexe: ${_cat!.sexe}'),
-                            Text('Couleur: ${_cat!.color}'),
-                            Text('Comportement: ${_cat!.behavior}'),
-                            Text('Stérilisé: ${_cat!.sterilized ? 'Oui' : 'Non'}'),
-                            Text('Race: ${_cat!.race}'),
-                            Text('Description: ${_cat!.description}'),
-                          ],
-                        ),
+                          const SizedBox(height: 15),
+                          if (_isEditing)
+                            TextFormField(
+                              controller: _descriptionController,
+                              decoration: InputDecoration(
+                                labelText:
+                                AppLocalizations.of(context)!.description,
+                                border: const OutlineInputBorder(),
+                              ),
+                              maxLines: null,
+                            )
+                          else
+                            Text(
+                              widget.annonce.Description ?? '',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          const SizedBox(height: 20),
+                          if (_cat != null)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)!.catDetailsTitle,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orangeAccent,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${AppLocalizations.of(context)!.name}: ${_cat!.name}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${AppLocalizations.of(context)!.gender}: ${_cat!.sexe}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${AppLocalizations.of(context)!.color}: ${_cat!.color}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${AppLocalizations.of(context)!.behavior}: ${_cat!.behavior}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                          if (_cat == null)
+                            Text(
+                                AppLocalizations.of(context)!.noCatInfoAvailable),
+                          if (currentUser != null &&
+                              widget.annonce.UserID == currentUser.id)
+                            SizedBox(
+                              width: double.infinity,
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.orange[100],
+                                        padding: const EdgeInsets.all(15),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CatDetails(cat: _cat!)),
+                                        );
+                                      },
+                                      child: Text(
+                                        AppLocalizations.of(context)!
+                                            .catDetails,
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.orange[100],
+                                        padding: const EdgeInsets.all(15),
+                                      ),
+                                      onPressed: _navigateToEditAnnonce,
+                                      child: Text(
+                                        AppLocalizations.of(context)!
+                                            .editAnnonce,
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
-                    )
-                        : const Text('Aucune information sur le chat disponible'),
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

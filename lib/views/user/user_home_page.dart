@@ -11,6 +11,8 @@ import '../annonce/form_add_annonce.dart';
 import '../login.dart';
 import '../swipe_card.dart';
 import './room/rooms_list_screen.dart';
+import 'package:provider/provider.dart';
+import '../../locale_provider.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key, required this.title, this.user});
@@ -27,7 +29,6 @@ class _UserHomePageState extends State<UserHomePage> {
   static final List<Widget> _widgetOptions = <Widget>[
     const SwipeCardsWidget(),
     const AnnoncesCatsMenu(),
-    const AddAnnonce(),
     const RoomsListScreen(),
     const ProfileScreen(),
   ];
@@ -48,6 +49,8 @@ class _UserHomePageState extends State<UserHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var localeProvider = Provider.of<LocaleProvider>(context);
+
     return Container(
       color: Colors.blue,
       child: Scaffold(
@@ -71,6 +74,24 @@ class _UserHomePageState extends State<UserHomePage> {
           ),
           elevation: 0,
           actions: [
+
+            GestureDetector(
+              onTap: () {
+                if (localeProvider.locale == const Locale('en')) {
+                  localeProvider.setLocale(const Locale('fr'));
+                } else {
+                  localeProvider.setLocale(const Locale('en'));
+                }
+              },
+              child: CircleAvatar(
+                radius: 15,
+                backgroundImage: AssetImage(
+                  localeProvider.locale == const Locale('fr')
+                      ? 'assets/images/flag_fr.png'
+                      : 'assets/images/flag_uk.png',
+                ),
+              ),
+            ),
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: _logout,

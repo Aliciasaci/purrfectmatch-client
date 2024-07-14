@@ -7,6 +7,7 @@ import '../../services/api_service.dart';
 import '../annonce/annonce_detail_page.dart';
 import '../cat/chat_page.dart';
 import '../../blocs/auth/auth_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserFavorisPage extends StatefulWidget {
   const UserFavorisPage({super.key});
@@ -27,7 +28,7 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
     _fetchUserFavoris();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-              _scrollController.position.maxScrollExtent &&
+          _scrollController.position.maxScrollExtent &&
           !_loading) {
         _fetchUserFavoris();
       }
@@ -69,6 +70,22 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
     }
   }
 
+  Future<void> _deleteFavori(String favoriId) async {
+    try {
+      await ApiService().deleteAnnonce(favoriId);
+      setState(() {
+        userFavorisData.removeWhere((favori) => favori.AnnonceID == favoriId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Favori supprimé avec succès')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de la suppression du favori: $e')),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -79,78 +96,97 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes favoris'),
+        title: Text(AppLocalizations.of(context)!.myFavorites),
+        backgroundColor: Colors.orange[100],
       ),
-      body: ListView.builder(
-        controller: _scrollController,
-        itemCount: userFavorisData.length + 1,
-        itemBuilder: (context, index) {
-          if (index == userFavorisData.length) {
-            return _loading
-                ? const Center(child: CircularProgressIndicator())
-                : const SizedBox.shrink();
-          }
-          final favori = userFavorisData[index];
-          final annonce = annoncesData[favori.AnnonceID];
-          return Card(
-            margin: const EdgeInsets.all(10),
-            color: Colors.white,
-            child: ListTile(
-              leading: annonce != null && annonce.CatID != null
-                  ? FutureBuilder<Cat>(
-                      future: ApiService().fetchCatByID(annonce.CatID!),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return const Icon(Icons.error);
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.picturesUrl.isEmpty) {
-                          return const Icon(Icons.image);
-                        } else {
-                          return Image.network(snapshot.data!.picturesUrl.first,
-                              width: 50, height: 50, fit: BoxFit.cover);
-                        }
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
+          ),
+        ),
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: userFavorisData.length + 1,
+          itemBuilder: (context, index) {
+            if (index == userFavorisData.length) {
+              return _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : const SizedBox.shrink();
+            }
+            final favori = userFavorisData[index];
+            final annonce = annoncesData[favori.AnnonceID];
+            return Card(
+              margin: const EdgeInsets.all(10),
+              color: Colors.white,
+              child: ListTile(
+                leading: annonce != null && annonce.CatID != null
+                    ? FutureBuilder<Cat>(
+                  future: ApiService().fetchCatByID(annonce.CatID!),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return const Icon(Icons.error, color: Colors.orange);
+                    } else if (!snapshot.hasData ||
+                        snapshot.data!.picturesUrl.isEmpty) {
+                      return const Icon(Icons.image, color: Colors.orange);
+                    } else {
+                      return Image.network(
+                          snapshot.data!.picturesUrl.first,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover);
+                    }
+                  },
+                )
+                    : const Icon(Icons.image, size: 50, color: Colors.orange),
+                title: Text(annonce != null
+                    ? annonce.Title
+                    : 'Annonce ID: ${favori.AnnonceID}'),
+                subtitle: Text(annonce != null
+                    ? annonce.Description
+                    : 'User ID: ${favori.UserID}'),
+                trailing: Wrap(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.chat, color: Colors.orange),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ChatPage(userId: favori.UserID),
+                          ),
+                        );
                       },
-                    )
-                  : const Icon(Icons.image, size: 50),
-              title: Text(annonce != null
-                  ? annonce.Title
-                  : 'Annonce ID: ${favori.AnnonceID}'),
-              subtitle: Text(annonce != null
-                  ? annonce.Description
-                  : 'User ID: ${favori.UserID}'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chat),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatPage(userId: favori.UserID),
-                        ),
-                      );
-                    },
-                  ),
-                  const Icon(Icons.arrow_forward),
-                ],
-              ),
-              onTap: () {
-                if (annonce != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AnnonceDetailPage(annonce: annonce),
                     ),
-                  );
-                }
-              },
-            ),
-          );
-        },
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.orange),
+                      onPressed: () {
+                        _deleteFavori(favori.AnnonceID);
+                      },
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  if (annonce != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AnnonceDetailPage(annonce: annonce),
+                      ),
+                    );
+                  }
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
