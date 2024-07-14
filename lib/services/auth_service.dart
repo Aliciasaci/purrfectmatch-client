@@ -116,8 +116,8 @@ class AuthService {
   }
 
   Future<void> handleGoogleSignIn() async {
-    /*try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    try {
+      /*final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
 
       final accessToken = googleAuth.accessToken;
@@ -130,7 +130,10 @@ class AuthService {
         throw 'No ID Token found.';
       }
 
-      final response = await http.get(
+      print('Access Token: $accessToken');
+      print('ID Token: $idToken');*/
+
+      /*final response = await http.get(
         Uri.parse('$baseUrl/auth/google'),
         headers: {
           //'Authorization': 'Bearer ${googleAuth.accessToken}',
@@ -139,11 +142,11 @@ class AuthService {
 
       // Handle response, e.g., navigate to home page
       print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      print('Response body: ${response.body}');*/
     } catch (error) {
       print('Error signing in with Google: $error');
       throw error; // Rethrow the error to be handled by the caller.
-    }*/
+    }
   }
 
   void logout() {
