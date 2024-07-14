@@ -74,12 +74,8 @@ class _AddAnnonceState extends State<AddAnnonce> {
         title: const Text('Ajouter une nouvelle annonce'),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
         child: Center(
           child: Container(
@@ -158,7 +154,8 @@ class _AddAnnonceState extends State<AddAnnonce> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const AddCat()),
+                              MaterialPageRoute(
+                                  builder: (context) => const AddCat()),
                             );
                           },
                           child: const Text('Ajouter un chat'),

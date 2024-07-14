@@ -42,7 +42,8 @@ class _RegisterPageState extends State<RegisterPage> {
       if (AuthService.authToken != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const UserHomePage(title: '')),
+          MaterialPageRoute(
+              builder: (context) => const UserHomePage(title: '')),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Inscription réussie!')),
@@ -71,155 +72,202 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: SingleChildScrollView(
-              child: Card(
-                color: Colors.white,
-                elevation: 4.0,
-                margin: const EdgeInsets.all(20.0),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Image(
-                          image: AssetImage('assets/logo.png'),
-                          height: 50,
-                          width: 50,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Image(
+                      image: AssetImage('assets/paw.png'),
+                      height: 50,
+                      width: 50,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Inscription',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
                         ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Inscription',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Nom',
+                          border: InputBorder.none,
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          controller: _nameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Nom',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre nom';
-                            }
-                            return null;
-                          },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre nom';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre email';
-                            }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                              return 'Veuillez entrer une adresse email valide';
-                            }
-                            return null;
-                          },
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          border: InputBorder.none,
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          controller: _passwordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Mot de passe',
-                            border: OutlineInputBorder(),
-                          ),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre mot de passe';
-                            }
-                            return null;
-                          },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre email';
+                          }
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            return 'Veuillez entrer une adresse email valide';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          controller: _addressRueController,
-                          decoration: const InputDecoration(
-                            labelText: 'Adresse Rue',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre adresse';
-                            }
-                            return null;
-                          },
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        decoration: const InputDecoration(
+                          labelText: 'Mot de passe',
+                          border: InputBorder.none,
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          controller: _cpController,
-                          decoration: const InputDecoration(
-                            labelText: 'Code Postal',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre code postal';
-                            }
-                            if (!RegExp(r'^\d{5}$').hasMatch(value)) {
-                              return 'Veuillez entrer un code postal valide';
-                            }
-                            return null;
-                          },
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre mot de passe';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                          controller: _villeController,
-                          decoration: const InputDecoration(
-                            labelText: 'Ville',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre ville';
-                            }
-                            return null;
-                          },
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _addressRueController,
+                        decoration: const InputDecoration(
+                          labelText: 'Adresse Rue',
+                          border: InputBorder.none,
                         ),
-                        const SizedBox(height: 20),
-                        _isLoading
-                            ? const CircularProgressIndicator()
-                            : ElevatedButton(
-                          onPressed: _register,
-                          child: const Text('Inscription'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre adresse';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
                         ),
-                        const SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Déjà un compte ? Connectez-vous',
-                            style: TextStyle(
-                              color: Colors.blue,
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _cpController,
+                        decoration: const InputDecoration(
+                          labelText: 'Code Postal',
+                          border: InputBorder.none,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre code postal';
+                          }
+                          if (!RegExp(r'^\d{5}$').hasMatch(value)) {
+                            return 'Veuillez entrer un code postal valide';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _villeController,
+                        decoration: const InputDecoration(
+                          labelText: 'Ville',
+                          border: InputBorder.none,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre ville';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : SizedBox(
+                            width: double.infinity,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.orange[100],
+                                padding: const EdgeInsets.all(15),
+                              ),
+                              onPressed: _register,
+                              child: const Text('Inscription'),
                             ),
                           ),
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        'Déjà un compte ? Connectez-vous',
+                        style: TextStyle(
+                          color: Colors.orange[200],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),

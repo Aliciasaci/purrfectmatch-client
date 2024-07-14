@@ -42,7 +42,12 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: '',
-        theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
+        theme: ThemeData(
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.blueGrey[50],
+          ),
+          scaffoldBackgroundColor: Colors.blueGrey[50],
+        ),
         home: BlocListener<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthAuthenticated) {
@@ -82,20 +87,22 @@ class MyApp extends StatelessWidget {
         routes: {
           '/admin': (context) => const AdminHomePage(title: ''),
           '/admin/users': (context) => BlocProvider(
-            create: (context) => CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
-            child: const CrudUserPage(),
-          ),
+                create: (context) =>
+                    CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
+                child: const CrudUserPage(),
+              ),
           '/admin/races': (context) => BlocProvider(
-            create: (context) => CrudRaceBloc(apiService: ApiService())..add(LoadRaces()),
-            child: const CrudRacePage(),
-          ),
+                create: (context) =>
+                    CrudRaceBloc(apiService: ApiService())..add(LoadRaces()),
+                child: const CrudRacePage(),
+              ),
           '/admin/associations': (context) => BlocProvider(
-            create: (context) => AssociationBloc(apiService: ApiService())
-              ..add(LoadAssociations()),
-            child: const ListAssociation(),
-          ),
+                create: (context) => AssociationBloc(apiService: ApiService())
+                  ..add(LoadAssociations()),
+                child: const ListAssociation(),
+              ),
           '/not-found': (context) =>
-            const NotFoundPage(title: 'Page not found'),
+              const NotFoundPage(title: 'Page not found'),
           '/user': (context) => const UserHomePage(title: ''),
           '/user/create-association': (context) => const CreateAssociation(),
         },

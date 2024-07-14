@@ -22,7 +22,7 @@ class _CatsListPageState extends State<CatsListPage> {
     _fetchCats();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent &&
+              _scrollController.position.maxScrollExtent &&
           !_loading) {
         _fetchCats();
       }
@@ -63,12 +63,8 @@ class _CatsListPageState extends State<CatsListPage> {
         title: const Text('Liste des Chats'),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
         child: ListView.builder(
           controller: _scrollController,

@@ -27,7 +27,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     _fetchUserAnnonces();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent &&
+              _scrollController.position.maxScrollExtent &&
           !_loading &&
           _hasMore) {
         _fetchUserAnnonces();
@@ -86,54 +86,45 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
       appBar: AppBar(
         title: const Text('Mes annonces'),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
-        ),
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: userAnnoncesData.length + 1,
-          itemBuilder: (context, index) {
-            if (index == userAnnoncesData.length) {
-              return _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : !_hasMore
-                  ? const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: Text('No more annonces')),
-              )
-                  : const SizedBox.shrink();
-            }
-            final annonce = userAnnoncesData[index];
-            final cat = annonce.CatID != null ? catsData[annonce.CatID!] : null;
-            return Card(
-              margin: const EdgeInsets.all(10),
-              color: Colors.white,
-              child: ListTile(
-                leading: cat != null && cat.picturesUrl.isNotEmpty
-                    ? Image.network(cat.picturesUrl.first,
-                    width: 50, height: 50, fit: BoxFit.cover)
-                    : const Icon(Icons.image, size: 50),
-                title: Text(annonce.Title),
-                subtitle: Text(
-                    'Description: ${annonce.Description}\nCat ID: ${annonce.CatID}'),
-                trailing: const Icon(Icons.arrow_forward),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AnnonceDetailPage(annonce: annonce),
-                    ),
-                  );
-                },
-              ),
-            );
-          },
-        ),
+      body: ListView.builder(
+        controller: _scrollController,
+        itemCount: userAnnoncesData.length + 1,
+        itemBuilder: (context, index) {
+          if (index == userAnnoncesData.length) {
+            return _loading
+                ? const Center(child: CircularProgressIndicator())
+                : !_hasMore
+                    ? const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(child: Text('No more annonces')),
+                      )
+                    : const SizedBox.shrink();
+          }
+          final annonce = userAnnoncesData[index];
+          final cat = annonce.CatID != null ? catsData[annonce.CatID!] : null;
+          return Card(
+            margin: const EdgeInsets.all(10),
+            color: Colors.white,
+            child: ListTile(
+              leading: cat != null && cat.picturesUrl.isNotEmpty
+                  ? Image.network(cat.picturesUrl.first,
+                      width: 50, height: 50, fit: BoxFit.cover)
+                  : const Icon(Icons.image, size: 50),
+              title: Text(annonce.Title),
+              subtitle: Text(
+                  'Description: ${annonce.Description}\nCat ID: ${annonce.CatID}'),
+              trailing: const Icon(Icons.arrow_forward),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AnnonceDetailPage(annonce: annonce),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
