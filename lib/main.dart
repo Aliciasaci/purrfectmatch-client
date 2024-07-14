@@ -14,6 +14,7 @@ import 'package:purrfectmatch/views/admin/race/crud_race_page.dart';
 import 'package:purrfectmatch/views/not_found_page.dart';
 import 'package:purrfectmatch/views/user/profile/create_association.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'appAuthLinks.dart';
 import 'blocs/auth/auth_bloc.dart';
 import 'services/auth_service.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _appLinksDeepLink.initialize(); // Initialize deep links when the app starts
+    kIsWeb ? _appLinksDeepLink.initialize() : null; // Initialize deep links when the app starts
 
     return MultiBlocProvider(
       providers: [

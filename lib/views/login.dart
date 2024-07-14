@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:purrfectmatch/services/auth_service.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -198,28 +197,6 @@ class _LoginPageState extends State<LoginPage> {
       print('Error signing in with Google: $error');
 
     }
-  }
-
-
-
-  void showGoogleModalBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-
-        double screenHeight = MediaQuery.of(context).size.height;
-        double webViewHeight = screenHeight * 0.75;
-
-        return SingleChildScrollView(
-          child: SizedBox(
-            height: webViewHeight,
-            child: InAppWebView(
-              initialUrlRequest: URLRequest(url: WebUri('$baseUrl/auth/google')),
-            ),
-          ),
-        );
-      },
-    );
   }
 }
 
