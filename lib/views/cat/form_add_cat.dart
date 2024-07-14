@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -135,24 +134,41 @@ class _AddCatState extends State<AddCat> {
     }
   }
 
+  Widget _buildTextFormField(TextEditingController controller, String label, {bool readOnly = false, void Function()? onTap, Icon? suffixIcon}) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.orange[100]!,
+        ),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: TextFormField(
+        controller: controller,
+        readOnly: readOnly,
+        onTap: onTap,
+        decoration: InputDecoration(
+          labelText: label,
+          border: InputBorder.none,
+          suffixIcon: suffixIcon,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         title: const Text('Add Cat'),
+        backgroundColor: Colors.orange[100],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
           ),
         ),
         child: Center(
@@ -177,34 +193,124 @@ class _AddCatState extends State<AddCat> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      buildTextFormField(_nameController, 'Name'),
+                      _buildTextFormField(_nameController, 'Name'),
                       const SizedBox(height: 10),
-                      buildTextFormFieldWithDatepicker(_birthDateController, 'Birth Date', context),
+                      _buildTextFormField(
+                        _birthDateController,
+                        'Birth Date',
+                        readOnly: true,
+                        onTap: () => _selectDate(context, _birthDateController),
+                        suffixIcon: const Icon(Icons.calendar_today),
+                      ),
                       const SizedBox(height: 10),
-                      buildTextFormFieldWithDatepicker(_lastVaccineDateController, 'Last Vaccine Date', context),
+                      _buildTextFormField(
+                        _lastVaccineDateController,
+                        'Last Vaccine Date',
+                        readOnly: true,
+                        onTap: () => _selectDate(context, _lastVaccineDateController),
+                        suffixIcon: const Icon(Icons.calendar_today),
+                      ),
                       const SizedBox(height: 10),
-                      buildTextFormField(_lastVaccineNameController, 'Last Vaccine Name'),
+                      _buildTextFormField(_lastVaccineNameController, 'Last Vaccine Name'),
                       const SizedBox(height: 10),
-                      buildTextFormField(_colorController, 'Color'),
+                      _buildTextFormField(_colorController, 'Color'),
                       const SizedBox(height: 10),
-                      buildTextFormField(_behaviorController, 'Behavior'),
+                      _buildTextFormField(_behaviorController, 'Behavior'),
                       const SizedBox(height: 10),
-                      buildRaceSelectFormField(raceList, 'Race'),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: DropdownButtonFormField<int>(
+                          decoration: const InputDecoration(
+                            labelText: 'Race',
+                            border: InputBorder.none,
+                          ),
+                          items: raceList.entries.map((entry) {
+                            return DropdownMenuItem<int>(
+                              value: entry.key,
+                              child: Text(entry.value),
+                            );
+                          }).toList(),
+                          value: _dropdownValue,
+                          onChanged: (int? newValue) {
+                            setState(() {
+                              _dropdownValue = newValue;
+                            });
+                          },
+                        ),
+                      ),
                       const SizedBox(height: 10),
-                      buildDescriptionFormField(_descriptionController, 'Description'),
+                      _buildTextFormField(
+                        _descriptionController,
+                        'Description',
+                      ),
                       const SizedBox(height: 10),
-                      buildSexeDropdown('Select Gender'),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            labelText: 'Select Gender',
+                            border: InputBorder.none,
+                          ),
+                          value: _selectedValue,
+                          items: _options.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedValue = newValue;
+                            });
+                          },
+                          isExpanded: true,
+                        ),
+                      ),
                       const SizedBox(height: 10),
-                      buildSwitchTile('Sterilized', _sterilized, (value) => setState(() => _sterilized = value)),
-                      buildSwitchTile('Reserved', _reserved, (value) => setState(() => _reserved = value)),
+                      SwitchListTile(
+                        title: Text('Sterilized'),
+                        value: _sterilized,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _sterilized = value;
+                          });
+                        },
+                      ),
+                      SwitchListTile(
+                        title: Text('Reserved'),
+                        value: _reserved,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _reserved = value;
+                          });
+                        },
+                      ),
                       const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: _pickFile,
-                        child: Text(_selectedFile == null ? 'Select Photo' : 'Photo Selected: ${_selectedFile!.name}'),
+                        child: Text(
+                          _selectedFile == null ? 'Select Photo' : 'Photo Selected: ${_selectedFile!.name}',
+                        ),
                       ),
                       const SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: _sendData,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange[100],
+                          padding: const EdgeInsets.all(15),
+                        ),
                         child: const Text('Send'),
                       ),
                       const SizedBox(height: 15),
@@ -218,71 +324,4 @@ class _AddCatState extends State<AddCat> {
       ),
     );
   }
-
-  Widget buildTextFormField(TextEditingController controller, String label) => TextFormField(
-    controller: controller,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-    ),
-  );
-
-  Widget buildTextFormFieldWithDatepicker(TextEditingController controller, String label, BuildContext context) => TextFormField(
-    controller: controller,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-      suffixIcon: const Icon(Icons.calendar_today),
-    ),
-    readOnly: true,
-    onTap: () => _selectDate(context, controller),
-  );
-
-  Widget buildDescriptionFormField(TextEditingController controller, String label) => TextFormField(
-    controller: controller,
-    maxLines: 3,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-    ),
-  );
-
-  Widget buildSexeDropdown(String hint) => DropdownButton<String>(
-    value: _selectedValue,
-    hint: Text(hint),
-    items: _options.map((String value) {
-      return DropdownMenuItem<String>(
-        value: value,
-        child: Text(value),
-      );
-    }).toList(),
-    onChanged: (String? newValue) {
-      setState(() {
-        _selectedValue = newValue;
-      });
-    },
-    isExpanded: true,
-  );
-
-  Widget buildSwitchTile(String title, bool value, ValueChanged<bool> onChanged) => SwitchListTile(
-    title: Text(title),
-    value: value,
-    onChanged: onChanged,
-  );
-
-  Widget buildRaceSelectFormField(Map<int?, String> items, String hint) => DropdownButton(
-    hint: Text(hint),
-    items: items.entries.map((entry) {
-      return DropdownMenuItem<dynamic>(
-        value: entry.key,
-        child: Text(entry.value),
-      );
-    }).toList(),
-    value: _dropdownValue,
-    onChanged: (dynamic newValue) {
-      setState(() {
-        _dropdownValue = newValue;
-      });
-    },
-  );
 }

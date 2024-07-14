@@ -282,5 +282,13 @@
   },
   "myCats" : "Mes chats",
   "global" : "Global",
-  "modificationSuccess" : "Successfuly modified"
+  "modificationSuccess" : "Successfuly modified",
+  "title" : "Titre",
+  "editAnnonceTitle" : "Modifier l'annonce",
+  "selectCat" : "Selected Cat",
+  "updateSuccess" : "Updated successfully",
+  "updateFailed" : "Failed to update",
+  "add" : "Add",
+  "catDetails" : "Cat Details",
+  "editAnnonce" : "Edit announcement"
 }

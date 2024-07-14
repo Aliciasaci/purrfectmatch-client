@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../services/api_service.dart';
 
@@ -37,22 +38,18 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
     } catch (e) {
       print('Failed to load races: $e');
     }
-    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 600,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.vertical(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(
           top: Radius.circular(25),
           bottom: Radius.circular(0),
         ),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-        ),
+        color: Colors.white,
       ),
       child: Center(
         child: Padding(
@@ -61,23 +58,30 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                  "Filtres",
-                  style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900) ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Age du chat',
-                  border: OutlineInputBorder(),
+              const Text("Filtres",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.orange[100]!,
+                  ),
+                  borderRadius: BorderRadius.circular(40),
                 ),
-                autocorrect: false,
-                maxLength: 2,
-                onChanged: (text) {
-                  setState(() {
-                    _age = text;
-                  });
-                },
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Age du chat',
+                    border: InputBorder.none,
+                  ),
+                  autocorrect: false,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [LengthLimitingTextInputFormatter(2)],
+                  onChanged: (text) {
+                    setState(() {
+                      _age = text;
+                    });
+                  },
+                ),
               ),
               Row(
                 children: [
@@ -112,12 +116,12 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                 ],
               ),
               DropdownButton(
-                hint: const Text('Sélectionner une race'),
+                  hint: const Text('Sélectionner une race'),
                   items: raceList.entries.map((entry) {
                     return DropdownMenuItem<dynamic>(
-                          value: entry.key,
-                          child: Text(entry.value),
-                        );
+                      value: entry.key,
+                      child: Text(entry.value),
+                    );
                   }).toList(),
                   value: _dropdownValue,
                   onChanged: (dynamic newValue) {
@@ -127,11 +131,16 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                       });
                     }
                   }),
-              ElevatedButton(
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.orange[100],
+                  padding: const EdgeInsets.all(15),
+                ),
                 child: const Text('Lancer la recherche'),
                 onPressed: () => {
                   widget.callback(_age, _catSex, _dropdownValue),
-                  Navigator.pop(context)},
+                  Navigator.pop(context)
+                },
               ),
             ],
           ),

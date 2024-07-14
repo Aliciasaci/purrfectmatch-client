@@ -9,7 +9,7 @@ import 'edit_cat_details.dart';
 import '../../blocs/auth/auth_bloc.dart';
 
 class CatsListPage extends StatefulWidget {
-  final String? userId; // Change the userId type to String
+  final String? userId;
 
   const CatsListPage({super.key, this.userId});
 
@@ -30,7 +30,9 @@ class _CatsListPageState extends State<CatsListPage> {
     _loadCurrentUser();
     _fetchCats();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !_loading) {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent &&
+          !_loading) {
         _fetchCats();
       }
     });
@@ -98,23 +100,25 @@ class _CatsListPageState extends State<CatsListPage> {
     );
 
     if (result == true) {
-      // If a cat was edited, reload the list
       _fetchCats();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final Color buttonColor = Colors.orange[400]!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.catListTitle),
+        backgroundColor: Colors.orange[100],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
           ),
         ),
         child: ListView.builder(
@@ -122,28 +126,53 @@ class _CatsListPageState extends State<CatsListPage> {
           itemCount: catsData.length + 1,
           itemBuilder: (context, index) {
             if (index == catsData.length) {
-              return _loading ? const Center(child: CircularProgressIndicator()) : const SizedBox.shrink();
+              return _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : const SizedBox.shrink();
             }
             final cat = catsData[index];
             return Card(
               margin: const EdgeInsets.all(10),
               color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: ListTile(
-                leading: cat.picturesUrl.isNotEmpty ? Image.network(cat.picturesUrl[0]) : const Icon(Icons.pets),
-                title: Text(cat.name),
+                leading: cat.picturesUrl.isNotEmpty
+                    ? ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    cat.picturesUrl[0],
+                    fit: BoxFit.cover,
+                    width: 50,
+                    height: 50,
+                  ),
+                )
+                    : const Icon(Icons.pets, size: 50),
+                title: Text(
+                  cat.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 subtitle: Text(
-                    '${AppLocalizations.of(context)!.race}: ${cat.race}\n${AppLocalizations.of(context)!.color}: ${cat.color}\n${AppLocalizations.of(context)!.behavior}: ${cat.behavior}\n${AppLocalizations.of(context)!.reserved}: ${cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
+                  '${AppLocalizations.of(context)!.race}: ${cat.race}\n'
+                      '${AppLocalizations.of(context)!.color}: ${cat.color}\n'
+                      '${AppLocalizations.of(context)!.behavior}: ${cat.behavior}\n'
+                      '${AppLocalizations.of(context)!.reserved}: ${cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}',
+                  style: const TextStyle(fontSize: 14),
+                ),
+                trailing: Wrap(
                   children: [
                     if (currentUser != null && cat.userId == currentUser!.id)
                       IconButton(
-                        icon: Icon(Icons.edit, color: Colors.green),
+                        icon: Icon(Icons.edit, color: buttonColor),
                         onPressed: () => _navigateAndEditCat(cat),
                       ),
                     if (currentUser != null && cat.userId == currentUser!.id)
                       IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
+                        icon: Icon(Icons.delete, color: buttonColor),
                         onPressed: () => _deleteCat(cat.ID!),
                       ),
                   ],

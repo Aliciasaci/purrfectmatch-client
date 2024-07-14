@@ -39,19 +39,30 @@ class CatDetails extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.catDetailsTitle),
+        backgroundColor: Colors.orange[100],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
           ),
         ),
         child: Center(
-          child: Card(
-            color: Colors.white,
-            margin: const EdgeInsets.all(20),
+          child: Container(
+            margin: const EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
@@ -59,12 +70,15 @@ class CatDetails extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Center(
-                      child: Image.network(
-                        cat.picturesUrl.isNotEmpty
-                            ? cat.picturesUrl.first
-                            : 'https://via.placeholder.com/300',
-                        height: 300,
-                        fit: BoxFit.cover,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          cat.picturesUrl.isNotEmpty
+                              ? cat.picturesUrl.first
+                              : 'https://via.placeholder.com/300',
+                          height: 300,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -73,6 +87,7 @@ class CatDetails extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: Colors.orange,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -143,6 +158,13 @@ class CatDetails extends StatelessWidget {
                               ),
                             );
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange[100],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            padding: const EdgeInsets.all(15),
+                          ),
                           child: Text(AppLocalizations.of(context)!.edit),
                         ),
                       ),

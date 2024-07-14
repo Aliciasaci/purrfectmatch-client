@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/annonce.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
-import '../annonce/annonce_detail_page.dart';
+import '../annonce/edit_annonce_page.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../annonce/annonce_detail_page.dart';
 
 class UserAnnoncesPage extends StatefulWidget {
   const UserAnnoncesPage({super.key});
@@ -47,9 +48,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
       if (authState is AuthAuthenticated) {
         final userId = authState.user.id;
         if (userId != null) {
-          print('Fetching annonces for user ID: $userId');
           final newAnnonces = await apiService.fetchUserAnnonces(userId);
-          print('Fetched ${newAnnonces.length} annonces: $newAnnonces');
 
           for (var annonce in newAnnonces) {
             if (annonce.CatID != null) {
@@ -68,19 +67,16 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
           setState(() {
             _loading = false;
           });
-          print('User ID is null');
         }
       }
     } catch (e) {
       setState(() {
         _loading = false;
       });
-      print('Failed to load user annonces: $e');
     }
   }
 
   Future<void> _deleteAnnonce(String annonceId) async {
-    print(annonceId);
     try {
       await ApiService().deleteAnnonce(annonceId);
       setState(() {
@@ -118,13 +114,14 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.myAnnouncements),
+        backgroundColor: Colors.orange[100],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
           ),
         ),
         child: ListView.builder(
@@ -148,30 +145,48 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
               color: Colors.white,
               child: ListTile(
                 leading: cat != null && cat.picturesUrl.isNotEmpty
-                    ? Image.network(cat.picturesUrl.first,
-                    width: 50, height: 50, fit: BoxFit.cover)
-                    : const Icon(Icons.image, size: 50),
+                    ? Image.network(
+                  cat.picturesUrl.first,
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                )
+                    : const Icon(Icons.image, size: 50, color: Colors.orange),
                 title: Text(annonce.Title),
                 subtitle: Text(
-                    'Description: ${annonce.Description}\nCat ID: ${annonce.CatID}'),
+                  'Description: ${annonce.Description}\nChat: ${cat?.name ?? 'Unknown'}',
+                ),
                 trailing: Wrap(
-                  spacing: 12,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
+                      icon: const Icon(Icons.edit, color: Colors.orange),
                       onPressed: () {
-                        print(annonce);
-                        print(annonce.ID);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditAnnoncePage(annonce: annonce),
+                          ),
+                        ).then((value) {
+                          if (value == true) {
+                            _reloadUserAnnonces();
+                          }
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.orange),
+                      onPressed: () {
                         if (annonce.ID != null) {
                           _deleteAnnonce(annonce.ID.toString());
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('ID de l\'annonce invalide')),
+                            SnackBar(
+                              content: Text('ID de l\'annonce invalide'),
+                            ),
                           );
                         }
                       },
                     ),
-                    const Icon(Icons.arrow_forward),
                   ],
                 ),
                 onTap: () {

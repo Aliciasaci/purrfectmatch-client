@@ -50,7 +50,12 @@ class MyApp extends StatelessWidget {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               title: '',
-              theme: ThemeData(scaffoldBackgroundColor: Colors.transparent),
+              theme: ThemeData(
+                appBarTheme: AppBarTheme(
+                  backgroundColor: Colors.blueGrey[50],
+                ),
+                scaffoldBackgroundColor: Colors.blueGrey[50],
+              ),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               locale: localeProvider.locale,

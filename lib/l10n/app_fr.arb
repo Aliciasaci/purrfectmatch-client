@@ -276,5 +276,13 @@
   "@noCatInfoAvailable": {
     "description": "Message affiché lorsque aucune information sur le chat n'est disponible"
   },
-  "global" : "Global"
+  "global" : "Global",
+  "title" : "Titre",
+  "editAnnonceTitle" : "Modifier l'annonce",
+  "selectCat" : "Chat choisi",
+  "updateSuccess" : "Mise à jour avec succès",
+  "updateFailed" : "Echec de mise à jour",
+  "add" : "Ajouter",
+  "catDetails" : "Détail du chat",
+  "editAnnonce" : "Modifier l'annonce"
 }

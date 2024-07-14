@@ -45,7 +45,8 @@ class _RegisterPageState extends State<RegisterPage> {
       if (AuthService.authToken != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const UserHomePage(title: '')),
+          MaterialPageRoute(
+              builder: (context) => const UserHomePage(title: '')),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.registerSuccessful)),
@@ -78,155 +79,209 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-              ),
-            ),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: SingleChildScrollView(
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 4.0,
-                    margin: const EdgeInsets.all(20.0),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Image(
-                              image: AssetImage('assets/logo.png'),
-                              height: 50,
-                              width: 50,
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              AppLocalizations.of(context)!.registerPage,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _nameController,
-                              decoration: InputDecoration(
-                                labelText: AppLocalizations.of(context)!.name,
-                                border: const OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLocalizations.of(context)!.enterName;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                labelText: AppLocalizations.of(context)!.email,
-                                border: const OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLocalizations.of(context)!.enterEmail;
-                                }
-                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                                  return AppLocalizations.of(context)!.invalidEmail;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _passwordController,
-                              decoration: InputDecoration(
-                                labelText: AppLocalizations.of(context)!.password,
-                                border: const OutlineInputBorder(),
-                              ),
-                              obscureText: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLocalizations.of(context)!.enterPassword;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _addressRueController,
-                              decoration: InputDecoration(
-                                labelText: AppLocalizations.of(context)!.addressRue,
-                                border: const OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLocalizations.of(context)!.enterAddress;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _cpController,
-                              decoration: InputDecoration(
-                                labelText: AppLocalizations.of(context)!.postalCode,
-                                border: const OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLocalizations.of(context)!.enterPostalCode;
-                                }
-                                if (!RegExp(r'^\d{5}$').hasMatch(value)) {
-                                  return AppLocalizations.of(context)!.invalidPostalCode;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _villeController,
-                              decoration: InputDecoration(
-                                labelText: AppLocalizations.of(context)!.city,
-                                border: const OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLocalizations.of(context)!.enterCity;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            _isLoading
-                                ? const CircularProgressIndicator()
-                                : ElevatedButton(
-                              onPressed: _register,
-                              child: Text(AppLocalizations.of(context)!.registerPage),
-                            ),
-                            const SizedBox(height: 20),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                AppLocalizations.of(context)!.alreadyHaveAccount,
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ),
-                          ],
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Image(
+                          image: AssetImage('assets/paw.png'),
+                          height: 50,
+                          width: 50,
                         ),
-                      ),
+                        const SizedBox(height: 20),
+                        Text(
+                          AppLocalizations.of(context)!.registerPage,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.orange[100]!,
+                            ),
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: TextFormField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              icon: Icon(Icons.account_circle_rounded,
+                                  color: Colors.orange[100]),
+                              border: InputBorder.none,
+                              labelText: AppLocalizations.of(context)!.name,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return AppLocalizations.of(context)!.enterName;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.orange[100]!,
+                            ),
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              icon: Icon(Icons.email, color: Colors.orange[100]),
+                              border: InputBorder.none,
+                              labelText: AppLocalizations.of(context)!.email,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return AppLocalizations.of(context)!.enterEmail;
+                              }
+                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                return AppLocalizations.of(context)!.invalidEmail;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.orange[100]!,
+                            ),
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: TextFormField(
+                            controller: _passwordController,
+                            decoration: InputDecoration(
+                              icon: Icon(Icons.lock, color: Colors.orange[100]),
+                              border: InputBorder.none,
+                              labelText: AppLocalizations.of(context)!.password,
+                            ),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return AppLocalizations.of(context)!.enterPassword;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.orange[100]!,
+                            ),
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: TextFormField(
+                            controller: _addressRueController,
+                            decoration: InputDecoration(
+                              icon: Icon(Icons.home, color: Colors.orange[100]),
+                              border: InputBorder.none,
+                              labelText: AppLocalizations.of(context)!.addressRue,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return AppLocalizations.of(context)!.enterAddress;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.orange[100]!,
+                            ),
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: TextFormField(
+                            controller: _cpController,
+                            decoration: InputDecoration(
+                              icon: Icon(Icons.location_on, color: Colors.orange[100]),
+                              border: InputBorder.none,
+                              labelText: AppLocalizations.of(context)!.postalCode,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return AppLocalizations.of(context)!.enterPostalCode;
+                              }
+                              if (!RegExp(r'^\d{5}$').hasMatch(value)) {
+                                return AppLocalizations.of(context)!.invalidPostalCode;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.orange[100]!,
+                            ),
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: TextFormField(
+                            controller: _villeController,
+                            decoration: InputDecoration(
+                              icon: Icon(Icons.location_city, color: Colors.orange[100]),
+                              border: InputBorder.none,
+                              labelText: AppLocalizations.of(context)!.city,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return AppLocalizations.of(context)!.enterCity;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        _isLoading
+                            ? const CircularProgressIndicator()
+                            : SizedBox(
+                          width: double.infinity,
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.orange[100],
+                              padding: const EdgeInsets.all(15),
+                            ),
+                            onPressed: _register,
+                            child: Text(AppLocalizations.of(context)!.registerPage),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            AppLocalizations.of(context)!.alreadyHaveAccount,
+                            style: TextStyle(
+                              color: Colors.orange[200],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

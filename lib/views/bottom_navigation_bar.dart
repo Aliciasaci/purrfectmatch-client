@@ -19,48 +19,30 @@ class CustomBottomNavigationBar extends StatefulWidget {
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(40.0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
+    return ClipRRect(
+      borderRadius: const BorderRadius.all(Radius.circular(40.0)),
+      child: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: _buildIcon(Icons.search, 0, Colors.green),
+            label: AppLocalizations.of(context)!.search,
+          ),
+          BottomNavigationBarItem(
+            icon: _buildIcon(Icons.pets, 1, Colors.pink),
+            label: AppLocalizations.of(context)!.adopt,
+          ),
+          BottomNavigationBarItem(
+            icon: _buildIcon(Icons.message, 3, Colors.deepPurple),
+            label: AppLocalizations.of(context)!.conversations,
+          ),
+          BottomNavigationBarItem(
+            icon: _buildIcon(Icons.person, 4, Colors.blueAccent),
+            label: AppLocalizations.of(context)!.profile,
           ),
         ],
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey.withOpacity(0.5)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(40.0)),
-        child: BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: _buildIcon(Icons.search, 0, Colors.green),
-              label: AppLocalizations.of(context)!.search,
-            ),
-            BottomNavigationBarItem(
-              icon: _buildIcon(Icons.pets, 1, Colors.pink),
-              label: AppLocalizations.of(context)!.adopt,
-            ),
-            BottomNavigationBarItem(
-              icon: _buildIcon(Icons.chat, 2, Colors.deepPurple),
-              label: AppLocalizations.of(context)!.conversations,
-            ),
-            BottomNavigationBarItem(
-              icon: _buildIcon(Icons.person, 3, Colors.blueAccent),
-              label: AppLocalizations.of(context)!.profile,
-            ),
-          ],
-          currentIndex: widget.selectedIndex,
-          onTap: widget.onItemTapped,
-        ),
+        currentIndex: widget.selectedIndex,
+        onTap: widget.onItemTapped,
+        selectedItemColor: Colors.black,
       ),
     );
   }
@@ -72,7 +54,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           padding: const EdgeInsets.all(8.0),
           child: Icon(
             iconData,
-            color: color,
+            color: widget.selectedIndex == index ? color : Colors.grey,
           ),
         ),
         if (widget.selectedIndex == index)
@@ -83,7 +65,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 color: color.withOpacity(0.1),
               ),
             ),
-          )
+          ),
       ],
     );
   }

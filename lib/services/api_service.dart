@@ -778,6 +778,25 @@ class ApiService {
     }
   }
 
+
+  Future<void> updateAnnonce(Annonce annonce) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/annonces/${annonce.ID}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(annonce.toJson()),
+    );
+
+    print(annonce.toJson());
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update annonce.');
+    }
+  }
+
+
   IOWebSocketChannel connectToRoom(int roomID) {
     final token = AuthService.authToken;
     return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {

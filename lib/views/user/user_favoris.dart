@@ -7,7 +7,7 @@ import '../../services/api_service.dart';
 import '../annonce/annonce_detail_page.dart';
 import '../cat/chat_page.dart';
 import '../../blocs/auth/auth_bloc.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserFavorisPage extends StatefulWidget {
   const UserFavorisPage({super.key});
@@ -70,6 +70,22 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
     }
   }
 
+  Future<void> _deleteFavori(String favoriId) async {
+    try {
+      await ApiService().deleteAnnonce(favoriId);
+      setState(() {
+        userFavorisData.removeWhere((favori) => favori.AnnonceID == favoriId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Favori supprimé avec succès')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de la suppression du favori: $e')),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -80,14 +96,15 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes favoris'),
+        title: Text(AppLocalizations.of(context)!.myFavorites),
+        backgroundColor: Colors.orange[100],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
           ),
         ),
         child: ListView.builder(
@@ -113,38 +130,46 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
                         ConnectionState.waiting) {
                       return const CircularProgressIndicator();
                     } else if (snapshot.hasError) {
-                      return const Icon(Icons.error);
+                      return const Icon(Icons.error, color: Colors.orange);
                     } else if (!snapshot.hasData ||
                         snapshot.data!.picturesUrl.isEmpty) {
-                      return const Icon(Icons.image);
+                      return const Icon(Icons.image, color: Colors.orange);
                     } else {
-                      return Image.network(snapshot.data!.picturesUrl.first,
-                          width: 50, height: 50, fit: BoxFit.cover);
+                      return Image.network(
+                          snapshot.data!.picturesUrl.first,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover);
                     }
                   },
                 )
-                    : const Icon(Icons.image, size: 50),
+                    : const Icon(Icons.image, size: 50, color: Colors.orange),
                 title: Text(annonce != null
                     ? annonce.Title
                     : 'Annonce ID: ${favori.AnnonceID}'),
                 subtitle: Text(annonce != null
                     ? annonce.Description
                     : 'User ID: ${favori.UserID}'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
+                trailing: Wrap(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chat),
+                      icon: const Icon(Icons.chat, color: Colors.orange),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChatPage(userId: favori.UserID),
+                            builder: (context) =>
+                                ChatPage(userId: favori.UserID),
                           ),
                         );
                       },
                     ),
-                    const Icon(Icons.arrow_forward),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.orange),
+                      onPressed: () {
+                        _deleteFavori(favori.AnnonceID);
+                      },
+                    ),
                   ],
                 ),
                 onTap: () {

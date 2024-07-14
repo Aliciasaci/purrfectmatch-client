@@ -6,6 +6,7 @@ import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../cat/cat_details.dart';
+import 'edit_annonce_page.dart';
 
 class AnnonceDetailPage extends StatefulWidget {
   final Annonce annonce;
@@ -33,7 +34,7 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
 
   void _populateFields() {
     _titleController.text = widget.annonce.Title;
-    _descriptionController.text = widget.annonce.Description;
+    _descriptionController.text = widget.annonce.Description ?? '';
   }
 
   Future<void> _fetchCatDetails() async {
@@ -70,6 +71,20 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
     _toggleEditing();
   }
 
+  void _navigateToEditAnnonce() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditAnnoncePage(annonce: widget.annonce),
+      ),
+    ).then((result) {
+      if (result == true) {
+        // Refresh annonce details
+        _fetchCatDetails();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = BlocProvider.of<AuthBloc>(context).state;
@@ -78,119 +93,188 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.annonceDetailsTitle),
+        backgroundColor: Colors.orange[100],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
-          ),
-        ),
-        child: Center(
-          child: Card(
-            color: Colors.white,
-            margin: const EdgeInsets.all(20),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _loadingCat
-                        ? const Center(child: CircularProgressIndicator())
-                        : _cat != null && _cat!.picturesUrl.isNotEmpty
-                        ? Image.network(
-                      _cat!.picturesUrl.first,
-                      height: 300,
-                      fit: BoxFit.cover,
-                    )
-                        : Container(
-                      height: 300,
-                      color: Colors.grey,
-                      child: const Icon(Icons.image, size: 100),
-                    ),
-                    const SizedBox(height: 20),
-                    if (_cat != null)
-                      Text(
-                        _cat!.name,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange,
-                        ),
-                      ),
-                    const SizedBox(height: 20),
-                    Text(
-                      widget.annonce.Title,
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                    const SizedBox(height: 15),
-                    Text(
-                      widget.annonce.Description,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 20),
-                    if (currentUser != null &&
-                        widget.annonce.UserID == currentUser.id)
-                      ElevatedButton(
-                        onPressed: _isEditing ? _saveChanges : _toggleEditing,
-                        child: Text(_isEditing
-                            ? AppLocalizations.of(context)!.save
-                            : AppLocalizations.of(context)!.edit),
-                      ),
-                    if (_cat != null)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.catDetailsTitle,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            '${AppLocalizations.of(context)!.gender}: ${_cat!.sexe}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            '${AppLocalizations.of(context)!.color}: ${_cat!.color}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            '${AppLocalizations.of(context)!.behavior}: ${_cat!.behavior}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 20),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          CatDetails(cat: _cat!)),
-                                );
-                              },
-                              child: Text(AppLocalizations.of(context)!.seeMore),
-                            ),
-                          ),
-                        ],
-                      ),
-                    if (_cat == null)
-                      Text(AppLocalizations.of(context)!.noCatInfoAvailable),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.orange[100]!, Colors.orange[200]!],
               ),
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _loadingCat
+                              ? const Center(child: CircularProgressIndicator())
+                              : _cat != null && _cat!.picturesUrl.isNotEmpty
+                              ? Image.network(
+                            _cat!.picturesUrl.first,
+                            height: 300,
+                            fit: BoxFit.cover,
+                          )
+                              : Container(
+                            height: 300,
+                            color: Colors.grey,
+                            child: const Icon(Icons.image, size: 100),
+                          ),
+                          const SizedBox(height: 20),
+                          if (_isEditing)
+                            TextFormField(
+                              controller: _titleController,
+                              decoration: InputDecoration(
+                                labelText: AppLocalizations.of(context)!.title,
+                                border: const OutlineInputBorder(),
+                              ),
+                            )
+                          else
+                            Text(
+                              widget.annonce.Title,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          const SizedBox(height: 15),
+                          if (_isEditing)
+                            TextFormField(
+                              controller: _descriptionController,
+                              decoration: InputDecoration(
+                                labelText:
+                                AppLocalizations.of(context)!.description,
+                                border: const OutlineInputBorder(),
+                              ),
+                              maxLines: null,
+                            )
+                          else
+                            Text(
+                              widget.annonce.Description ?? '',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          const SizedBox(height: 20),
+                          if (_cat != null)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)!.catDetailsTitle,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orangeAccent,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${AppLocalizations.of(context)!.name}: ${_cat!.name}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${AppLocalizations.of(context)!.gender}: ${_cat!.sexe}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${AppLocalizations.of(context)!.color}: ${_cat!.color}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${AppLocalizations.of(context)!.behavior}: ${_cat!.behavior}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                          if (_cat == null)
+                            Text(
+                                AppLocalizations.of(context)!.noCatInfoAvailable),
+                          if (currentUser != null &&
+                              widget.annonce.UserID == currentUser.id)
+                            SizedBox(
+                              width: double.infinity,
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.orange[100],
+                                        padding: const EdgeInsets.all(15),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CatDetails(cat: _cat!)),
+                                        );
+                                      },
+                                      child: Text(
+                                        AppLocalizations.of(context)!
+                                            .catDetails,
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.orange[100],
+                                        padding: const EdgeInsets.all(15),
+                                      ),
+                                      onPressed: _navigateToEditAnnonce,
+                                      child: Text(
+                                        AppLocalizations.of(context)!
+                                            .editAnnonce,
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

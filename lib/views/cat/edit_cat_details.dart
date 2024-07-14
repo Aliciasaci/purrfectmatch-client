@@ -31,12 +31,6 @@ class _EditCatDetailsState extends State<EditCatDetails> {
     _populateFields();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _initializeLocalizationFields();
-  }
-
   void _populateFields() {
     _nameController.text = widget.cat.name;
     _birthDateController.text = widget.cat.birthDate;
@@ -49,12 +43,6 @@ class _EditCatDetailsState extends State<EditCatDetails> {
     _sexeController.text = widget.cat.sexe;
     _sterilized = widget.cat.sterilized;
     _reserved = widget.cat.reserved;
-  }
-
-  void _initializeLocalizationFields() {
-    setState(() {
-      // Update the sterilized and reserved status based on localization
-    });
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -100,18 +88,41 @@ class _EditCatDetailsState extends State<EditCatDetails> {
     }
   }
 
+  Widget _buildTextField(TextEditingController controller, String label, {bool readOnly = false, void Function()? onTap, Icon? suffixIcon}) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.orange[100]!,
+        ),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: TextFormField(
+        controller: controller,
+        readOnly: readOnly,
+        onTap: onTap,
+        decoration: InputDecoration(
+          labelText: label,
+          border: InputBorder.none,
+          suffixIcon: suffixIcon,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.editCatDetailsTitle),
+        backgroundColor: Colors.orange[100],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
           ),
         ),
         child: Center(
@@ -125,83 +136,35 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.name,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _nameController,
-                    ),
+                    _buildTextField(_nameController, AppLocalizations.of(context)!.name),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.birthDate,
-                        border: const OutlineInputBorder(),
-                        suffixIcon: const Icon(Icons.calendar_today),
-                      ),
-                      controller: _birthDateController,
+                    _buildTextField(
+                      _birthDateController,
+                      AppLocalizations.of(context)!.birthDate,
                       readOnly: true,
                       onTap: () => _selectDate(context, _birthDateController),
+                      suffixIcon: const Icon(Icons.calendar_today),
                     ),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.lastVaccineDate,
-                        border: const OutlineInputBorder(),
-                        suffixIcon: const Icon(Icons.calendar_today),
-                      ),
-                      controller: _lastVaccineDateController,
+                    _buildTextField(
+                      _lastVaccineDateController,
+                      AppLocalizations.of(context)!.lastVaccineDate,
                       readOnly: true,
                       onTap: () => _selectDate(context, _lastVaccineDateController),
+                      suffixIcon: const Icon(Icons.calendar_today),
                     ),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.lastVaccineName,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _lastVaccineNameController,
-                    ),
+                    _buildTextField(_lastVaccineNameController, AppLocalizations.of(context)!.lastVaccineName),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.color,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _colorController,
-                    ),
+                    _buildTextField(_colorController, AppLocalizations.of(context)!.color),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.behavior,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _behaviorController,
-                    ),
+                    _buildTextField(_behaviorController, AppLocalizations.of(context)!.behavior),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.race,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _raceController,
-                    ),
+                    _buildTextField(_raceController, AppLocalizations.of(context)!.race),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.description,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _descriptionController,
-                    ),
+                    _buildTextField(_descriptionController, AppLocalizations.of(context)!.description),
                     const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.gender,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: _sexeController,
-                    ),
+                    _buildTextField(_sexeController, AppLocalizations.of(context)!.gender),
                     const SizedBox(height: 10),
                     SwitchListTile(
                       title: Text(AppLocalizations.of(context)!.sterilized),
@@ -224,9 +187,16 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                     const SizedBox(height: 20),
                     Align(
                       alignment: Alignment.center,
-                      child: ElevatedButton(
-                        onPressed: _saveChanges,
-                        child: Text(AppLocalizations.of(context)!.edit),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.orange[100],
+                            padding: const EdgeInsets.all(15),
+                          ),
+                          onPressed: _saveChanges,
+                          child: Text(AppLocalizations.of(context)!.edit),
+                        ),
                       ),
                     ),
                   ],

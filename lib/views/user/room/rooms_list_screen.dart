@@ -24,7 +24,6 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Conversations'),
       ),

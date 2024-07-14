@@ -45,6 +45,7 @@ flutter:
   assets:
     - assets/logo.png
     - assets/paws.png
+    - assets/paw.png
     - assets/images/img.png
     - assets/images/flag_fr.png
     - assets/images/flag_uk.png

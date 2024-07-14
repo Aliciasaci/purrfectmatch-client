@@ -37,6 +37,22 @@ class Annonce {
     return data;
   }
 
+  Annonce copyWith({
+    int? ID,
+    String? Title,
+    String? Description,
+    String? UserID,
+    String? CatID,
+  }) {
+    return Annonce(
+      ID: ID ?? this.ID,
+      Title: Title ?? this.Title,
+      Description: Description ?? this.Description,
+      UserID: UserID ?? this.UserID,
+      CatID: CatID ?? this.CatID,
+    );
+  }
+
   @override
   String toString() {
     return 'ID: $ID, Title: $Title, Description: $Description, UserID: $UserID, CatID: $CatID}';
