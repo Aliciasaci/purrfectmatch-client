@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:purrfectmatch/services/auth_service.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../blocs/auth/auth_bloc.dart';
 import 'register.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +139,20 @@ class _LoginPageState extends State<LoginPage> {
                                   child: const Text('Connexion'),
                                 ),
                                 const SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    //showGoogleModalBottomSheet(context);
+                                    _handleGoogleSignIn();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  child: const Text(
+                                    'Connexion avec Google',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -162,4 +182,46 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+  void _handleGoogleSignIn() async {
+    try {
+      final Uri url = Uri.parse('$baseUrl/auth/google');
+      if (!await launchUrl(url)) {
+        throw Exception('Could not launch $url');
+      }
+      /*await AuthService().handleGoogleSignIn();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const UserHomePage(title: '')),
+      );*/
+    } catch (error) {
+      print('Error signing in with Google: $error');
+
+    }
+  }
+
+
+
+  void showGoogleModalBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+
+        double screenHeight = MediaQuery.of(context).size.height;
+        double webViewHeight = screenHeight * 0.75;
+
+        return SingleChildScrollView(
+          child: SizedBox(
+            height: webViewHeight,
+            child: InAppWebView(
+              initialUrlRequest: URLRequest(url: WebUri('$baseUrl/auth/google')),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
+
+
+

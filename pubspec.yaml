@@ -26,6 +26,9 @@ dependencies:
   http_parser: ^4.0.2
   url_launcher: ^6.3.0
   web_socket_channel: ^2.2.0
+  google_sign_in: ^6.2.1
+  flutter_inappwebview: ^6.0.0
+  app_links: ^6.1.4
 
 dev_dependencies:
   flutter_test:

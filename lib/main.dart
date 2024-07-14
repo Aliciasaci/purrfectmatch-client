@@ -14,9 +14,12 @@ import 'package:purrfectmatch/views/admin/race/crud_race_page.dart';
 import 'package:purrfectmatch/views/not_found_page.dart';
 import 'package:purrfectmatch/views/user/profile/create_association.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
+import 'appAuthLinks.dart';
 import 'blocs/auth/auth_bloc.dart';
 import 'services/auth_service.dart';
 import 'views/login.dart';
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,9 +30,12 @@ void main() async {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
   final AuthService authService = AuthService();
+  final DynamicLinkHandler _appLinksDeepLink = DynamicLinkHandler.instance;
 
   @override
   Widget build(BuildContext context) {
+    _appLinksDeepLink.initialize(); // Initialize deep links when the app starts
+
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(

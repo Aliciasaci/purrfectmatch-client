@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,6 +8,7 @@ import '../models/user.dart';
 class AuthService {
   static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
   static String? authToken;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
   Future<void> login(String email, String password) async {
     try {
@@ -111,6 +113,37 @@ class AuthService {
     } else {
       throw Exception('Failed to update user profile');
     }
+  }
+
+  Future<void> handleGoogleSignIn() async {
+    /*try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      if (accessToken == null) {
+        throw 'No Access Token found.';
+      }
+      if (idToken == null) {
+        throw 'No ID Token found.';
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/auth/google'),
+        headers: {
+          //'Authorization': 'Bearer ${googleAuth.accessToken}',
+        },
+      );
+
+      // Handle response, e.g., navigate to home page
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    } catch (error) {
+      print('Error signing in with Google: $error');
+      throw error; // Rethrow the error to be handled by the caller.
+    }*/
   }
 
   void logout() {
