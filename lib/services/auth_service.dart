@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import '../models/user.dart';
 
 class AuthService {
@@ -116,36 +118,34 @@ class AuthService {
   }
 
   Future<void> handleGoogleSignIn() async {
+    /*final Uri url = Uri.parse('$baseUrl/auth/google');
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }*/
+    final url = '$baseUrl/auth/google';
+    const callbackUrlScheme = 'purrmatch';
     try {
-      /*final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
-
-      final accessToken = googleAuth.accessToken;
-      final idToken = googleAuth.idToken;
-
-      if (accessToken == null) {
-        throw 'No Access Token found.';
-      }
-      if (idToken == null) {
-        throw 'No ID Token found.';
-      }
-
-      print('Access Token: $accessToken');
-      print('ID Token: $idToken');*/
-
-      /*final response = await http.get(
-        Uri.parse('$baseUrl/auth/google'),
-        headers: {
-          //'Authorization': 'Bearer ${googleAuth.accessToken}',
-        },
+      final result = await FlutterWebAuth2.authenticate(
+          url: url,
+          callbackUrlScheme: callbackUrlScheme,
+          options: const FlutterWebAuth2Options(
+            timeout: 5,
+          )
       );
-
-      // Handle response, e.g., navigate to home page
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');*/
-    } catch (error) {
-      print('Error signing in with Google: $error');
-      throw error; // Rethrow the error to be handled by the caller.
+      print('Got auth result: $result');
+      final token = Uri.parse(result).queryParameters['token'];
+      print('Got auth token: $token');
+      if (token != null) {
+        authToken = token;
+        final user = await getCurrentUser();
+        print('Got user: $user');
+        if (user == null) {
+          throw Exception('Failed to retrieve user data');
+        }
+      }
+    } on PlatformException catch (e) {
+      print('Got auth error: ${e.message}');
+      throw Exception('Failed to authenticate with Google');
     }
   }
 

@@ -8,7 +8,7 @@ import '../blocs/auth/auth_bloc.dart';
 import 'register.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -142,7 +142,9 @@ class _LoginPageState extends State<LoginPage> {
                                 const SizedBox(height: 20),
                                 ElevatedButton(
                                   onPressed: () {
-                                    _handleGoogleSignIn();
+                                    BlocProvider.of<AuthBloc>(context).add(
+                                      GoogleLoginRequested(),
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
@@ -185,33 +187,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void _handleGoogleSignIn() async {
     try {
-      /*final Uri url = Uri.parse('$baseUrl/auth/google');
-      if (!await launchUrl(url)) {
-        throw Exception('Could not launch $url');
-      }*/
-      final url = '$baseUrl/auth/google';
-      const callbackUrlScheme = 'purrmatch';
-      try {
-        final result = await FlutterWebAuth2.authenticate(
-            url: url,
-            callbackUrlScheme: callbackUrlScheme,
-            options: const FlutterWebAuth2Options(
-              timeout: 5, // example: 5 seconds timeout
-            )
-        );
-        print('Got auth result: $result');
-      } on PlatformException catch (e) {
-        print('Got auth error: ${e.message}');
-      }
-
-      //await AuthService().handleGoogleSignIn();
-      /*Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const UserHomePage(title: '')),
-      );*/
-    } catch (error) {
-      print('Error signing in with Google: $error');
-
+      await AuthService().handleGoogleSignIn();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Échec de la connexion avec Google')),
+      );
     }
   }
 }
