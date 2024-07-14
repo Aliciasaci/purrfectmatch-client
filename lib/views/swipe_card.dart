@@ -7,7 +7,7 @@ import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/views/cat/cat_details.dart';
 import 'package:purrfectmatch/views/user/user_public_profile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/blocs/auth_bloc.dart';
+import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'filter_modal.dart';
 
 class SwipeCardsWidget extends StatefulWidget {

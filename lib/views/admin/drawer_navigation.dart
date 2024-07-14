@@ -23,6 +23,13 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
+            title: const Text('Gestion des races'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/admin/races');
+            },
+          ),
+          ListTile(
             title: const Text('Gestion des demandes d\'association'),
             onTap: () {
               Navigator.pop(context);

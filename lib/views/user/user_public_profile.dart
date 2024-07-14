@@ -5,7 +5,7 @@ import '../../models/user.dart';
 import '../../models/rating.dart';
 import '../../services/api_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../blocs/auth_bloc.dart';
+import '../../blocs/auth/auth_bloc.dart';
 
 class UserPublicProfile extends StatefulWidget {
   final User user;

@@ -619,7 +619,7 @@ class ApiService {
     }
   }
 
-  Future<List<Races>> fetchAllRaces() async {
+  Future<List<Race>> fetchAllRaces() async {
     final token = AuthService.authToken;
     final response = await http.get(
       Uri.parse('$baseUrl/races'),
@@ -628,13 +628,63 @@ class ApiService {
       },
     );
 
-    print('$baseUrl/races');
-    print(response.statusCode);
     if (response.statusCode == 200) {
       List<dynamic> raceJson = jsonDecode(response.body);
-      return raceJson.map((json) => Races.fromJson(json)).toList();
+      return raceJson.map((json) => Race.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load races');
+    }
+  }
+
+  Future<Race> createRace(Race race) async {
+    final token = AuthService.authToken;
+    final response = await http.post(
+      Uri.parse('$baseUrl/races'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(race.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> raceJson = jsonDecode(response.body);
+      return Race.fromJson(raceJson);
+    } else {
+      throw Exception('Failed to create race.');
+    }
+  }
+
+  Future<Race> updateRace(Race race) async {
+    final token = AuthService.authToken;
+    final response = await http.put(
+      Uri.parse('$baseUrl/races/${race.id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(race.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> raceJson = jsonDecode(response.body);
+      return Race.fromJson(raceJson);
+    } else {
+      throw Exception('Failed to update race.');
+    }
+  }
+
+  Future<void> deleteRace(int raceId) async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/races/$raceId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('Failed to delete race');
     }
   }
 
@@ -694,4 +744,5 @@ class ApiService {
       'Authorization': 'Bearer $token',
     });
   }
+
 }
