@@ -38,7 +38,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
     _lastVaccineNameController.text = widget.cat.lastVaccineName;
     _colorController.text = widget.cat.color;
     _behaviorController.text = widget.cat.behavior;
-    _raceController.text = widget.cat.race;
+    _raceController.text = widget.cat.raceID;
     _descriptionController.text = widget.cat.description;
     _sexeController.text = widget.cat.sexe;
     _sterilized = widget.cat.sterilized;
@@ -67,7 +67,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       color: _colorController.text,
       behavior: _behaviorController.text,
       sterilized: _sterilized,
-      race: _raceController.text,
+      raceID: _raceController.text,
       description: _descriptionController.text,
       sexe: _sexeController.text,
       reserved: _reserved,

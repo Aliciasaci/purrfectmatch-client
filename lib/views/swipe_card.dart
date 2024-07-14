@@ -271,7 +271,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                   ),
                                 ),
                                 Text(
-                                  "Race: ${cat.race}",
+                                  "Race: ${cat.raceID}",
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,

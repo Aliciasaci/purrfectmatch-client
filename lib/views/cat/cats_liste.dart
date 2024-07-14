@@ -157,7 +157,7 @@ class _CatsListPageState extends State<CatsListPage> {
                   ),
                 ),
                 subtitle: Text(
-                  '${AppLocalizations.of(context)!.race}: ${cat.race}\n'
+                  '${AppLocalizations.of(context)!.race}: ${cat.raceID}\n'
                       '${AppLocalizations.of(context)!.color}: ${cat.color}\n'
                       '${AppLocalizations.of(context)!.behavior}: ${cat.behavior}\n'
                       '${AppLocalizations.of(context)!.reserved}: ${cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}',

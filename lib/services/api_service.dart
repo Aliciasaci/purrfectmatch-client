@@ -58,22 +58,18 @@ class ApiService {
 
     request.fields['name'] = cat.name;
     request.fields['sexe'] = cat.sexe;
-    request.fields['birthDate'] = cat.birthDate;
-    request.fields['lastVaccineDate'] = cat.lastVaccineDate;
-    request.fields['lastVaccineName'] = cat.lastVaccineName;
-    request.fields['color'] = cat.color;
-    request.fields['behavior'] = cat.behavior;
-    request.fields['race'] = cat.race;
-    request.fields['description'] = cat.description;
-    request.fields['sterilized'] = cat.sterilized.toString();
-    request.fields['reserved'] = cat.reserved.toString();
-    request.fields['userId'] = cat.userId;
+    request.fields['BirthDate'] = cat.birthDate;
+    request.fields['LastVaccine'] = cat.lastVaccineDate;
+    request.fields['LastVaccineName'] = cat.lastVaccineName;
+    request.fields['Color'] = cat.color;
+    request.fields['Behavior'] = cat.behavior;
+    request.fields['RaceID'] = cat.raceID;
+    request.fields['Description'] = cat.description;
+    request.fields['Sterilized'] = cat.sterilized.toString();
+    request.fields['Reserved'] = cat.reserved.toString();
+    request.fields['UserID'] = cat.userId;
 
-    // Afficher les champs de la requête
-    print('Request Fields:');
-    request.fields.forEach((key, value) {
-      print('$key: $value');
-    });
+    print('----------<>Cat JSON: ${jsonEncode(cat.toJson())}');
 
     if (selectedFile != null) {
       request.files.add(
@@ -84,30 +80,17 @@ class ApiService {
           filename: selectedFile.name,
         ),
       );
-
-      // Afficher les informations du fichier
-      print('Selected File:');
-      print('Name: ${selectedFile.name}');
-      print('Size: ${selectedFile.size}');
     }
 
-    // Afficher les en-têtes de la requête
-    print('Request Headers:');
-    request.headers.forEach((key, value) {
-      print('$key: $value');
-    });
-
     var response = await request.send();
-
-    // Afficher la réponse
-    print('Response Status: ${response.statusCode}');
-    print('Response Headers: ${response.headers}');
-    print('Response Content: ${await response.stream.bytesToString()}');
-
-    if (response.statusCode != 200) {
+  print("jeeeeeeeeeee");
+    print(response.statusCode);
+    if (response.statusCode != 201) {
       throw Exception('Failed to create cat profile');
     }
   }
+
+
 
   Future<void> updateCat(Cat cat) async {
     final token = AuthService.authToken;

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -28,7 +27,7 @@ class _AddCatState extends State<AddCat> {
   String? _selectedValue;
   bool _sterilized = false;
   bool _reserved = false;
-  final List<String> _options = ['male', 'femelle'];
+  final List<String> _options = ['male', 'female'];
   PlatformFile? _selectedFile;
   Map<int?, String> raceList = {};
   int? _dropdownValue;
@@ -75,17 +74,15 @@ class _AddCatState extends State<AddCat> {
   }
 
   Future<void> _pickFile() async {
-    if (await Permission.storage.request().isGranted) {
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-      if (result != null) {
-        setState(() {
-          _selectedFile = result.files.first;
-        });
-      }
+    if (result != null) {
+      setState(() {
+        _selectedFile = result.files.first;
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Storage permission denied')),
+        const SnackBar(content: Text('No file selected')),
       );
     }
   }
@@ -94,11 +91,8 @@ class _AddCatState extends State<AddCat> {
     try {
       final apiService = ApiService();
       final newRaces = await apiService.fetchAllRaces();
-      for (var race in newRaces) {
-        raceList[race.id] = race.raceName;
-      }
       setState(() {
-        raceList = raceList;
+        raceList = {for (var race in newRaces) race.id: race.raceName};
       });
     } catch (e) {
       print('Failed to load races: $e');
@@ -106,15 +100,29 @@ class _AddCatState extends State<AddCat> {
   }
 
   Future<void> _sendData() async {
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not authenticated')),
+      );
+      return;
+    }
+
+    if (_nameController.text.isEmpty || _birthDateController.text.isEmpty || _colorController.text.isEmpty || _behaviorController.text.isEmpty || _dropdownValue == null || _selectedValue == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
     Cat cat = Cat(
       name: _nameController.text,
       birthDate: _birthDateController.text,
-      lastVaccineDate: _lastVaccineDateController.text,
-      lastVaccineName: _lastVaccineNameController.text,
+      lastVaccineDate: _lastVaccineDateController.text.isNotEmpty ? _lastVaccineDateController.text : '',
+      lastVaccineName: _lastVaccineNameController.text.isNotEmpty ? _lastVaccineNameController.text : '',
       color: _colorController.text,
       behavior: _behaviorController.text,
-      race: _dropdownValue?.toString() ?? '',
-      description: _descriptionController.text,
+      raceID: _dropdownValue.toString(),
+      description: _descriptionController.text.isNotEmpty ? _descriptionController.text : '',
       sexe: _selectedValue ?? '',
       sterilized: _sterilized,
       reserved: _reserved,
@@ -280,7 +288,7 @@ class _AddCatState extends State<AddCat> {
                       ),
                       const SizedBox(height: 10),
                       SwitchListTile(
-                        title: Text('Sterilized'),
+                        title: const Text('Sterilized'),
                         value: _sterilized,
                         onChanged: (bool value) {
                           setState(() {
@@ -289,7 +297,7 @@ class _AddCatState extends State<AddCat> {
                         },
                       ),
                       SwitchListTile(
-                        title: Text('Reserved'),
+                        title: const Text('Reserved'),
                         value: _reserved,
                         onChanged: (bool value) {
                           setState(() {
