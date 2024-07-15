@@ -84,5 +84,6 @@
   "language" : "Langues",
   "english" : "Anglais",
   "french" : "Français",
-  "addCatTitle" : "Ajouter un chat"
+  "addCatTitle" : "Ajouter un chat",
+  "myAssociations" : "Mes asso"
 }

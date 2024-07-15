@@ -6,7 +6,8 @@ import 'package:purrfectmatch/models/user.dart';
 import '../../../blocs/auth/auth_bloc.dart';
 import '../../login.dart';
 import 'edit_profile_screen.dart';
-import 'settings_screen.dart';  // Add this line to import the SettingsScreen
+import 'settings_screen.dart';
+import 'user_associations_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -107,7 +108,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ProfileMenuWidget(
                     title: "Associations",
                     icon: Icons.home,
-                    onPress: () {},
+                    onPress: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const UserAssociationsScreen()),
+                      );
+                    },
                   ),
                   const Divider(),
                   const SizedBox(height: 10),
