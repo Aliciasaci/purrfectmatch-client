@@ -7,10 +7,10 @@ class AnnounceMap extends StatefulWidget {
   const AnnounceMap({super.key, required String announceAddress, required user});
 
   @override
-  State<AnnounceMap> createState() => _AnnonceMapState();
+  State<AnnounceMap> createState() => _AnnounceMapState();
 }
 
-class _AnnonceMapState extends State<AnnounceMap> {
+class _AnnounceMapState extends State<AnnounceMap> {
   final Completer<GoogleMapController> _controller =
   Completer<GoogleMapController>();
 
