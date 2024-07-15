@@ -6,6 +6,7 @@ import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../cat/cat_details.dart';
+import 'announceMap.dart';
 import 'edit_annonce_page.dart';
 
 class AnnonceDetailPage extends StatefulWidget {
@@ -95,6 +96,7 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
   Widget build(BuildContext context) {
     final authState = BlocProvider.of<AuthBloc>(context).state;
     final currentUser = authState is AuthAuthenticated ? authState.user : null;
+    final userAddress = "${currentUser?.addressRue} ${currentUser?.cp} ${currentUser?.ville}";
 
     return Scaffold(
       appBar: AppBar(
@@ -228,14 +230,38 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                           if (_cat == null)
                             Text(
                                 AppLocalizations.of(context)!.noCatInfoAvailable),
-                          if (currentUser != null &&
-                              widget.annonce.UserID == currentUser.id)
-                            SizedBox(
-                              width: double.infinity,
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.orange[100],
+                                      padding: const EdgeInsets.all(15),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AnnounceMap(
+                                                      announceAddress: _annonceAddress,
+                                                      user: userAddress))
+                                      );},
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .maps,
+                                      style: const TextStyle(
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                if (currentUser != null && widget.annonce.UserID == currentUser.id) ...
+                                [
                                   Expanded(
                                     child: TextButton(
                                       style: TextButton.styleFrom(
@@ -248,8 +274,7 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   CatDetails(cat: _cat!)),
-                                        );
-                                      },
+                                        );},
                                       child: Text(
                                         AppLocalizations.of(context)!
                                             .catDetails,
@@ -275,8 +300,9 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                                     ),
                                   ),
                                 ],
-                              ),
+                              ],
                             ),
+                          ),
                         ],
                       ),
                     ),

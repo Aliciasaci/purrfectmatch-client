@@ -29,6 +29,7 @@ dependencies:
   url_launcher: ^6.3.0
   web_socket_channel: ^2.2.0
   image_picker: ^0.8.4+4
+  google_maps_flutter: ^2.7.0
 
 dev_dependencies:
   flutter_test:

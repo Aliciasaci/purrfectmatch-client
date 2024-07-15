@@ -291,5 +291,6 @@
   "add" : "Add",
   "catDetails" : "Cat Details",
   "editAnnonce" : "Edit",
-  "maps": "Map"
+  "maps": "Map",
+  "catAge": "Cat's age"
 }

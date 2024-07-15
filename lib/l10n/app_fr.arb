@@ -285,5 +285,6 @@
   "add" : "Ajouter",
   "catDetails" : "Détail du chat",
   "editAnnonce" : "Modifier",
-  "maps": "Trajet"
+  "maps": "Trajet",
+  "catAge": "Age du chat"
 }
