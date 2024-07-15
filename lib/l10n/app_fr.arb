@@ -284,5 +284,6 @@
   "updateFailed" : "Echec de mise à jour",
   "add" : "Ajouter",
   "catDetails" : "Détail du chat",
-  "editAnnonce" : "Modifier l'annonce"
+  "editAnnonce" : "Modifier",
+  "maps": "Trajet"
 }
