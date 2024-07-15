@@ -185,14 +185,10 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                               style: const TextStyle(fontSize: 16),
                             ),
                           const SizedBox(height: 15),
-                          TextFormField(
-                            controller: _annonceAddressController,
-                            enabled: _isEditing,
-                            decoration: const InputDecoration(
-                              labelText: "Adresse du chat",
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
+                            Text(
+                              _annonceAddress ?? '',
+                              style: const TextStyle(fontSize: 16)
+                              ),
                           const SizedBox(height: 20),
                           if (_cat != null)
                             Column(
