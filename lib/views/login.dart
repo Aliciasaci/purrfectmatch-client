@@ -170,18 +170,15 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                ElevatedButton(
+                                IconButton(
                                   onPressed: () {
                                     BlocProvider.of<AuthBloc>(context).add(
                                       GoogleLoginRequested(),
                                     );
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  child: const Text(
-                                    'Connexion avec Google',
-                                    style: TextStyle(color: Colors.white),
+                                  icon: const CircleAvatar(
+                                    backgroundImage: AssetImage('assets/google_logo.png'),
+                                    radius: 20,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
