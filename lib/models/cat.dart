@@ -12,7 +12,7 @@ class Cat {
   final String description;
   final bool reserved;
   final List<String> picturesUrl;
-  final String userId;
+  final String? userId;
 
   Cat({
     this.ID,
@@ -28,7 +28,7 @@ class Cat {
     required this.description,
     required this.reserved,
     required this.picturesUrl,
-    required this.userId,
+    this.userId,
   });
 
   factory Cat.fromJson(Map<String, dynamic> json) {

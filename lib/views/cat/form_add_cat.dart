@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +30,7 @@ class _AddCatState extends State<AddCat> {
   PlatformFile? _selectedFile;
   Map<int?, String> raceList = {};
   int? _dropdownValue;
-  late User currentUser;
+  User? currentUser;
 
   @override
   void dispose() {
@@ -69,17 +68,25 @@ class _AddCatState extends State<AddCat> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      controller.text = DateFormat('yyyy-MM-dd').format(picked);
+      controller.text = DateFormat('dd-MM-yyyy').format(picked);
     }
   }
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
 
     if (result != null) {
       setState(() {
         _selectedFile = result.files.first;
       });
+
+      // Afficher les informations sur le fichier sélectionné
+      print('File selected: ${_selectedFile!.name}');
+      print('File path: ${_selectedFile!.path}');
+      print('File size: ${_selectedFile!.size}');
+      print('File readStream: ${_selectedFile!.readStream != null ? 'Available' : 'Not available'}');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No file selected')),
@@ -114,10 +121,18 @@ class _AddCatState extends State<AddCat> {
       return;
     }
 
+    // Format the dates
+    String formattedBirthDate = _birthDateController.text.isNotEmpty
+        ? DateFormat('dd-MM-yyyy').format(DateFormat('yyyy-MM-dd').parse(_birthDateController.text))
+        : '';
+    String formattedLastVaccineDate = _lastVaccineDateController.text.isNotEmpty
+        ? DateFormat('dd-MM-yyyy').format(DateFormat('yyyy-MM-dd').parse(_lastVaccineDateController.text))
+        : '';
+
     Cat cat = Cat(
       name: _nameController.text,
-      birthDate: _birthDateController.text,
-      lastVaccineDate: _lastVaccineDateController.text.isNotEmpty ? _lastVaccineDateController.text : '',
+      birthDate: formattedBirthDate,
+      lastVaccineDate: formattedLastVaccineDate,
       lastVaccineName: _lastVaccineNameController.text.isNotEmpty ? _lastVaccineNameController.text : '',
       color: _colorController.text,
       behavior: _behaviorController.text,
@@ -127,13 +142,13 @@ class _AddCatState extends State<AddCat> {
       sterilized: _sterilized,
       reserved: _reserved,
       picturesUrl: _selectedFile != null ? [_selectedFile!.name] : [],
-      userId: currentUser.id ?? '',
+      userId: currentUser!.id,
     );
 
     try {
       await ApiService().createCat(cat, _selectedFile);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data sent successfully')),
+        const SnackBar(content: Text('Chat crée avec succès !')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

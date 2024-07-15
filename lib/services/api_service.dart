@@ -56,55 +56,81 @@ class ApiService {
     final token = AuthService.authToken;
     request.headers['Authorization'] = 'Bearer $token';
 
-    request.fields['name'] = cat.name;
-    request.fields['sexe'] = cat.sexe;
-    request.fields['BirthDate'] = cat.birthDate;
-    request.fields['LastVaccine'] = cat.lastVaccineDate;
-    request.fields['LastVaccineName'] = cat.lastVaccineName;
-    request.fields['Color'] = cat.color;
-    request.fields['Behavior'] = cat.behavior;
-    request.fields['RaceID'] = cat.raceID;
-    request.fields['Description'] = cat.description;
-    request.fields['Sterilized'] = cat.sterilized.toString();
-    request.fields['Reserved'] = cat.reserved.toString();
-    request.fields['UserID'] = cat.userId;
+    cat.toJson().forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
 
-    print('----------<>Cat JSON: ${jsonEncode(cat.toJson())}');
-
-    if (selectedFile != null) {
+    if (selectedFile != null && selectedFile.path != null) {
       request.files.add(
-        http.MultipartFile(
+        await http.MultipartFile.fromPath(
           'uploaded_file',
-          selectedFile.readStream!,
-          selectedFile.size,
+          selectedFile.path!,
           filename: selectedFile.name,
+          contentType: MediaType('image', selectedFile.extension ?? 'jpeg'),
         ),
       );
+    } else {
+      print('File selection error: No file selected or file path is null');
     }
 
+    // Affichez l'objet avant de l'envoyer
+    print('Cat object to be sent:');
+    print(jsonEncode(cat.toJson()));
+
+    // Affichez les champs de la requête
+    print('Request fields:');
+    print(request.fields);
+
     var response = await request.send();
-  print("jeeeeeeeeeee");
-    print(response.statusCode);
-    if (response.statusCode != 201) {
+    final responseString = await response.stream.bytesToString();
+
+    if (response.statusCode == 201) {
+      print('Cat created successfully');
+    } else {
+      print('Failed to create cat: $responseString');
       throw Exception('Failed to create cat profile');
     }
   }
 
+  Future<void> updateCat(Cat cat, PlatformFile? selectedFile) async {
+    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/cats/${cat.ID}'));
 
-
-  Future<void> updateCat(Cat cat) async {
     final token = AuthService.authToken;
-    final response = await http.put(
-      Uri.parse('$baseUrl/cats/${cat.ID}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(cat.toJson()),
-    );
+    request.headers['Authorization'] = 'Bearer $token';
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update cat.');
+    cat.toJson().forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
+
+    if (selectedFile != null && selectedFile.path != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'uploaded_file',
+          selectedFile.path!,
+          filename: selectedFile.name,
+          contentType: MediaType('image', selectedFile.extension ?? 'jpeg'),
+        ),
+      );
+    } else {
+      print('File selection error: No file selected or file path is null');
+    }
+
+    // Affichez l'objet avant de l'envoyer
+    print('Cat object to be sent:');
+    print(jsonEncode(cat.toJson()));
+
+    // Affichez les champs de la requête
+    print('Request fields:');
+    print(request.fields);
+
+    var response = await request.send();
+    final responseString = await response.stream.bytesToString();
+
+    if (response.statusCode == 200) {
+      print('Cat updated successfully');
+    } else {
+      print('Failed to update cat: $responseString');
+      throw Exception('Failed to update cat profile');
     }
   }
 
