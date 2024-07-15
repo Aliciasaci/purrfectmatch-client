@@ -1,11 +1,13 @@
-import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../models/user.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddCat extends StatefulWidget {
   const AddCat({super.key});
@@ -73,9 +75,7 @@ class _AddCatState extends State<AddCat> {
   }
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-    );
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       setState(() {
@@ -183,7 +183,7 @@ class _AddCatState extends State<AddCat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Cat'),
+        title: Text(AppLocalizations.of(context)!.addCatTitle),
         backgroundColor: Colors.orange[100],
       ),
       body: Container(
@@ -195,27 +195,28 @@ class _AddCatState extends State<AddCat> {
           ),
         ),
         child: Center(
-          child: Container(
-            margin: const EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          child: Card(
+            color: Colors.white,
+            margin: const EdgeInsets.all(20),
             child: Padding(
-              padding: const EdgeInsets.all(40),
+              padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
                 child: Form(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Create Cat Profile',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                      if (_selectedFile != null)
+                        Center(
+                          child: Image.file(
+                            File(_selectedFile!.path!),
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       _buildTextFormField(_nameController, 'Name'),
                       const SizedBox(height: 10),
                       _buildTextFormField(
@@ -328,13 +329,19 @@ class _AddCatState extends State<AddCat> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: _sendData,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange[100],
-                          padding: const EdgeInsets.all(15),
+                      Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _sendData,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange[100],
+                              padding: const EdgeInsets.all(15),
+                            ),
+                            child: const Text('Add Cat'),
+                          ),
                         ),
-                        child: const Text('Send'),
                       ),
                       const SizedBox(height: 15),
                     ],

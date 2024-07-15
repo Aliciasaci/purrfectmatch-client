@@ -199,7 +199,10 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           if (_matchEngine != null)
             Padding(
               padding: const EdgeInsets.all(10.0),
-              child: FilterModalWidget(callback: fetchCatsByFilters),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: FilterModalWidget(callback: fetchCatsByFilters),
+              ),
             ),
           Expanded(
             child: Padding(
@@ -213,99 +216,113 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   Annonce annonce = item['annonce'] as Annonce;
                   Cat cat = item['cat'] as Cat;
                   User user = item['user'] as User;
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Stack(
-                      children: [
-                        Image.network(
-                          cat.picturesUrl.first,
-                          fit: BoxFit.cover,
-                          height: double.infinity,
-                          width: double.infinity,
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.5),
-                                Colors.transparent
-                              ],
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: [
+                          Image.network(
+                            cat.picturesUrl.first,
+                            fit: BoxFit.cover,
+                            height: double.infinity,
+                            width: double.infinity,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.black.withOpacity(0.5),
+                                  Colors.transparent
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                cat.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  cat.name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "${calculateAge(cat.birthDate)} ans",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
+                                Text(
+                                  "${calculateAge(cat.birthDate)} ans",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "Sexe: ${cat.sexe}",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
+                                Text(
+                                  "Sexe: ${cat.sexe}",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "Race: ${cat.raceID}",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
+                                Text(
+                                  "Race: ${cat.raceID}",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
                                 ),
-                              ),
-                              MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              UserPublicProfile(user: user)),
-                                    );
-                                  },
-                                  child: Text(
-                                    "Mise en ligne par: ${user.name}",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: Colors.white,
-                                      decorationThickness: 2,
-                                      height: 1.5, // Add space between text and underline
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                UserPublicProfile(user: user)),
+                                      );
+                                    },
+                                    child: Text(
+                                      "Mise en ligne par: ${user.name}",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Colors.white,
+                                        decorationThickness: 2,
+                                        height: 1.5, // Add space between text and underline
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              const Text(
-                                "Disponible",
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                const Text(
+                                  "Disponible",
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -334,7 +351,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
               alignment: Alignment.bottomCenter,
               children: [
                 Positioned(
-                  bottom: 10,
+                  bottom: 18,
                   left: 10,
                   child: Transform.rotate(
                     angle: -0.3,
@@ -364,7 +381,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   ),
                 ),
                 Positioned(
-                  bottom: 20,
+                  bottom: 30,
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -396,7 +413,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   ),
                 ),
                 Positioned(
-                  bottom: 10,
+                  bottom: 18,
                   right: 10,
                   child: Transform.rotate(
                     angle: 0.3,

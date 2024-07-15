@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
-import 'package:file_picker/file_picker.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditCatDetails extends StatefulWidget {
   final Cat cat;
@@ -22,12 +25,13 @@ class _EditCatDetailsState extends State<EditCatDetails> {
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _behaviorController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _sexeController = TextEditingController();
+  String? _selectedValue;
   late bool _sterilized;
   late bool _reserved;
   int? _dropdownValue;
   PlatformFile? _selectedFile;
   Map<int?, String> raceList = {};
+  final List<String> _options = ['male', 'female'];
 
   @override
   void initState() {
@@ -44,7 +48,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
     _colorController.text = widget.cat.color;
     _behaviorController.text = widget.cat.behavior;
     _descriptionController.text = widget.cat.description;
-    _sexeController.text = widget.cat.sexe;
+    _selectedValue = widget.cat.sexe.toLowerCase();  // Ensure the value matches the options in _options
     _sterilized = widget.cat.sterilized;
     _reserved = widget.cat.reserved;
     _dropdownValue = int.tryParse(widget.cat.raceID);
@@ -52,8 +56,8 @@ class _EditCatDetailsState extends State<EditCatDetails> {
 
   String _formatDate(String date) {
     try {
-      final parsedDate = DateFormat('yyyy-MM-dd').parse(date);
-      return DateFormat('yyyy-MM-dd').format(parsedDate);
+      final parsedDate = DateFormat('dd-MM-yyyy').parse(date);
+      return DateFormat('dd-MM-yyyy').format(parsedDate);
     } catch (e) {
       return date;
     }
@@ -79,20 +83,19 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      controller.text = DateFormat('yyyy-MM-dd').format(picked);
+      controller.text = DateFormat('dd-MM-yyyy').format(picked);
     }
   }
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-    );
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       setState(() {
         _selectedFile = result.files.first;
       });
 
+      // Afficher les informations sur le fichier sélectionné
       print('File selected: ${_selectedFile!.name}');
       print('File path: ${_selectedFile!.path}');
       print('File size: ${_selectedFile!.size}');
@@ -106,10 +109,10 @@ class _EditCatDetailsState extends State<EditCatDetails> {
 
   Future<void> _saveChanges() async {
     String formattedBirthDate = _birthDateController.text.isNotEmpty
-        ? DateFormat('yyyy-MM-dd').format(DateFormat('yyyy-MM-dd').parse(_birthDateController.text))
+        ? DateFormat('dd-MM-yyyy').format(DateFormat('dd-MM-yyyy').parse(_birthDateController.text))
         : '';
     String formattedLastVaccineDate = _lastVaccineDateController.text.isNotEmpty
-        ? DateFormat('yyyy-MM-dd').format(DateFormat('yyyy-MM-dd').parse(_lastVaccineDateController.text))
+        ? DateFormat('dd-MM-yyyy').format(DateFormat('dd-MM-yyyy').parse(_lastVaccineDateController.text))
         : '';
 
     Cat updatedCat = Cat(
@@ -123,7 +126,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       sterilized: _sterilized,
       raceID: _dropdownValue.toString(),
       description: _descriptionController.text,
-      sexe: _sexeController.text,
+      sexe: _selectedValue ?? '',
       reserved: _reserved,
       picturesUrl: widget.cat.picturesUrl,
       userId: widget.cat.userId,
@@ -201,6 +204,16 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                           ),
                         ),
                       const SizedBox(height: 10),
+                      if (_selectedFile != null)
+                        Center(
+                          child: Image.file(
+                            File(_selectedFile!.path!),
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      const SizedBox(height: 10),
                       _buildTextFormField(_nameController, 'Name'),
                       const SizedBox(height: 10),
                       _buildTextFormField(
@@ -258,7 +271,34 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                         'Description',
                       ),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_sexeController, 'Gender'),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            labelText: 'Select Gender',
+                            border: InputBorder.none,
+                          ),
+                          value: _selectedValue,
+                          items: _options.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedValue = newValue;
+                            });
+                          },
+                          isExpanded: true,
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       SwitchListTile(
                         title: const Text('Sterilized'),

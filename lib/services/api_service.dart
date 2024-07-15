@@ -115,11 +115,9 @@ class ApiService {
       print('File selection error: No file selected or file path is null');
     }
 
-    // Affichez l'objet avant de l'envoyer
     print('Cat object to be sent:');
     print(jsonEncode(cat.toJson()));
 
-    // Affichez les champs de la requête
     print('Request fields:');
     print(request.fields);
 

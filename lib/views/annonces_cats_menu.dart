@@ -28,7 +28,7 @@ class AnnoncesCatsMenu extends StatelessWidget {
             children: [
               _buildCard(
                 context,
-                title: AppLocalizations.of(context)!.user,
+                title: AppLocalizations.of(context)!.monCompte,
                 children: [
                   ListTile(
                     title: Text(
@@ -52,6 +52,12 @@ class AnnoncesCatsMenu extends StatelessWidget {
                     text: AppLocalizations.of(context)!.myAnnouncements,
                     page: const UserAnnoncesPage(),
                   ),
+                  _buildListTile(
+                    context,
+                    icon: Icons.favorite,
+                    text: AppLocalizations.of(context)!.myFavorites,
+                    page: const UserFavorisPage(),
+                  ),
                   const Divider(color: Colors.white), // Divider color set to white
                   ListTile(
                     title: Text(
@@ -68,12 +74,6 @@ class AnnoncesCatsMenu extends StatelessWidget {
                     icon: Icons.add,
                     text: AppLocalizations.of(context)!.addCat,
                     page: const AddCat(),
-                  ),
-                  _buildListTile(
-                    context,
-                    icon: Icons.favorite,
-                    text: AppLocalizations.of(context)!.myFavorites,
-                    page: const UserFavorisPage(),
                   ),
                   if (currentUser != null)
                     _buildListTile(

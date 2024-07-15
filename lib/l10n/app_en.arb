@@ -1,294 +1,90 @@
 {
   "@@locale": "en",
   "helloWorld": "Hello World!",
-  "@helloWorld": {
-    "description": "The conventional newborn programmer greeting"
-  },
   "login": "Login",
-  "@login": {
-    "description": "The login button text"
-  },
   "email": "Email",
-  "@email": {
-    "description": "Email label text"
-  },
   "password": "Password",
-  "@password": {
-    "description": "Password label text"
-  },
   "loginSuccessful": "Login successful!",
-  "@loginSuccessful": {
-    "description": "Message displayed when login is successful"
-  },
   "register": "Don't have an account? Sign up",
-  "@register": {
-    "description": "Register link text"
-  },
   "switchLanguage": "Switch Language",
-  "@switchLanguage": {
-    "description": "Button text to switch languages"
-  },
   "enterPassword": "Please enter your password",
-  "@enterPassword": {
-    "description": "Error message when password is not entered"
-  },
   "invalidEmail": "Please enter a valid email address",
-  "@invalidEmail": {
-    "description": "Error message when email format is invalid"
-  },
   "enterEmail": "Please enter your email",
-  "@enterEmail": {
-    "description": "Error message when email is not entered"
-  },
   "registerPage": "Register Page",
-  "@registerPage": {
-    "description": "Title for the Register Page"
-  },
   "registerSuccessful": "Registration successful!",
-  "@registerSuccessful": {
-    "description": "Message displayed when registration is successful"
-  },
   "tokenRetrievalFailed": "Failed to retrieve token",
-  "@tokenRetrievalFailed": {
-    "description": "Message displayed when token retrieval fails"
-  },
   "registrationFailed": "Registration failed",
-  "@registrationFailed": {
-    "description": "Message displayed when registration fails"
-  },
   "name": "Name",
-  "@name": {
-    "description": "Name label text"
-  },
   "enterName": "Please enter your name",
-  "@enterName": {
-    "description": "Error message when name is not entered"
-  },
   "addressRue": "Address Rue",
-  "@addressRue": {
-    "description": "Address Rue label text"
-  },
   "enterAddress": "Please enter your address",
-  "@enterAddress": {
-    "description": "Error message when address is not entered"
-  },
   "postalCode": "Postal Code",
-  "@postalCode": {
-    "description": "Postal Code label text"
-  },
   "enterPostalCode": "Please enter your postal code",
-  "@enterPostalCode": {
-    "description": "Error message when postal code is not entered"
-  },
   "invalidPostalCode": "Please enter a valid postal code",
-  "@invalidPostalCode": {
-    "description": "Error message when postal code format is invalid"
-  },
   "city": "City",
-  "@city": {
-    "description": "City label text"
-  },
   "enterCity": "Please enter your city",
-  "@enterCity": {
-    "description": "Error message when city is not entered"
-  },
   "alreadyHaveAccount": "Already have an account? Log in",
-  "@alreadyHaveAccount": {
-    "description": "Login link text for existing users"
-  },
   "cats": "Cats",
-  "@cats": {
-    "description": "Title for the cats section"
-  },
   "viewAllCats": "View all cats",
-  "@viewAllCats": {
-    "description": "Text for viewing all cats"
-  },
   "addCat": "Add a cat",
-  "@addCat": {
-    "description": "Text for adding a new cat"
-  },
   "announcements": "Announcements",
-  "@announcements": {
-    "description": "Title for the announcements section"
-  },
   "viewAllAnnouncements": "View all announcements",
-  "@viewAllAnnouncements": {
-    "description": "Text for viewing all announcements"
-  },
   "createAnnouncement": "Create an announcement",
-  "@createAnnouncement": {
-    "description": "Text for creating a new announcement"
-  },
   "user": "User",
-  "@user": {
-    "description": "Title for the user section"
-  },
   "myAnnouncements": "My announcements",
-  "@myAnnouncements": {
-    "description": "Text for viewing user's own announcements"
-  },
   "myFavorites": "My favorites",
-  "@myFavorites": {
-    "description": "Text for viewing user's favorite items"
-  },
   "search": "Search",
-  "@search": {
-    "description": "Label for the search tab"
-  },
   "adopt": "Adopt",
-  "@adopt": {
-    "description": "Label for the adopt tab"
-  },
   "conversations": "Conversations",
-  "@conversations": {
-    "description": "Label for the conversations tab"
-  },
   "profile": "Profile",
-  "@profile": {
-    "description": "Label for the profile tab"
-  },
   "catDetailsTitle": "Cat Details",
-  "@catDetailsTitle": {
-    "description": "Title for the cat details page"
-  },
   "birthDate": "Birth Date",
-  "@birthDate": {
-    "description": "Label for the birth date"
-  },
   "age": "Age",
-  "@age": {
-    "description": "Label for the age"
-  },
   "lastVaccineDate": "Last Vaccine Date",
-  "@lastVaccineDate": {
-    "description": "Label for the last vaccine date"
-  },
   "lastVaccineName": "Last Vaccine Name",
-  "@lastVaccineName": {
-    "description": "Label for the last vaccine name"
-  },
   "color": "Color",
-  "@color": {
-    "description": "Label for the color"
-  },
   "behavior": "Behavior",
-  "@behavior": {
-    "description": "Label for the behavior"
-  },
   "race": "Race",
-  "@race": {
-    "description": "Label for the race"
-  },
   "description": "Description",
-  "@description": {
-    "description": "Label for the description"
-  },
   "gender": "Gender",
-  "@gender": {
-    "description": "Label for the gender"
-  },
   "sterilized": "Sterilized",
-  "@sterilized": {
-    "description": "Label for the sterilized status"
-  },
   "reserved": "Reserved",
-  "@reserved": {
-    "description": "Label for the reserved status"
-  },
   "yes": "Yes",
-  "@yes": {
-    "description": "Yes label"
-  },
   "no": "No",
-  "@no": {
-    "description": "No label"
-  },
   "edit": "Edit",
-  "@edit": {
-    "description": "Edit button text"
-  },
   "catListTitle": "List of Cats",
-  "@catListTitle": {
-    "description": "Title for the cat list page"
-  },
   "editCatDetailsTitle": "Edit Cat Details",
-  "@editCatDetailsTitle": {
-    "description": "Title for the edit cat details page"
-  },
   "createCatProfile": "Create a Cat Profile",
-  "@createCatProfile": {
-    "description": "Title for creating a cat profile"
-  },
   "selectGender": "Select a gender",
-  "@selectGender": {
-    "description": "Hint text for selecting gender"
-  },
   "selectPhoto": "Select a photo",
-  "@selectPhoto": {
-    "description": "Button text for selecting a photo"
-  },
   "photoSelected": "Photo selected",
-  "@photoSelected": {
-    "description": "Text displayed when a photo is selected"
-  },
   "send": "Send",
-  "@send": {
-    "description": "Button text for sending data"
-  },
   "dataSentSuccessfully": "Data sent successfully",
-  "@dataSentSuccessfully": {
-    "description": "Message displayed when data is sent successfully"
-  },
   "dataSendError": "Error sending data",
-  "@dataSendError": {
-    "description": "Message displayed when there is an error sending data"
-  },
   "storagePermissionDenied": "Storage permission denied",
-  "@storagePermissionDenied": {
-    "description": "Message displayed when storage permission is denied"
-  },
   "userNotAuthenticated": "User not authenticated",
-  "@userNotAuthenticated": {
-    "description": "Message displayed when the user is not authenticated"
-  },
   "annonceDetailsTitle": "Annonce Details",
-  "@annonceDetailsTitle": {
-    "description": "Title for the annonce details page"
-  },
   "annonceTitle": "Title of the Annonce",
-  "@annonceTitle": {
-    "description": "Label for the title of the annonce"
-  },
   "catId": "Cat ID",
-  "@catId": {
-    "description": "Label for the cat ID"
-  },
   "back": "Back",
-  "@back": {
-    "description": "Text for the back button"
-  },
   "save": "Save",
-  "@save": {
-    "description": "Text for the save button"
-  },
   "noCatInfoAvailable": "No cat information available",
-  "@noCatInfoAvailable": {
-    "description": "Message displayed when no cat information is available"
-  },
-  "seeMore" : "Voir plus",
-  "@seeMore" : {
-    "description": "See more"
-  },
-  "myCats" : "Mes chats",
-  "global" : "Global",
-  "modificationSuccess" : "Successfuly modified",
-  "title" : "Titre",
-  "editAnnonceTitle" : "Modifier l'annonce",
-  "selectCat" : "Selected Cat",
-  "updateSuccess" : "Updated successfully",
-  "updateFailed" : "Failed to update",
-  "add" : "Add",
-  "catDetails" : "Cat Details",
-  "editAnnonce" : "Edit announcement"
+  "seeMore": "See more",
+  "global": "Global",
+  "modificationSuccess": "Successfully modified",
+  "title": "Title",
+  "editAnnonceTitle": "Edit announcement",
+  "selectCat": "Select Cat",
+  "updateSuccess": "Updated successfully",
+  "updateFailed": "Failed to update",
+  "add": "Add",
+  "catDetails": "Cat Details",
+  "editAnnonce": "Edit announcement",
+  "monCompte": "My account",
+  "myCats" : "My cats",
+  "settings" :"Settings",
+  "language" : "Language",
+  "english" : "English",
+  "french" : "French",
+  "addCatTitle" : "Insert a title"
 }
