@@ -12,7 +12,9 @@ import '../models/race.dart';
 import '../models/user.dart';
 import '../models/favoris.dart';
 import '../models/rating.dart';
+import '../models/notification_token.dart';
 import 'package:file_picker/file_picker.dart';
+import '../notificationManager.dart';
 import './auth_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -803,4 +805,42 @@ class ApiService {
       'Authorization': 'Bearer $token',
     });
   }
+
+  // Notifications
+  Future<NotificationToken> createNotificationToken(String userId, String fcmToken) async {
+    final token = AuthService.authToken;
+    NotificationToken notificationToken = NotificationToken(userId: userId, token: fcmToken);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/notifications'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(notificationToken.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      final Map<String, dynamic> notificationTokenJson = jsonDecode(response.body);
+      return NotificationToken.fromJson(notificationTokenJson);
+    } else {
+      throw Exception('Failed to create notification token.');
+    }
+  }
+
+  Future<void> deleteNotificationToken(String notificationTokenId) async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/notifications/$notificationTokenId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete notification token');
+    }
+  }
+
+
 }

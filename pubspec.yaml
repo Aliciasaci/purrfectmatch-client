@@ -32,6 +32,9 @@ dependencies:
   app_links: ^6.1.4
   flutter_web_auth_2: ^3.1.2
   image_picker: ^0.8.4+4
+  firebase_messaging: ^15.0.3
+  firebase_core: ^3.2.0
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:
