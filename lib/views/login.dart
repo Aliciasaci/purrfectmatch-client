@@ -8,7 +8,13 @@ import '../blocs/auth/auth_bloc.dart';
 import 'register.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:purrfectmatch/views/user/user_home_page.dart';
+import '../locale_provider.dart';
+import '../views/register.dart';
+import '../blocs/auth/auth_bloc.dart';
+import '../views/language_switcher.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -26,6 +32,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    var localeProvider = Provider.of<LocaleProvider>(context);
+
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -44,31 +52,23 @@ class _LoginPageState extends State<LoginPage> {
             } else if (state is AuthAuthenticated) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const UserHomePage(title: '')),
+                MaterialPageRoute(
+                    builder: (context) => const UserHomePage(title: '')),
               );
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Connexion réussie!')),
+                SnackBar(
+                    content: Text(AppLocalizations.of(context)!.loginSuccessful)),
               );
             }
           }
         },
         builder: (context, state) {
-          return Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.amberAccent, Colors.orange],
-              ),
-            ),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: SingleChildScrollView(
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 4.0,
-                    margin: const EdgeInsets.all(20.0),
+          return Stack(
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
                       child: Form(
@@ -77,67 +77,97 @@ class _LoginPageState extends State<LoginPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Image(
-                              image: AssetImage('assets/logo.png'),
+                              image: AssetImage('assets/paw.png'),
                               height: 50,
                               width: 50,
                             ),
                             const SizedBox(height: 20),
-                            const Text(
-                              'Connexion',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.login,
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _emailController,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                border: OutlineInputBorder(),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.orange[100]!,
+                                ),
+                                borderRadius: BorderRadius.circular(40),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Veuillez entrer votre email';
-                                }
-                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                                  return 'Veuillez entrer une adresse email valide';
-                                }
-                                return null;
-                              },
+                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              child: TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  icon: Icon(Icons.account_circle_rounded,
+                                      color: Colors.orange[100]),
+                                  border: InputBorder.none,
+                                  labelText: AppLocalizations.of(context)!.email,
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return AppLocalizations.of(context)!.enterEmail;
+                                  }
+                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                      .hasMatch(value)) {
+                                    return AppLocalizations.of(context)!.invalidEmail;
+                                  }
+                                  return null;
+                                },
+                              ),
                             ),
                             const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _passwordController,
-                              decoration: const InputDecoration(
-                                labelText: 'Mot de passe',
-                                border: OutlineInputBorder(),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.orange[100]!,
+                                ),
+                                borderRadius: BorderRadius.circular(40),
                               ),
-                              obscureText: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Veuillez entrer votre mot de passe';
-                                }
-                                return null;
-                              },
+                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              child: TextFormField(
+                                controller: _passwordController,
+                                decoration: InputDecoration(
+                                  labelText: AppLocalizations.of(context)!.password,
+                                  border: InputBorder.none,
+                                  icon: Icon(Icons.lock, color: Colors.orange[100]),
+                                ),
+                                obscureText: true,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return AppLocalizations.of(context)!.enterPassword;
+                                  }
+                                  return null;
+                                },
+                              ),
                             ),
                             const SizedBox(height: 20),
                             _isLoading
                                 ? const CircularProgressIndicator()
                                 : Column(
                               children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (_formKey.currentState!.validate()) {
-                                      BlocProvider.of<AuthBloc>(context).add(
-                                        LoginRequested(
-                                          email: _emailController.text,
-                                          password: _passwordController.text,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: const Text('Connexion'),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.orange[100],
+                                      padding: const EdgeInsets.all(15),
+                                    ),
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        BlocProvider.of<AuthBloc>(context).add(
+                                          LoginRequested(
+                                            email: _emailController.text,
+                                            password:
+                                            _passwordController.text,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Text(AppLocalizations.of(context)!.login),
+                                  ),
                                 ),
                                 const SizedBox(height: 20),
                                 ElevatedButton(
@@ -159,13 +189,15 @@ class _LoginPageState extends State<LoginPage> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const RegisterPage()),
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                          const RegisterPage()),
                                     );
                                   },
-                                  child: const Text(
-                                    'Pas encore de compte ? Inscris-toi',
+                                  child: Text(
+                                    AppLocalizations.of(context)!.register,
                                     style: TextStyle(
-                                      color: Colors.blue,
+                                      color: Colors.orange[200],
                                     ),
                                   ),
                                 ),
@@ -178,7 +210,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-            ),
+              const Positioned(
+                top: 40,
+                right: 20,
+                child: LanguageSwitcher(),
+              ),
+            ],
           );
         },
       ),

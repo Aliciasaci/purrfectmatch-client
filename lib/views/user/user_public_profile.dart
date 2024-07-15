@@ -146,17 +146,18 @@ class _UserPublicProfileState extends State<UserPublicProfile> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profil de ${widget.user.name}'),
+        backgroundColor: Colors.orange[100],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent[100]!, Colors.orange[400]!],
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
           ),
         ),
         child: _isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : Padding(
           padding: const EdgeInsets.all(16.0),
           child: Center(
@@ -170,12 +171,12 @@ class _UserPublicProfileState extends State<UserPublicProfile> {
                   children: [
                     Text(
                       widget.user.name,
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       'Commentaires',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     Expanded(
                       child: ListView.builder(
@@ -198,7 +199,7 @@ class _UserPublicProfileState extends State<UserPublicProfile> {
                                       children: [
                                         RatingBarIndicator(
                                           rating: rating.mark.toDouble(),
-                                          itemBuilder: (context, index) => Icon(
+                                          itemBuilder: (context, index) => const Icon(
                                             Icons.star,
                                             color: Colors.amber,
                                           ),
@@ -218,11 +219,11 @@ class _UserPublicProfileState extends State<UserPublicProfile> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.edit, color: Colors.green),
+                                      icon: const Icon(Icons.edit, color: Colors.orange),
                                       onPressed: () => _startEditing(rating),
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.delete, color: Colors.red),
+                                      icon: const Icon(Icons.delete, color: Colors.orange),
                                       onPressed: () => _deleteRating(rating),
                                     ),
                                   ],
@@ -248,7 +249,7 @@ class _UserPublicProfileState extends State<UserPublicProfile> {
                             color: Colors.grey.withOpacity(0.1),
                             spreadRadius: 2,
                             blurRadius: 5,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
@@ -263,17 +264,29 @@ class _UserPublicProfileState extends State<UserPublicProfile> {
                               children: [
                                 Text(
                                   'Ajouter une évaluation',
-                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                 ),
-                                TextFormField(
-                                  controller: _commentController,
-                                  decoration: InputDecoration(labelText: 'Commentaire'),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Veuillez entrer un commentaire';
-                                    }
-                                    return null;
-                                  },
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.orange[100]!,
+                                    ),
+                                    borderRadius: BorderRadius.circular(40),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                                  child: TextFormField(
+                                    controller: _commentController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Commentaire',
+                                      border: InputBorder.none,
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Veuillez entrer un commentaire';
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
                                 const SizedBox(height: 10),
                                 RatingBar.builder(
@@ -282,7 +295,7 @@ class _UserPublicProfileState extends State<UserPublicProfile> {
                                   direction: Axis.horizontal,
                                   allowHalfRating: false,
                                   itemCount: 5,
-                                  itemBuilder: (context, _) => Icon(
+                                  itemBuilder: (context, _) => const Icon(
                                     Icons.star,
                                     color: Colors.amber,
                                   ),
@@ -293,9 +306,16 @@ class _UserPublicProfileState extends State<UserPublicProfile> {
                                   },
                                 ),
                                 const SizedBox(height: 10),
-                                ElevatedButton(
-                                  onPressed: _submitRating,
-                                  child: Text('Soumettre'),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.orange[100],
+                                      padding: const EdgeInsets.all(15),
+                                    ),
+                                    onPressed: _submitRating,
+                                    child: const Text('Soumettre'),
+                                  ),
                                 ),
                               ],
                             ),
