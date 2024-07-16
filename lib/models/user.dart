@@ -84,4 +84,31 @@ class User {
   String toString() {
     return '{name: $name, email: $email, addressRue: $addressRue, cp: $cp, ville: $ville, password: $password, profilePicURL: $profilePicURL, createdAt: $createdAt, roles: $roles, associations: $associations }';
   }
+
+  User copyWith({
+    String? profilePicURL,
+    String? name,
+    String? email,
+    String? addressRue,
+    String? cp,
+    String? ville,
+    String? password,
+    List<Role>? roles,
+    List<Association>? associations,
+  }) {
+    return User(
+      id: id,
+      profilePicURL: profilePicURL ?? this.profilePicURL,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      addressRue: addressRue ?? this.addressRue,
+      cp: cp ?? this.cp,
+      ville: ville ?? this.ville,
+      password: password ?? this.password,
+      roles: roles ?? this.roles,
+      associations: associations ?? this.associations,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
 }

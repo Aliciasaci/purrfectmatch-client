@@ -3,13 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'package:purrfectmatch/blocs/room/room_bloc.dart';
+import 'package:purrfectmatch/models/annonce.dart';
+import 'package:purrfectmatch/models/room.dart';
+import 'package:purrfectmatch/models/user.dart';
+import 'package:purrfectmatch/services/api_service.dart';
+import 'package:purrfectmatch/views/annonce/annonce_detail_page.dart';
 
 class RoomScreen extends StatefulWidget {
-  final int roomID;
-  final String annonceTitle;
+  final Room room;
 
-  const RoomScreen(
-      {super.key, required this.roomID, required this.annonceTitle});
+  const RoomScreen({super.key, required this.room});
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -17,17 +20,25 @@ class RoomScreen extends StatefulWidget {
 
 class _RoomScreenState extends State<RoomScreen> {
   final TextEditingController _messageController = TextEditingController();
-  String? _currentUserID;
+  User? _currentUser;
   final ScrollController _scrollController = ScrollController();
+  final ApiService _apiService = ApiService();
+  Annonce? annonce;
 
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.roomID));
+    BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.room.id!));
     final authState = BlocProvider.of<AuthBloc>(context).state;
     if (authState is AuthAuthenticated) {
-      _currentUserID = authState.user.id;
+      _currentUser = authState.user;
     }
+    String annonceIDString = widget.room.annonceID.toString();
+    _apiService.fetchAnnonceByID(annonceIDString).then((value) {
+      setState(() {
+        annonce = value;
+      });
+    });
   }
 
   @override
@@ -35,14 +46,25 @@ class _RoomScreenState extends State<RoomScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          title: Text(widget.annonceTitle),
+          title: Text(widget.room.annonceTitle!),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.of(context).pop();
               BlocProvider.of<RoomBloc>(context).add(LoadRooms());
             },
-          )),
+          ),
+          actions: [
+            if (annonce != null)
+              IconButton(
+                icon: const Icon(Icons.info),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => AnnonceDetailPage(annonce: annonce!),
+                  ));
+                },
+              ),
+          ]),
       body: Column(
         children: [
           Expanded(
@@ -56,39 +78,127 @@ class _RoomScreenState extends State<RoomScreen> {
                         _scrollController
                             .jumpTo(_scrollController.position.maxScrollExtent);
                       });
-                      return Column(
-                        children: state.messages.map((message) {
-                          final isCurrentUser =
-                              message.senderId == _currentUserID;
-                          return Align(
-                            alignment: isCurrentUser
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 16),
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 8),
-                              decoration: BoxDecoration(
-                                color: isCurrentUser
-                                    ? Colors.orange[100]
-                                    : Colors.grey[200],
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                      // get the other user from the room context
+                      final otherUserID =
+                          widget.room.user1Id == _currentUser!.id!
+                              ? widget.room.user2Id
+                              : widget.room.user1Id;
+
+                      final getOtherUser =
+                          _apiService.fetchUserByID(otherUserID);
+
+                      return FutureBuilder<User>(
+                        future: getOtherUser,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final otherUser = snapshot.data!;
+                            final currentUserPicture =
+                                _currentUser!.profilePicURL == "default"
+                                    ? _apiService.serveDefaultProfilePicture()
+                                    : _currentUser!.profilePicURL;
+                            final otherUserPicture =
+                                otherUser.profilePicURL == "default"
+                                    ? _apiService.serveDefaultProfilePicture()
+                                    : otherUser.profilePicURL;
+                            return Padding(
+                              padding: const EdgeInsets.all(15.0),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(message.content),
-                                  Text(
-                                    DateFormat("HH:mm")
-                                        .format(message.timestamp.toLocal()),
-                                    style: const TextStyle(fontSize: 10),
-                                  ),
-                                ],
+                                children: state.messages.map((message) {
+                                  final isCurrentUser =
+                                      message.senderId == _currentUser!.id!;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Row(
+                                      mainAxisAlignment: isCurrentUser
+                                          ? MainAxisAlignment.end
+                                          : MainAxisAlignment.start,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: isCurrentUser
+                                              ? CrossAxisAlignment.end
+                                              : CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 16),
+                                              decoration: BoxDecoration(
+                                                color: isCurrentUser
+                                                    ? Colors.orange[100]
+                                                    : Colors.grey[200],
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    isCurrentUser
+                                                        ? CrossAxisAlignment.end
+                                                        : CrossAxisAlignment
+                                                            .start,
+                                                children: [
+                                                  Text(message.content!),
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment: isCurrentUser
+                                                  ? MainAxisAlignment.end
+                                                  : MainAxisAlignment.start,
+                                              children: [
+                                                if (!isCurrentUser)
+                                                  CircleAvatar(
+                                                    radius: 10,
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                            otherUserPicture!),
+                                                  ),
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                  DateFormat("HH:mm").format(
+                                                      message.timestamp!
+                                                          .toLocal()),
+                                                  style: const TextStyle(
+                                                      fontSize: 8),
+                                                ),
+                                                const SizedBox(width: 5),
+                                                if (isCurrentUser)
+                                                  CircleAvatar(
+                                                    radius: 10,
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                            currentUserPicture!),
+                                                  ),
+                                                if (isCurrentUser &&
+                                                    message.isRead!)
+                                                  const Icon(
+                                                    Icons.check,
+                                                    size: 15,
+                                                    color: Colors.blue,
+                                                  ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
                               ),
-                            ),
-                          );
-                        }).toList(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                snapshot.error.toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            );
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
                       );
                     } else if (state is RoomError) {
                       return Center(

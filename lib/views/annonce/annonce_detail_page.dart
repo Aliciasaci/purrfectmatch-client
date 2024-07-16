@@ -93,21 +93,9 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.annonceDetailsTitle),
-        backgroundColor: Colors.orange[100],
       ),
       body: Stack(
         children: [
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.orange[100]!, Colors.orange[200]!],
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: SingleChildScrollView(
@@ -134,16 +122,16 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                           _loadingCat
                               ? const Center(child: CircularProgressIndicator())
                               : _cat != null && _cat!.picturesUrl.isNotEmpty
-                              ? Image.network(
-                            _cat!.picturesUrl.first,
-                            height: 300,
-                            fit: BoxFit.cover,
-                          )
-                              : Container(
-                            height: 300,
-                            color: Colors.grey,
-                            child: const Icon(Icons.image, size: 100),
-                          ),
+                                  ? Image.network(
+                                      _cat!.picturesUrl.first,
+                                      height: 300,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(
+                                      height: 300,
+                                      color: Colors.grey,
+                                      child: const Icon(Icons.image, size: 100),
+                                    ),
                           const SizedBox(height: 20),
                           if (_isEditing)
                             TextFormField(
@@ -168,7 +156,7 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                               controller: _descriptionController,
                               decoration: InputDecoration(
                                 labelText:
-                                AppLocalizations.of(context)!.description,
+                                    AppLocalizations.of(context)!.description,
                                 border: const OutlineInputBorder(),
                               ),
                               maxLines: null,
@@ -215,15 +203,15 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                               ],
                             ),
                           if (_cat == null)
-                            Text(
-                                AppLocalizations.of(context)!.noCatInfoAvailable),
+                            Text(AppLocalizations.of(context)!
+                                .noCatInfoAvailable),
                           if (currentUser != null &&
                               widget.annonce.UserID == currentUser.id)
                             SizedBox(
                               width: double.infinity,
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: TextButton(
