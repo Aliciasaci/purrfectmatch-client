@@ -3,13 +3,17 @@ import 'dart:io' show Platform;
 import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
+import 'package:purrfectmatch/blocs/room/room_bloc.dart';
+import 'package:purrfectmatch/views/user/room/room_screen.dart';
 import 'package:rxdart/rxdart.dart';
 
 final class NotificationManager {
   NotificationManager._();
 
   static final instance = NotificationManager._();
+  int? roomID;
 
   // used to pass messages from event handler to the UI
   final _messageStreamController = BehaviorSubject<RemoteMessage>();
@@ -46,14 +50,14 @@ final class NotificationManager {
       print("Error notification token: $err");
     });
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (kDebugMode) {
-        print('Handling a foreground message: ${message.messageId}');
-        print('Message data: ${message.data}');
-        print('Message notification: ${message.notification?.title}');
-        print('Message notification: ${message.notification?.body}');
-      }
+      _handleForegroundMessage(message);
       _messageStreamController.sink.add(message);
     });
+    FlutterLocalNotificationsPlugin().initialize(
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      ),
+    );
   }
 
   Future<String?> getFCMToken() async {
@@ -73,7 +77,32 @@ final class NotificationManager {
     return fcmToken;
   }
 
-  void _handleMessage(RemoteMessage message) {
-    log('Handling a background message ${message.messageId}');
+  void setRoomID(int id) {
+    roomID = id;
+  }
+
+  void _handleForegroundMessage(RemoteMessage message) {
+    if (kDebugMode) {
+      print('Handling a foreground message: ${message.messageId}');
+      print('Message data: ${message.data}');
+      print('Message notification: ${message.notification?.title}');
+      print('Message notification: ${message.notification?.body}');
+    }
+    print('Current room ID: $roomID');
+    if (message.data.isNotEmpty && message.data['RoomID'] == roomID.toString()) {
+      return;
+    }
+    final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    NotificationDetails notificationDetails = const NotificationDetails(
+      android: AndroidNotificationDetails(
+          "Channel Id",
+          "Main Channel",
+          groupKey: "gfg",
+          importance: Importance.max,
+          playSound: true,
+          priority: Priority.high),
+    );
+    FlutterLocalNotificationsPlugin().show(
+        id, message.notification!.title, message.notification!.body, notificationDetails);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'package:purrfectmatch/blocs/room/room_bloc.dart';
+import 'package:purrfectmatch/notificationManager.dart';
 
 class RoomScreen extends StatefulWidget {
   final int roomID;
@@ -23,6 +24,7 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
+    NotificationManager.instance.setRoomID(widget.roomID);
     BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.roomID));
     final authState = BlocProvider.of<AuthBloc>(context).state;
     if (authState is AuthAuthenticated) {
@@ -39,6 +41,7 @@ class _RoomScreenState extends State<RoomScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
+              NotificationManager.instance.setRoomID(-1);
               Navigator.of(context).pop();
               BlocProvider.of<RoomBloc>(context).add(LoadRooms());
             },
