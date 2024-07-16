@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/blocs/room/room_bloc.dart';
-import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/user/profile/profile_screen.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../models/user.dart';
 import '../annonces_cats_menu.dart';
 import '../bottom_navigation_bar.dart';
-import '../annonce/form_add_annonce.dart';
 import '../login.dart';
 import '../swipe_card.dart';
 import './room/rooms_list_screen.dart';
@@ -51,43 +48,40 @@ class _UserHomePageState extends State<UserHomePage> {
   Widget build(BuildContext context) {
     var localeProvider = Provider.of<LocaleProvider>(context);
 
-    return Container(
-      color: Colors.blue,
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Stack(
-            children: [
-              const Image(
-                image: AssetImage('assets/paw.png'),
-                height: 30,
-                width: 30,
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Stack(
+          children: [
+            const Image(
+              image: AssetImage('assets/paw.png'),
+              height: 30,
+              width: 30,
+            ),
+            Text(
+              widget.title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                overflow: TextOverflow.ellipsis,
               ),
-              Text(
-                widget.title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          elevation: 0,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: _logout,
-              tooltip: 'Logout',
             ),
           ],
         ),
-        body: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
-        ),
-        bottomNavigationBar: CustomBottomNavigationBar(
-          selectedIndex: _selectedIndex,
-          onItemTapped: _onItemTapped,
-        ),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
+      ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }

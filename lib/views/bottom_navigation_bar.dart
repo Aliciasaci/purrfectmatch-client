@@ -20,7 +20,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(40.0)),
+      borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(40.0), topRight: Radius.circular(40.0)),
       child: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(

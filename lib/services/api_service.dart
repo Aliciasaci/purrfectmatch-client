@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../models/association.dart';
@@ -16,7 +15,7 @@ import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:mime/mime.dart';
 
 class ApiService {
   static String get baseUrl =>
@@ -92,7 +91,8 @@ class ApiService {
   }
 
   Future<void> updateCat(Cat cat, PlatformFile? selectedFile) async {
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/cats/${cat.ID}'));
+    var request =
+        http.MultipartRequest('PUT', Uri.parse('$baseUrl/cats/${cat.ID}'));
 
     final token = AuthService.authToken;
     request.headers['Authorization'] = 'Bearer $token';
@@ -234,7 +234,8 @@ class ApiService {
     } else if (response.statusCode == 400) {
       throw Exception('Champs manquants ou invalides dans la requête');
     } else if (response.statusCode == 401) {
-      throw Exception('Non autorisé. Veuillez vérifier vos informations d\'authentification');
+      throw Exception(
+          'Non autorisé. Veuillez vérifier vos informations d\'authentification');
     } else if (response.statusCode == 500) {
       throw Exception('Erreur interne du serveur');
     } else {
@@ -309,9 +310,11 @@ class ApiService {
   }
 
   // Association methods
-  Future<void> createAssociation(Association association, String filePath, String fileName) async {
+  Future<void> createAssociation(
+      Association association, String filePath, String fileName) async {
     final token = AuthService.authToken;
-    final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+    final request =
+        http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
 
     association.toJson().forEach((key, value) {
       request.fields[key] = value.toString();
@@ -351,7 +354,9 @@ class ApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> associationsJson = jsonDecode(response.body);
-      return associationsJson.map((json) => Association.fromJson(json)).toList();
+      return associationsJson
+          .map((json) => Association.fromJson(json))
+          .toList();
     } else {
       throw Exception('Failed to load associations');
     }
@@ -385,7 +390,9 @@ class ApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> associationsJson = jsonDecode(response.body);
-      return associationsJson.map((json) => Association.fromJson(json)).toList();
+      return associationsJson
+          .map((json) => Association.fromJson(json))
+          .toList();
     } else {
       throw Exception('Failed to load user associations');
     }
@@ -407,7 +414,8 @@ class ApiService {
     }
   }
 
-  Future<void> updateAssociationVerifyStatus(int associationId, bool verified) async {
+  Future<void> updateAssociationVerifyStatus(
+      int associationId, bool verified) async {
     final token = AuthService.authToken;
     final response = await http.put(
       Uri.parse('$baseUrl/associations/$associationId/verify'),
@@ -435,9 +443,6 @@ class ApiService {
       throw Exception('Failed to delete association');
     }
   }
-
-
-
 
   // User methods
   Future<List<User>> fetchAllUsers() async {
@@ -495,23 +500,43 @@ class ApiService {
     }
   }
 
-  Future<void> updateUserProfilePic(String userId, PlatformFile selectedFile) async {
+  Future<String> updateUserProfilePic(
+      String userId, String selectedFilePath, String selectedFileName) async {
     final token = AuthService.authToken;
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/$userId/profile/pic'));
+    var request =
+        http.MultipartRequest('POST', Uri.parse('$baseUrl/profile/picture'));
 
     request.headers['Authorization'] = 'Bearer $token';
+
+    String? mimeType = lookupMimeType(selectedFilePath);
+    MediaType contentType;
+    if (mimeType != null) {
+      var type = mimeType.split('/');
+      if (type.length == 2) {
+        contentType = MediaType(type[0], type[1]);
+      } else {
+        throw Exception('Invalid MIME type');
+      }
+    } else {
+      contentType = MediaType('image', 'jpeg');
+    }
+
     request.files.add(
-      http.MultipartFile(
+      await http.MultipartFile.fromPath(
         'uploaded_file',
-        selectedFile.readStream!,
-        selectedFile.size,
-        filename: selectedFile.name,
+        selectedFilePath,
+        filename: selectedFileName,
+        contentType: contentType,
       ),
     );
 
     var response = await request.send();
 
-    if (response.statusCode != 200) {
+    if (response.statusCode == 200) {
+      final responseString = await response.stream.bytesToString();
+      final Map<String, dynamic> responseData = jsonDecode(responseString);
+      return responseData['profilePicURL'];
+    } else {
       throw Exception('Failed to update user profile pic');
     }
   }
@@ -576,7 +601,8 @@ class ApiService {
     if (response.statusCode == 201) {
       try {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        if (responseData['success'] == 'true' && responseData['favorite'] != null) {
+        if (responseData['success'] == 'true' &&
+            responseData['favorite'] != null) {
           return responseData['favorite'];
         } else {
           throw Exception('Failed to create favorite');
@@ -709,7 +735,6 @@ class ApiService {
     }
   }
 
-  // Race methods
   Future<List<Race>> fetchAllRaces() async {
     final token = AuthService.authToken;
     final response = await http.get(
@@ -828,10 +853,31 @@ class ApiService {
     }
   }
 
+  Future<Message> getLatestMessage(int roomID) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms/$roomID/latest'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      return Message.fromJsonLastest(parsed);
+    } else {
+      throw Exception('Failed to load latest message');
+    }
+  }
+
   IOWebSocketChannel connectToRoom(int roomID) {
     final token = AuthService.authToken;
     return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
       'Authorization': 'Bearer $token',
     });
+  }
+
+  String serveDefaultProfilePicture() {
+    return '$baseUrl/assets/images/default_picture.png';
   }
 }

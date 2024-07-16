@@ -1,8 +1,11 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/constants/color.dart';
 import 'package:purrfectmatch/constants/image_strings.dart';
 import 'package:purrfectmatch/constants/text_strings.dart';
+import 'package:purrfectmatch/services/api_service.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../blocs/auth/auth_bloc.dart';
 import '../../../models/user.dart';
 
@@ -19,6 +22,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _addressRueController = TextEditingController();
   final _cpController = TextEditingController();
   final _villeController = TextEditingController();
+  String _profilePicController = "";
+  final ApiService apiService = ApiService();
 
   User? _currentUser;
 
@@ -37,6 +42,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _addressRueController.text = _currentUser!.addressRue;
       _cpController.text = _currentUser!.cp;
       _villeController.text = _currentUser!.ville;
+      _profilePicController = _currentUser!.profilePicURL! == "default"
+          ? apiService.serveDefaultProfilePicture()
+          : _currentUser!.profilePicURL!;
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await FilePicker.platform.pickFiles();
+    if (pickedFile != null) {
+      final image = await apiService.updateUserProfilePic(_currentUser!.id!,
+          pickedFile.files.single.path!, pickedFile.files.single.name);
+      if (!mounted) return; // Check if the widget is still mounted
+      setState(() {
+        _profilePicController = image;
+      });
+      final updatedUser = _currentUser!.copyWith(profilePicURL: image);
+      // Use a local variable for BlocProvider to avoid using context across async gaps
+      final authBloc = BlocProvider.of<AuthBloc>(context);
+      if (!mounted) return; // Check again as there's another async gap before
+      authBloc.add(UpdateProfilePicRequested(updatedUser));
     }
   }
 
@@ -47,6 +72,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _addressRueController.dispose();
     _cpController.dispose();
     _villeController.dispose();
+    _profilePicController = "";
     super.dispose();
   }
 
@@ -66,9 +92,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(userEditProfileTitle, style: Theme.of(context).textTheme.headlineSmall),
+        title: Text(userEditProfileTitle,
+            style: Theme.of(context).textTheme.headlineSmall),
         centerTitle: true,
       ),
       body: BlocListener<AuthBloc, AuthState>(
@@ -81,6 +107,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _addressRueController.text = _currentUser!.addressRue;
               _cpController.text = _currentUser!.cp;
               _villeController.text = _currentUser!.ville;
+              _profilePicController = _currentUser!.profilePicURL! == "default"
+                  ? apiService.serveDefaultProfilePicture()
+                  : _currentUser!.profilePicURL!;
             });
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -90,9 +119,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Failed to update profile"),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: Text(state.message),
+                duration: const Duration(seconds: 2),
               ),
             );
           }
@@ -108,20 +137,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     height: 120,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: const Image(image: AssetImage(userProfileImage)),
+                      child: Image.network(_profilePicController),
                     ),
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: Container(
-                      width: 35,
-                      height: 35,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color: Colors.white),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.black,
-                        size: 20,
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: Colors.white,
+                        ),
+                        child: const Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -131,62 +166,111 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               Form(
                 child: Column(
                   children: [
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: "Nom",
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          labelText: "Nom",
+                          prefixIcon:
+                              Icon(Icons.person, color: Colors.orange[100]),
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 15),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: "Mail",
-                        prefixIcon: Icon(Icons.email),
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: "Mail",
+                          prefixIcon:
+                              Icon(Icons.email, color: Colors.orange[100]),
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 15),
-                    TextFormField(
-                      controller: _addressRueController,
-                      decoration: const InputDecoration(
-                        labelText: "Adresse rue",
-                        prefixIcon: Icon(Icons.home),
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _addressRueController,
+                        decoration: InputDecoration(
+                          labelText: "Adresse rue",
+                          prefixIcon:
+                              Icon(Icons.home, color: Colors.orange[100]),
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 15),
-                    TextFormField(
-                      controller: _cpController,
-                      decoration: const InputDecoration(
-                        labelText: "CP",
-                        prefixIcon: Icon(Icons.home),
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _cpController,
+                        decoration: InputDecoration(
+                          labelText: "CP",
+                          prefixIcon:
+                              Icon(Icons.home, color: Colors.orange[100]),
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 15),
-                    TextFormField(
-                      controller: _villeController,
-                      decoration: const InputDecoration(
-                        labelText: "Ville",
-                        prefixIcon: Icon(Icons.home),
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.orange[100]!,
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextFormField(
+                        controller: _villeController,
+                        decoration: InputDecoration(
+                          labelText: "Ville",
+                          prefixIcon:
+                              Icon(Icons.home, color: Colors.orange[100]),
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 30),
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _updateUser,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: darkYellowColor,
-                          side: BorderSide.none,
-                          shape: const StadiumBorder(),
-                        ),
-                        child: const Text(userEditProfileTitle, style: TextStyle(color: darkColor)),
-                      ),
+                      child: TextButton(
+                          onPressed: _updateUser,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange[100],
+                            side: BorderSide.none,
+                            shape: const StadiumBorder(),
+                          ),
+                          child: const Text(userEditProfileTitle)),
                     ),
                     const SizedBox(height: 50),
                     Row(
@@ -199,7 +283,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             children: [
                               TextSpan(
                                 text: " ${_currentUser?.createdAt ?? ''}",
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 12),
                               ),
                             ],
                           ),

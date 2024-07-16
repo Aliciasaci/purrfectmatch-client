@@ -5,47 +5,47 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.3.1 <4.0.0"
+    sdk: ">=3.3.1 <4.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.6
-  swipe_cards: ^2.0.0+1
-  flutter_native_splash: ^2.4.0
-  flutter_launcher_icons: ^0.13.1
-  file_picker: ^8.0.6
-  intl: any
-  http: ^1.2.1
-  permission_handler: ^11.3.1
-  flutter_localizations:
-    sdk: flutter
-  flutter_bloc: ^8.1.6
-  equatable: ^2.0.5
-  flutter_dotenv: ^5.1.0
-  badges: ^3.1.2
-  flutter_rating_bar: ^4.0.0
-  http_parser: ^4.0.2
-  url_launcher: ^6.3.0
-  web_socket_channel: ^2.2.0
-  google_sign_in: ^6.2.1
-  app_links: ^6.1.4
-  flutter_web_auth_2: ^3.1.2
-  image_picker: ^0.8.4+4
-  ffi: ^2.0.1
+    flutter:
+        sdk: flutter
+    cupertino_icons: ^1.0.6
+    swipe_cards: ^2.0.0+1
+    flutter_native_splash: ^2.4.0
+    flutter_launcher_icons: ^0.13.1
+    file_picker: ^8.0.6
+    intl: any
+    http: ^1.2.1
+    permission_handler: ^11.3.1
+    flutter_localizations:
+        sdk: flutter
+    flutter_bloc: ^8.1.6
+    equatable: ^2.0.5
+    flutter_dotenv: ^5.1.0
+    badges: ^3.1.2
+    flutter_rating_bar: ^4.0.0
+    http_parser: ^4.0.2
+    url_launcher: ^6.3.0
+    web_socket_channel: ^2.2.0
+    image_picker: ^0.8.4+4
+    mime: ^1.0.0
+    google_sign_in: ^6.2.1
+    app_links: ^6.1.4
+    flutter_web_auth_2: ^3.1.2
+    ffi: ^2.0.1
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
-  intl_utils: ^2.6.1
-  ffi: ^2.0.1
+    flutter_test:
+        sdk: flutter
+    flutter_lints: ^3.0.0
+    intl_utils: ^2.6.1
 
 flutter:
-  uses-material-design: true
+    uses-material-design: true
 
-  # Enable code generation for localizations
-  generate: true
+    # Enable code generation for localizations
+    generate: true
 
   assets:
     - assets/logo.png
@@ -58,14 +58,14 @@ flutter:
     - .env
 
 flutter_native_splash:
-  color: "#000000"
-  image: assets/paw.png
-  android_12:
-    image: assets/bg.png
-    color: "#FFF4CA"
+    color: "#000000"
+    image: assets/paw.png
+    android_12:
+        image: assets/bg.png
+        color: "#FFF4CA"
 
 flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/logo.png"
-  min_sdk_android: 21
+    android: "launcher_icon"
+    ios: true
+    image_path: "assets/logo.png"
+    min_sdk_android: 21
