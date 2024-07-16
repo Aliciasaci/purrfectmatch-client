@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../models/association.dart';
@@ -16,6 +15,7 @@ import 'package:file_picker/file_picker.dart';
 import './auth_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mime/mime.dart';
 
 class ApiService {
   static String get baseUrl =>
@@ -277,23 +277,43 @@ class ApiService {
     }
   }
 
-  Future<void> updateUserProfilePic(String userId, PlatformFile selectedFile) async {
+  Future<String> updateUserProfilePic(
+      String userId, String selectedFilePath, String selectedFileName) async {
     final token = AuthService.authToken;
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/users/$userId/profile/pic'));
+    var request =
+        http.MultipartRequest('POST', Uri.parse('$baseUrl/profile/picture'));
 
     request.headers['Authorization'] = 'Bearer $token';
+
+    String? mimeType = lookupMimeType(selectedFilePath);
+    MediaType contentType;
+    if (mimeType != null) {
+      var type = mimeType.split('/');
+      if (type.length == 2) {
+        contentType = MediaType(type[0], type[1]);
+      } else {
+        throw Exception('Invalid MIME type');
+      }
+    } else {
+      contentType = MediaType('image', 'jpeg');
+    }
+
     request.files.add(
-      http.MultipartFile(
+      await http.MultipartFile.fromPath(
         'uploaded_file',
-        selectedFile.readStream!,
-        selectedFile.size,
-        filename: selectedFile.name,
+        selectedFilePath,
+        filename: selectedFileName,
+        contentType: contentType,
       ),
     );
 
     var response = await request.send();
 
-    if (response.statusCode != 200) {
+    if (response.statusCode == 200) {
+      final responseString = await response.stream.bytesToString();
+      final Map<String, dynamic> responseData = jsonDecode(responseString);
+      return responseData['profilePicURL'];
+    } else {
       throw Exception('Failed to update user profile pic');
     }
   }
@@ -531,7 +551,7 @@ class ApiService {
       Association association, String filePath, String fileName) async {
     final token = AuthService.authToken;
     final request =
-    http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+        http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
 
     association.toJson().forEach((key, value) {
       request.fields[key] = value.toString();
@@ -743,6 +763,22 @@ class ApiService {
     }
   }
 
+  Future<Message> getLatestMessage(int roomID) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/rooms/$roomID/latest'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      return Message.fromJsonLastest(parsed);
+    } else {
+      throw Exception('Failed to load latest message');
+    }
+  }
 
   Future<List<Cat>> fetchCatsByUser(String userId) async {
     final token = AuthService.authToken;
@@ -762,9 +798,6 @@ class ApiService {
   }
 
   Future<void> deleteAnnonce(String annonceId) async {
-
-
-    print(annonceId);
     final token = AuthService.authToken;
     final response = await http.delete(
       Uri.parse('$baseUrl/annonces/$annonceId'),
@@ -778,7 +811,6 @@ class ApiService {
     }
   }
 
-
   Future<void> updateAnnonce(Annonce annonce) async {
     final token = AuthService.authToken;
     final response = await http.put(
@@ -790,17 +822,19 @@ class ApiService {
       body: jsonEncode(annonce.toJson()),
     );
 
-    print(annonce.toJson());
     if (response.statusCode != 200) {
       throw Exception('Failed to update annonce.');
     }
   }
-
 
   IOWebSocketChannel connectToRoom(int roomID) {
     final token = AuthService.authToken;
     return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
       'Authorization': 'Bearer $token',
     });
+  }
+
+  String serveDefaultProfilePicture() {
+    return '$baseUrl/assets/images/default_picture.png';
   }
 }

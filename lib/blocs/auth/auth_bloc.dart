@@ -12,9 +12,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginRequested>(_onLoginRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<UpdateProfileRequested>(_onUpdateProfileRequested);
+    on<UpdateProfilePicRequested>(_onUpdateProfilePicRequested);
   }
 
-  Future<void> _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLoginRequested(
+      LoginRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       await authService.login(event.email, event.password);
@@ -29,17 +31,35 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogoutRequested(
+      LogoutRequested event, Emitter<AuthState> emit) async {
     authService.logout();
     emit(AuthInitial());
   }
 
-  Future<void> _onUpdateProfileRequested(UpdateProfileRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onUpdateProfileRequested(
+      UpdateProfileRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       final updatedUser = await authService.updateProfile(event.user);
       if (updatedUser != null) {
-        emit(AuthAuthenticated(token: AuthService.authToken!, user: updatedUser));
+        emit(AuthAuthenticated(
+            token: AuthService.authToken!, user: updatedUser));
+      } else {
+        emit(AuthError(message: 'Failed to update profile.'));
+      }
+    } catch (e) {
+      emit(AuthError(message: 'Failed to update profile.'));
+    }
+  }
+
+  Future<void> _onUpdateProfilePicRequested(
+      UpdateProfilePicRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      if (event.user != null) {
+        emit(
+            AuthAuthenticated(token: AuthService.authToken!, user: event.user));
       } else {
         emit(AuthError(message: 'Failed to update profile.'));
       }
