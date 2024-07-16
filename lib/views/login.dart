@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:purrfectmatch/services/auth_service.dart';
+import 'package:purrfectmatch/views/user/user_home_page.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../blocs/auth/auth_bloc.dart';
+import 'register.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
 import '../locale_provider.dart';
 import '../views/register.dart';
 import '../blocs/auth/auth_bloc.dart';
-import '../views/language_switcher.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
 
   @override
   Widget build(BuildContext context) {
@@ -161,6 +169,18 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 20),
+                                IconButton(
+                                  onPressed: () {
+                                    BlocProvider.of<AuthBloc>(context).add(
+                                      GoogleLoginRequested(),
+                                    );
+                                  },
+                                  icon: const CircleAvatar(
+                                    backgroundImage: AssetImage('assets/google_logo.png'),
+                                    radius: 20,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -186,15 +206,20 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              const Positioned(
-                top: 40,
-                right: 20,
-                child: LanguageSwitcher(),
-              ),
             ],
           );
         },
       ),
     );
+  }
+
+  void _handleGoogleSignIn() async {
+    try {
+      await AuthService().handleGoogleSignIn();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Échec de la connexion avec Google')),
+      );
+    }
   }
 }

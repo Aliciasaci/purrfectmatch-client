@@ -1,7 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditCatDetails extends StatefulWidget {
   final Cat cat;
@@ -19,30 +24,55 @@ class _EditCatDetailsState extends State<EditCatDetails> {
   final TextEditingController _lastVaccineNameController = TextEditingController();
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _behaviorController = TextEditingController();
-  final TextEditingController _raceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _sexeController = TextEditingController();
+  String? _selectedValue;
   late bool _sterilized;
   late bool _reserved;
+  int? _dropdownValue;
+  PlatformFile? _selectedFile;
+  Map<int?, String> raceList = {};
+  final List<String> _options = ['male', 'female'];
 
   @override
   void initState() {
     super.initState();
     _populateFields();
+    _fetchCatRaces();
   }
 
   void _populateFields() {
     _nameController.text = widget.cat.name;
-    _birthDateController.text = widget.cat.birthDate;
-    _lastVaccineDateController.text = widget.cat.lastVaccineDate;
+    _birthDateController.text = _formatDate(widget.cat.birthDate);
+    _lastVaccineDateController.text = _formatDate(widget.cat.lastVaccineDate);
     _lastVaccineNameController.text = widget.cat.lastVaccineName;
     _colorController.text = widget.cat.color;
     _behaviorController.text = widget.cat.behavior;
-    _raceController.text = widget.cat.race;
     _descriptionController.text = widget.cat.description;
-    _sexeController.text = widget.cat.sexe;
+    _selectedValue = widget.cat.sexe.toLowerCase();  // Ensure the value matches the options in _options
     _sterilized = widget.cat.sterilized;
     _reserved = widget.cat.reserved;
+    _dropdownValue = int.tryParse(widget.cat.raceID);
+  }
+
+  String _formatDate(String date) {
+    try {
+      final parsedDate = DateFormat('dd-MM-yyyy').parse(date);
+      return DateFormat('dd-MM-yyyy').format(parsedDate);
+    } catch (e) {
+      return date;
+    }
+  }
+
+  Future<void> _fetchCatRaces() async {
+    try {
+      final apiService = ApiService();
+      final newRaces = await apiService.fetchAllRaces();
+      setState(() {
+        raceList = {for (var race in newRaces) race.id: race.raceName};
+      });
+    } catch (e) {
+      print('Failed to load races: $e');
+    }
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -53,30 +83,57 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      controller.text = picked.toIso8601String().split('T').first;
+      controller.text = DateFormat('dd-MM-yyyy').format(picked);
     }
   }
 
-  void _saveChanges() async {
+  Future<void> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      setState(() {
+        _selectedFile = result.files.first;
+      });
+
+      // Afficher les informations sur le fichier sélectionné
+      print('File selected: ${_selectedFile!.name}');
+      print('File path: ${_selectedFile!.path}');
+      print('File size: ${_selectedFile!.size}');
+      print('File readStream: ${_selectedFile!.readStream != null ? 'Available' : 'Not available'}');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No file selected')),
+      );
+    }
+  }
+
+  Future<void> _saveChanges() async {
+    String formattedBirthDate = _birthDateController.text.isNotEmpty
+        ? DateFormat('dd-MM-yyyy').format(DateFormat('dd-MM-yyyy').parse(_birthDateController.text))
+        : '';
+    String formattedLastVaccineDate = _lastVaccineDateController.text.isNotEmpty
+        ? DateFormat('dd-MM-yyyy').format(DateFormat('dd-MM-yyyy').parse(_lastVaccineDateController.text))
+        : '';
+
     Cat updatedCat = Cat(
       ID: widget.cat.ID,
       name: _nameController.text,
-      birthDate: _birthDateController.text,
-      lastVaccineDate: _lastVaccineDateController.text,
+      birthDate: formattedBirthDate,
+      lastVaccineDate: formattedLastVaccineDate,
       lastVaccineName: _lastVaccineNameController.text,
       color: _colorController.text,
       behavior: _behaviorController.text,
       sterilized: _sterilized,
-      race: _raceController.text,
+      raceID: _dropdownValue.toString(),
       description: _descriptionController.text,
-      sexe: _sexeController.text,
+      sexe: _selectedValue ?? '',
       reserved: _reserved,
       picturesUrl: widget.cat.picturesUrl,
       userId: widget.cat.userId,
     );
 
     try {
-      await ApiService().updateCat(updatedCat);
+      await ApiService().updateCat(updatedCat, _selectedFile);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.modificationSuccess)),
       );
@@ -88,7 +145,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
     }
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, {bool readOnly = false, void Function()? onTap, Icon? suffixIcon}) {
+  Widget _buildTextFormField(TextEditingController controller, String label, {bool readOnly = false, void Function()? onTap, Icon? suffixIcon}) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -132,74 +189,160 @@ class _EditCatDetailsState extends State<EditCatDetails> {
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    _buildTextField(_nameController, AppLocalizations.of(context)!.name),
-                    const SizedBox(height: 10),
-                    _buildTextField(
-                      _birthDateController,
-                      AppLocalizations.of(context)!.birthDate,
-                      readOnly: true,
-                      onTap: () => _selectDate(context, _birthDateController),
-                      suffixIcon: const Icon(Icons.calendar_today),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildTextField(
-                      _lastVaccineDateController,
-                      AppLocalizations.of(context)!.lastVaccineDate,
-                      readOnly: true,
-                      onTap: () => _selectDate(context, _lastVaccineDateController),
-                      suffixIcon: const Icon(Icons.calendar_today),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildTextField(_lastVaccineNameController, AppLocalizations.of(context)!.lastVaccineName),
-                    const SizedBox(height: 10),
-                    _buildTextField(_colorController, AppLocalizations.of(context)!.color),
-                    const SizedBox(height: 10),
-                    _buildTextField(_behaviorController, AppLocalizations.of(context)!.behavior),
-                    const SizedBox(height: 10),
-                    _buildTextField(_raceController, AppLocalizations.of(context)!.race),
-                    const SizedBox(height: 10),
-                    _buildTextField(_descriptionController, AppLocalizations.of(context)!.description),
-                    const SizedBox(height: 10),
-                    _buildTextField(_sexeController, AppLocalizations.of(context)!.gender),
-                    const SizedBox(height: 10),
-                    SwitchListTile(
-                      title: Text(AppLocalizations.of(context)!.sterilized),
-                      value: _sterilized,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _sterilized = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      title: Text(AppLocalizations.of(context)!.reserved),
-                      value: _reserved,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _reserved = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.orange[100],
-                            padding: const EdgeInsets.all(15),
+                child: Form(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 10),
+                      if (widget.cat.picturesUrl.isNotEmpty)
+                        Center(
+                          child: Image.network(
+                            widget.cat.picturesUrl[0],
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
                           ),
-                          onPressed: _saveChanges,
-                          child: Text(AppLocalizations.of(context)!.edit),
+                        ),
+                      const SizedBox(height: 10),
+                      if (_selectedFile != null)
+                        Center(
+                          child: Image.file(
+                            File(_selectedFile!.path!),
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                      _buildTextFormField(_nameController, 'Name'),
+                      const SizedBox(height: 10),
+                      _buildTextFormField(
+                        _birthDateController,
+                        'Birth Date',
+                        readOnly: true,
+                        onTap: () => _selectDate(context, _birthDateController),
+                        suffixIcon: const Icon(Icons.calendar_today),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildTextFormField(
+                        _lastVaccineDateController,
+                        'Last Vaccine Date',
+                        readOnly: true,
+                        onTap: () => _selectDate(context, _lastVaccineDateController),
+                        suffixIcon: const Icon(Icons.calendar_today),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildTextFormField(_lastVaccineNameController, 'Last Vaccine Name'),
+                      const SizedBox(height: 10),
+                      _buildTextFormField(_colorController, 'Color'),
+                      const SizedBox(height: 10),
+                      _buildTextFormField(_behaviorController, 'Behavior'),
+                      const SizedBox(height: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: DropdownButtonFormField<int>(
+                          decoration: const InputDecoration(
+                            labelText: 'Race',
+                            border: InputBorder.none,
+                          ),
+                          items: raceList.entries.map((entry) {
+                            return DropdownMenuItem<int>(
+                              value: entry.key,
+                              child: Text(entry.value),
+                            );
+                          }).toList(),
+                          value: _dropdownValue,
+                          onChanged: (int? newValue) {
+                            setState(() {
+                              _dropdownValue = newValue;
+                            });
+                          },
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                      _buildTextFormField(
+                        _descriptionController,
+                        'Description',
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.orange[100]!,
+                          ),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            labelText: 'Select Gender',
+                            border: InputBorder.none,
+                          ),
+                          value: _selectedValue,
+                          items: _options.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedValue = newValue;
+                            });
+                          },
+                          isExpanded: true,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SwitchListTile(
+                        title: const Text('Sterilized'),
+                        value: _sterilized,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _sterilized = value;
+                          });
+                        },
+                      ),
+                      SwitchListTile(
+                        title: const Text('Reserved'),
+                        value: _reserved,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _reserved = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: _pickFile,
+                        child: Text(
+                          _selectedFile == null ? 'Select Photo' : 'Photo Selected: ${_selectedFile!.name}',
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _saveChanges,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange[100],
+                              padding: const EdgeInsets.all(15),
+                            ),
+                            child: const Text('Save Changes'),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                    ],
+                  ),
                 ),
               ),
             ),

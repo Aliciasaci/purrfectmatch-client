@@ -30,6 +30,10 @@ dependencies:
     web_socket_channel: ^2.2.0
     image_picker: ^0.8.4+4
     mime: ^1.0.0
+    google_sign_in: ^6.2.1
+    app_links: ^6.1.4
+    flutter_web_auth_2: ^3.1.2
+    ffi: ^2.0.1
 
 dev_dependencies:
     flutter_test:
@@ -43,14 +47,15 @@ flutter:
     # Enable code generation for localizations
     generate: true
 
-    assets:
-        - assets/logo.png
-        - assets/paws.png
-        - assets/paw.png
-        - assets/images/img.png
-        - assets/images/flag_fr.png
-        - assets/images/flag_uk.png
-        - .env
+  assets:
+    - assets/logo.png
+    - assets/paws.png
+    - assets/paw.png
+    - assets/images/img.png
+    - assets/images/flag_fr.png
+    - assets/images/flag_uk.png
+    - assets/google_logo.png
+    - .env
 
 flutter_native_splash:
     color: "#000000"

@@ -104,6 +104,6 @@ class Association {
 
   @override
   String toString() {
-    return 'Association { id: $id, name: $name, addressRue: $addressRue, cp: $cp, ville: $ville, phone: $phone, email: $email, kbisFile: $kbisFile, ownerId: $ownerId, verified: $verified, createdAt: $createdAt, updatedAt: $updatedAt }';
+    return '(Associa)tion { id: $id, name: $name, addressRue: $addressRue, cp: $cp, ville: $ville, phone: $phone, email: $email, kbisFile: $kbisFile, ownerId: $ownerId, verified: $verified, createdAt: $createdAt, updatedAt: $updatedAt }';
   }
 }

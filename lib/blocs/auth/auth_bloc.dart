@@ -10,6 +10,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc({required this.authService}) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
+    on<GoogleLoginRequested>(_onGoogleLoginRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<UpdateProfileRequested>(_onUpdateProfileRequested);
     on<UpdateProfilePicRequested>(_onUpdateProfilePicRequested);
@@ -28,6 +29,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } catch (e) {
       emit(AuthError(message: 'Failed to login.'));
+    }
+  }
+
+  Future<void> _onGoogleLoginRequested(
+      GoogleLoginRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      await authService.handleGoogleSignIn();
+      final user = await authService.getCurrentUser();
+      if (user != null) {
+        emit(AuthAuthenticated(token: AuthService.authToken!, user: user));
+      } else {
+        emit(AuthError(message: 'Failed to retrieve user.'));
+      }
+    } catch (e) {
+      emit(AuthError(message: 'Failed to authenticate with Google.'));
     }
   }
 

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/user/profile/profile_menu_widget.dart';
-import 'package:purrfectmatch/constants/color.dart';
-import 'package:purrfectmatch/constants/text_strings.dart';
 import 'package:purrfectmatch/views/user/profile/edit_profile_screen.dart';
 import 'package:purrfectmatch/models/user.dart';
 import '../../../blocs/auth/auth_bloc.dart';
 import '../../login.dart';
+import 'settings_screen.dart';
+import 'user_associations_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -87,12 +87,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ProfileMenuWidget(
                     title: "Réglages",
                     icon: Icons.settings,
-                    onPress: () {},
+                    onPress: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingsScreen()),
+                      );
+                    },
                   ),
                   ProfileMenuWidget(
                     title: "Associations",
                     icon: Icons.home,
-                    onPress: () {},
+                    onPress: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const UserAssociationsScreen()),
+                      );
+                    },
                   ),
                   const Divider(),
                   const SizedBox(height: 10),

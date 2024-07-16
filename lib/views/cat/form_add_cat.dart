@@ -1,13 +1,13 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../models/user.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddCat extends StatefulWidget {
   const AddCat({super.key});
@@ -28,11 +28,11 @@ class _AddCatState extends State<AddCat> {
   String? _selectedValue;
   bool _sterilized = false;
   bool _reserved = false;
-  final List<String> _options = ['male', 'femelle'];
+  final List<String> _options = ['male', 'female'];
   PlatformFile? _selectedFile;
   Map<int?, String> raceList = {};
   int? _dropdownValue;
-  late User currentUser;
+  User? currentUser;
 
   @override
   void dispose() {
@@ -70,22 +70,26 @@ class _AddCatState extends State<AddCat> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      controller.text = DateFormat('yyyy-MM-dd').format(picked);
+      controller.text = DateFormat('dd-MM-yyyy').format(picked);
     }
   }
 
   Future<void> _pickFile() async {
-    if (await Permission.storage.request().isGranted) {
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-      if (result != null) {
-        setState(() {
-          _selectedFile = result.files.first;
-        });
-      }
+    if (result != null) {
+      setState(() {
+        _selectedFile = result.files.first;
+      });
+
+      // Afficher les informations sur le fichier sélectionné
+      print('File selected: ${_selectedFile!.name}');
+      print('File path: ${_selectedFile!.path}');
+      print('File size: ${_selectedFile!.size}');
+      print('File readStream: ${_selectedFile!.readStream != null ? 'Available' : 'Not available'}');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Storage permission denied')),
+        const SnackBar(content: Text('No file selected')),
       );
     }
   }
@@ -94,11 +98,8 @@ class _AddCatState extends State<AddCat> {
     try {
       final apiService = ApiService();
       final newRaces = await apiService.fetchAllRaces();
-      for (var race in newRaces) {
-        raceList[race.id] = race.raceName;
-      }
       setState(() {
-        raceList = raceList;
+        raceList = {for (var race in newRaces) race.id: race.raceName};
       });
     } catch (e) {
       print('Failed to load races: $e');
@@ -106,26 +107,48 @@ class _AddCatState extends State<AddCat> {
   }
 
   Future<void> _sendData() async {
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not authenticated')),
+      );
+      return;
+    }
+
+    if (_nameController.text.isEmpty || _birthDateController.text.isEmpty || _colorController.text.isEmpty || _behaviorController.text.isEmpty || _dropdownValue == null || _selectedValue == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    // Format the dates
+    String formattedBirthDate = _birthDateController.text.isNotEmpty
+        ? DateFormat('dd-MM-yyyy').format(DateFormat('yyyy-MM-dd').parse(_birthDateController.text))
+        : '';
+    String formattedLastVaccineDate = _lastVaccineDateController.text.isNotEmpty
+        ? DateFormat('dd-MM-yyyy').format(DateFormat('yyyy-MM-dd').parse(_lastVaccineDateController.text))
+        : '';
+
     Cat cat = Cat(
       name: _nameController.text,
-      birthDate: _birthDateController.text,
-      lastVaccineDate: _lastVaccineDateController.text,
-      lastVaccineName: _lastVaccineNameController.text,
+      birthDate: formattedBirthDate,
+      lastVaccineDate: formattedLastVaccineDate,
+      lastVaccineName: _lastVaccineNameController.text.isNotEmpty ? _lastVaccineNameController.text : '',
       color: _colorController.text,
       behavior: _behaviorController.text,
-      race: _dropdownValue?.toString() ?? '',
-      description: _descriptionController.text,
+      raceID: _dropdownValue.toString(),
+      description: _descriptionController.text.isNotEmpty ? _descriptionController.text : '',
       sexe: _selectedValue ?? '',
       sterilized: _sterilized,
       reserved: _reserved,
       picturesUrl: _selectedFile != null ? [_selectedFile!.name] : [],
-      userId: currentUser.id ?? '',
+      userId: currentUser!.id,
     );
 
     try {
       await ApiService().createCat(cat, _selectedFile);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data sent successfully')),
+        const SnackBar(content: Text('Chat crée avec succès !')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -160,7 +183,7 @@ class _AddCatState extends State<AddCat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Cat'),
+        title: Text(AppLocalizations.of(context)!.addCatTitle),
         backgroundColor: Colors.orange[100],
       ),
       body: Container(
@@ -172,27 +195,28 @@ class _AddCatState extends State<AddCat> {
           ),
         ),
         child: Center(
-          child: Container(
-            margin: const EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          child: Card(
+            color: Colors.white,
+            margin: const EdgeInsets.all(20),
             child: Padding(
-              padding: const EdgeInsets.all(40),
+              padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
                 child: Form(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Create Cat Profile',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                      if (_selectedFile != null)
+                        Center(
+                          child: Image.file(
+                            File(_selectedFile!.path!),
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       _buildTextFormField(_nameController, 'Name'),
                       const SizedBox(height: 10),
                       _buildTextFormField(
@@ -280,7 +304,7 @@ class _AddCatState extends State<AddCat> {
                       ),
                       const SizedBox(height: 10),
                       SwitchListTile(
-                        title: Text('Sterilized'),
+                        title: const Text('Sterilized'),
                         value: _sterilized,
                         onChanged: (bool value) {
                           setState(() {
@@ -289,7 +313,7 @@ class _AddCatState extends State<AddCat> {
                         },
                       ),
                       SwitchListTile(
-                        title: Text('Reserved'),
+                        title: const Text('Reserved'),
                         value: _reserved,
                         onChanged: (bool value) {
                           setState(() {
@@ -305,13 +329,19 @@ class _AddCatState extends State<AddCat> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: _sendData,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange[100],
-                          padding: const EdgeInsets.all(15),
+                      Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _sendData,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange[100],
+                              padding: const EdgeInsets.all(15),
+                            ),
+                            child: const Text('Add Cat'),
+                          ),
                         ),
-                        child: const Text('Send'),
                       ),
                       const SizedBox(height: 15),
                     ],

@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import '../models/user.dart';
 
 class AuthService {
   static String get baseUrl =>
       kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
   static String? authToken;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
   Future<void> login(String email, String password) async {
     try {
@@ -114,6 +118,38 @@ class AuthService {
       return User.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to update user profile');
+    }
+  }
+
+  Future<void> handleGoogleSignIn() async {
+    /*final Uri url = Uri.parse('$baseUrl/auth/google');
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }*/
+    final url = '$baseUrl/auth/google';
+    const callbackUrlScheme = 'purrmatch';
+    try {
+      final result = await FlutterWebAuth2.authenticate(
+          url: url,
+          callbackUrlScheme: callbackUrlScheme,
+          options: const FlutterWebAuth2Options(
+            timeout: 5,
+          )
+      );
+      print('Got auth result: $result');
+      final token = Uri.parse(result).queryParameters['token'];
+      print('Got auth token: $token');
+      if (token != null) {
+        authToken = token;
+        final user = await getCurrentUser();
+        print('Got user: $user');
+        if (user == null) {
+          throw Exception('Failed to retrieve user data');
+        }
+      }
+    } on PlatformException catch (e) {
+      print('Got auth error: ${e.message}');
+      throw Exception('Failed to authenticate with Google');
     }
   }
 
