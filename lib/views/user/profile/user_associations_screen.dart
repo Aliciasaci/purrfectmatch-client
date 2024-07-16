@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/models/association.dart';
+import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -26,8 +27,7 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
     super.initState();
     _fetchUserAssociations();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent &&
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent &&
           !_loading &&
           _hasMore) {
         _fetchUserAssociations();
@@ -45,8 +45,7 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
       if (authState is AuthAuthenticated) {
         final userId = authState.user.id;
         if (userId != null) {
-          final newAssociations =
-          await _apiService.fetchUserAssociations(userId);
+          final newAssociations = await _apiService.fetchUserAssociations(userId);
           setState(() {
             _associations.addAll(newAssociations);
             _loading = false;
@@ -63,6 +62,7 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
       setState(() {
         _loading = false;
       });
+      print('Erreur lors du chargement des associations: $e');
     }
   }
 
@@ -70,8 +70,7 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
     try {
       await _apiService.deleteAssociation(associationId);
       setState(() {
-        _associations.removeWhere(
-                (association) => association.id.toString() == associationId);
+        _associations.removeWhere((association) => association.id.toString() == associationId);
         _reloadUserAssociations();
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -99,6 +98,39 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
     super.dispose();
   }
 
+  Future<Widget> _buildMemberList(Association association) async {
+    List<Widget> memberWidgets = [];
+    List<String> memberIds = association.members;
+
+    for (String memberId in memberIds) {
+      memberId = memberId.replaceAll(RegExp(r'[\[\]"]'), ''); // Clean up the ID
+      bool isOwner = memberId == association.ownerId;
+      try {
+        User user = await _apiService.fetchUserByID(memberId);
+        memberWidgets.add(
+          ListTile(
+            leading: isOwner
+                ? const Icon(Icons.verified_user, color: Colors.orange)
+                : null,
+            title: Text('${user.name}${isOwner ? ' (Owner)' : ''}'),
+            subtitle: Text(user.email),
+          ),
+        );
+      } catch (e) {
+        memberWidgets.add(
+          ListTile(
+            leading: isOwner
+                ? const Icon(Icons.verified_user, color: Colors.orange)
+                : null,
+            title: Text('ID: $memberId'),
+            subtitle: const Text('Failed to load user details'),
+          ),
+        );
+      }
+    }
+    return Column(children: memberWidgets);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,7 +146,9 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
             colors: [Colors.orange[100]!, Colors.orange[200]!],
           ),
         ),
-        child: ListView.builder(
+        child: _loading && _associations.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.builder(
           controller: _scrollController,
           itemCount: _associations.length + 1,
           itemBuilder: (context, index) {
@@ -133,10 +167,56 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
               margin: const EdgeInsets.all(10),
               color: Colors.white,
               child: ListTile(
-                title: Text(association.name),
-                subtitle: Text('Email: ${association.email}\nAddress: ${association.addressRue}, ${association.cp} ${association.ville}'),
-                trailing: Wrap(
+                title: Text(
+                  association.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Email: ${association.email}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    Text(
+                      'Address: ${association.addressRue}, ${association.cp} ${association.ville}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Membres',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    FutureBuilder<Widget>(
+                      future: _buildMemberList(association),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return ListTile(
+                            title: Text('Error: ${snapshot.error}'),
+                          );
+                        } else {
+                          return snapshot.data ?? Container();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                trailing: Wrap(
+                  spacing: 12, // space between two icons
+                  children: <Widget>[
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.orange),
                       onPressed: () {

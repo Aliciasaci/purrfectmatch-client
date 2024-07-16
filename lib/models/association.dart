@@ -1,5 +1,3 @@
-import 'package:purrfectmatch/models/user.dart';
-
 class Association {
   final int? id;
   final String name;
@@ -10,7 +8,7 @@ class Association {
   final String email;
   final String kbisFile;
   final String ownerId;
-  // final User? owner;
+  final List<String> members;
   final bool? verified;
   final String? createdAt;
   final String? updatedAt;
@@ -25,7 +23,7 @@ class Association {
     required this.email,
     required this.kbisFile,
     required this.ownerId,
-    // this.owner,
+    required this.members,
     this.verified,
     this.createdAt,
     this.updatedAt,
@@ -42,10 +40,14 @@ class Association {
       email: json['Email'] ?? '',
       kbisFile: json['KbisFile'] ?? '',
       ownerId: json['OwnerId'] ?? '',
-      // owner: json['owner'] != null ? User.fromJson(json['owner']) : null,
-      verified: json['Rerified'] ?? false,
-      createdAt: json['CreatedAt'] != null ? DateTime.parse(json['CreatedAt']).toIso8601String() : null,
-      updatedAt: json['UpdatedAt'] != null ? DateTime.parse(json['UpdatedAt']).toIso8601String() : null,
+      members: List<String>.from(json['Members'] ?? []),
+      verified: json['Verified'] ?? false,
+      createdAt: json['CreatedAt'] != null
+          ? DateTime.parse(json['CreatedAt']).toIso8601String()
+          : null,
+      updatedAt: json['UpdatedAt'] != null
+          ? DateTime.parse(json['UpdatedAt']).toIso8601String()
+          : null,
     );
   }
 
@@ -59,7 +61,7 @@ class Association {
       'email': email,
       'kbisFile': kbisFile,
       'ownerId': ownerId,
-      //'owner': owner?.toJson(),
+      'members': members,
     };
 
     if (id != null) data['id'] = id;
@@ -70,6 +72,7 @@ class Association {
     return data;
   }
 
+  // Ajout de la méthode copyWith
   Association copyWith({
     int? id,
     String? name,
@@ -80,7 +83,7 @@ class Association {
     String? email,
     String? kbisFile,
     String? ownerId,
-    // User? owner,
+    List<String>? members,
     bool? verified,
     String? createdAt,
     String? updatedAt,
@@ -95,15 +98,10 @@ class Association {
       email: email ?? this.email,
       kbisFile: kbisFile ?? this.kbisFile,
       ownerId: ownerId ?? this.ownerId,
-      // owner: owner ?? this.owner,
+      members: members ?? this.members,
       verified: verified ?? this.verified,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
-
-  @override
-  String toString() {
-    return '(Associa)tion { id: $id, name: $name, addressRue: $addressRue, cp: $cp, ville: $ville, phone: $phone, email: $email, kbisFile: $kbisFile, ownerId: $ownerId, verified: $verified, createdAt: $createdAt, updatedAt: $updatedAt }';
   }
 }

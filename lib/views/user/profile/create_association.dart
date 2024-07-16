@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/models/association.dart';
+import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/services/api_service.dart';
-
 import '../../../blocs/auth/auth_bloc.dart';
 
 class CreateAssociation extends StatefulWidget {
@@ -24,6 +24,27 @@ class _CreateAssociationState extends State<CreateAssociation> {
   final TextEditingController _emailController = TextEditingController();
   String? _kbisFileName;
   String? _kbisFilePath;
+  List<User> _allUsers = [];
+  List<User> _selectedMembers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAllUsers();
+  }
+
+  Future<void> _fetchAllUsers() async {
+    try {
+      final users = await ApiService().fetchAllUsers();
+      setState(() {
+        _allUsers = users;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors du chargement des utilisateurs: $e')),
+      );
+    }
+  }
 
   Future<void> _pickKbisFile() async {
     final result = await FilePicker.platform.pickFiles();
@@ -50,6 +71,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
           email: _emailController.text,
           kbisFile: _kbisFilePath!,
           ownerId: ownerId,
+          members: _selectedMembers.map((user) => user.id!).toList(),
         );
         ApiService apiService = ApiService();
         try {
@@ -58,10 +80,11 @@ class _CreateAssociationState extends State<CreateAssociation> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('L\'association a été créée avec succès')),
           );
+          Navigator.pop(context, true);
         } catch (e) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erreur lors de la création de l\'association')),
+            SnackBar(content: Text('Erreur lors de la création de l\'association: $e')),
           );
         }
       }
@@ -98,6 +121,54 @@ class _CreateAssociationState extends State<CreateAssociation> {
     );
   }
 
+  Widget _buildUserSelection() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.orange[100]!,
+        ),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: DropdownButtonFormField<User>(
+        isExpanded: true,
+        decoration: const InputDecoration(
+          labelText: 'Ajouter des membres',
+          border: InputBorder.none,
+        ),
+        items: _allUsers.map((User user) {
+          return DropdownMenuItem<User>(
+            value: user,
+            child: Text(user.name),
+          );
+        }).toList(),
+        onChanged: (User? newUser) {
+          if (newUser != null && !_selectedMembers.contains(newUser)) {
+            setState(() {
+              _selectedMembers.add(newUser);
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildSelectedMembers() {
+    return Wrap(
+      spacing: 10,
+      children: _selectedMembers.map((User member) {
+        return Chip(
+          label: Text(member.name),
+          onDeleted: () {
+            setState(() {
+              _selectedMembers.remove(member);
+            });
+          },
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,7 +201,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'Create Association Profile',
+                        'Créer le profil de l\'association',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -162,6 +233,10 @@ class _CreateAssociationState extends State<CreateAssociation> {
                         ),
                         child: const Text('Choisir le fichier KBIS'),
                       ),
+                      const SizedBox(height: 10),
+                      _buildUserSelection(),
+                      const SizedBox(height: 15),
+                      _buildSelectedMembers(),
                       const SizedBox(height: 10),
                       SizedBox(
                         width: double.infinity,
