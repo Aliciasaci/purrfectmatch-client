@@ -122,7 +122,7 @@ class CatDetails extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      '${AppLocalizations.of(context)!.race}: ${cat.race}',
+                      '${AppLocalizations.of(context)!.race}: ${cat.raceID}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 10),

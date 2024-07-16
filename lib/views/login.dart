@@ -14,7 +14,6 @@ import 'package:purrfectmatch/views/user/user_home_page.dart';
 import '../locale_provider.dart';
 import '../views/register.dart';
 import '../blocs/auth/auth_bloc.dart';
-import '../views/language_switcher.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -207,11 +206,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              const Positioned(
-                top: 40,
-                right: 20,
-                child: LanguageSwitcher(),
-              ),
             ],
           );
         },
@@ -229,6 +223,3 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 }
-
-
-
