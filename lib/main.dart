@@ -90,6 +90,7 @@ class MyApp extends StatelessWidget {
               home: BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) {
                   if (state is AuthAuthenticated) {
+                    print(state.user.roles.toString());
                     if (state.user.roles.any((role) => role.name == 'ADMIN')) {
                       Navigator.of(context).pushReplacementNamed('/admin');
                     } else if (state.user.roles.any((role) => role.name == 'USER')) {

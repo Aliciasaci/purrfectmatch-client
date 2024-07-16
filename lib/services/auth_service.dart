@@ -131,10 +131,6 @@ class AuthService {
   }
 
   Future<void> handleGoogleSignIn() async {
-    /*final Uri url = Uri.parse('$baseUrl/auth/google');
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }*/
     final url = '$baseUrl/auth/google';
     const callbackUrlScheme = 'purrmatch';
     try {
@@ -151,6 +147,13 @@ class AuthService {
       if (token != null) {
         authToken = token;
         final user = await getCurrentUser();
+        var userId = currentUser!.id;
+        var fcmToken = await NotificationManager.instance.getFCMToken();
+
+        if (fcmToken != null) {
+          ApiService().createNotificationToken(userId!, fcmToken);
+        }
+
         print('Got user: $user');
         if (user == null) {
           throw Exception('Failed to retrieve user data');
