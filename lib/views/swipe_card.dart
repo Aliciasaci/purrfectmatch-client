@@ -50,11 +50,15 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     if (currentUser != null && currentUser!.id != null) {
       try {
         final annonces = await apiService.fetchAllAnnonces();
-        final userFavorites = await apiService.fetchUserFavorites(currentUser!.id!);
-        final favoriteAnnonceIds = userFavorites.map((favoris) => favoris.AnnonceID).toSet();
+        final userFavorites =
+            await apiService.fetchUserFavorites(currentUser!.id!);
+        final favoriteAnnonceIds =
+            userFavorites.map((favoris) => favoris.AnnonceID).toSet();
 
         final filteredAnnonces = annonces
-            .where((annonce) => annonce.UserID != currentUser!.id && !favoriteAnnonceIds.contains(annonce.ID))
+            .where((annonce) =>
+                annonce.UserID != currentUser!.id &&
+                !favoriteAnnonceIds.contains(annonce.ID.toString()))
             .toList();
 
         for (var annonce in filteredAnnonces) {
@@ -76,7 +80,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 superlikeAction: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            AnnonceDetailPage(annonce: annonce)),
                   );
                 },
               ));
@@ -105,7 +111,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
       final filteredAnnonce =
-      await apiService.fetchCatsByFilters(age, catSex, race);
+          await apiService.fetchCatsByFilters(age, catSex, race);
       for (var annonce in filteredAnnonce) {
         annoncesList.add(annonce);
       }
@@ -139,7 +145,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           superlikeAction: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
+              MaterialPageRoute(
+                  builder: (context) => AnnonceDetailPage(annonce: annonce)),
             );
           },
         ));
@@ -210,138 +217,143 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
               child: _matchEngine == null
                   ? const Center(child: CircularProgressIndicator())
                   : SwipeCards(
-                matchEngine: _matchEngine!,
-                itemBuilder: (BuildContext context, int index) {
-                  var item = _swipeItems[index].content as Map;
-                  Annonce annonce = item['annonce'] as Annonce;
-                  Cat cat = item['cat'] as Cat;
-                  User user = item['user'] as User;
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          spreadRadius: 2,
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Stack(
-                        children: [
-                          Image.network(
-                            cat.picturesUrl.first,
-                            fit: BoxFit.cover,
-                            height: double.infinity,
-                            width: double.infinity,
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  Colors.black.withOpacity(0.5),
-                                  Colors.transparent
-                                ],
+                      matchEngine: _matchEngine!,
+                      itemBuilder: (BuildContext context, int index) {
+                        var item = _swipeItems[index].content as Map;
+                        Annonce annonce = item['annonce'] as Annonce;
+                        Cat cat = item['cat'] as Cat;
+                        User user = item['user'] as User;
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 20),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
-                            ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Stack(
                               children: [
-                                Text(
-                                  cat.name,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                Image.network(
+                                  cat.picturesUrl.first,
+                                  fit: BoxFit.cover,
+                                  height: double.infinity,
+                                  width: double.infinity,
                                 ),
-                                Text(
-                                  "${calculateAge(cat.birthDate)} ans",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                Text(
-                                  "Sexe: ${cat.sexe}",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                Text(
-                                  "Race: ${cat.raceID}",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                UserPublicProfile(user: user)),
-                                      );
-                                    },
-                                    child: Text(
-                                      "Mise en ligne par: ${user.name}",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        decoration: TextDecoration.underline,
-                                        decorationColor: Colors.white,
-                                        decorationThickness: 2,
-                                        height: 1.5, // Add space between text and underline
-                                      ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                      colors: [
+                                        Colors.black.withOpacity(0.5),
+                                        Colors.transparent
+                                      ],
                                     ),
                                   ),
                                 ),
-                                const Text(
-                                  "Disponible",
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        cat.name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${calculateAge(cat.birthDate)} ans",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Sexe: ${cat.sexe}",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Race: ${cat.raceID}",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      UserPublicProfile(
+                                                          user: user)),
+                                            );
+                                          },
+                                          child: Text(
+                                            "Mise en ligne par: ${user.name}",
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationColor: Colors.white,
+                                              decorationThickness: 2,
+                                              height:
+                                                  1.5, // Add space between text and underline
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const Text(
+                                        "Disponible",
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        );
+                      },
+                      onStackFinished: () {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text("Pile terminée"),
+                          duration: Duration(milliseconds: 500),
+                        ));
+                      },
+                      itemChanged: (SwipeItem item, int index) {
+                        var itemContent = item.content as Map;
+                        Annonce annonce = itemContent['annonce'] as Annonce;
+                        Cat cat = itemContent['cat'] as Cat;
+                      },
+                      leftSwipeAllowed: true,
+                      rightSwipeAllowed: true,
+                      upSwipeAllowed: true,
+                      fillSpace: true,
                     ),
-                  );
-                },
-                onStackFinished: () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("Pile terminée"),
-                    duration: Duration(milliseconds: 500),
-                  ));
-                },
-                itemChanged: (SwipeItem item, int index) {
-                  var itemContent = item.content as Map;
-                  Annonce annonce = itemContent['annonce'] as Annonce;
-                  Cat cat = itemContent['cat'] as Cat;
-                },
-                leftSwipeAllowed: true,
-                rightSwipeAllowed: true,
-                upSwipeAllowed: true,
-                fillSpace: true,
-              ),
             ),
           ),
           SizedBox(
