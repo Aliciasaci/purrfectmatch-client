@@ -110,6 +110,18 @@ class _RoomScreenState extends State<RoomScreen> {
                                 children: state.messages.map((message) {
                                   final isCurrentUser =
                                       message.senderId == _currentUser!.id!;
+                                  final isToday =
+                                      message.timestamp!.toLocal().day ==
+                                              DateTime.now().day &&
+                                          message.timestamp!.toLocal().month ==
+                                              DateTime.now().month &&
+                                          message.timestamp!.toLocal().year ==
+                                              DateTime.now().year;
+                                  final formattedTimestamp = isToday
+                                      ? DateFormat("HH:mm")
+                                          .format(message.timestamp!.toLocal())
+                                      : DateFormat("d/MM")
+                                          .format(message.timestamp!.toLocal());
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: Row(
@@ -159,9 +171,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                                   ),
                                                 const SizedBox(width: 5),
                                                 Text(
-                                                  DateFormat("HH:mm").format(
-                                                      message.timestamp!
-                                                          .toLocal()),
+                                                  formattedTimestamp,
                                                   style: const TextStyle(
                                                       fontSize: 8),
                                                 ),
@@ -175,10 +185,15 @@ class _RoomScreenState extends State<RoomScreen> {
                                                   ),
                                                 if (isCurrentUser &&
                                                     message.isRead!)
-                                                  const Icon(
-                                                    Icons.check,
-                                                    size: 15,
-                                                    color: Colors.blue,
+                                                  const Row(
+                                                    children: [
+                                                      SizedBox(width: 5),
+                                                      Icon(
+                                                        Icons.check,
+                                                        size: 15,
+                                                        color: Colors.blue,
+                                                      ),
+                                                    ],
                                                   ),
                                               ],
                                             ),
