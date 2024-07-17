@@ -37,11 +37,10 @@ class ListAssociation extends StatelessWidget {
                           DataColumn(label: Text('Action')),
                         ],
                         rows: state.associations.map((association) => DataRow(cells: [
-                          DataCell(Text(association.name)),
-                          DataCell(Text(association.email)),
-                          DataCell(Text(association.ownerId)),
-                          //DataCell(Text(association.owner!.name!)),
-                          DataCell(Text(association.verified! ? 'Oui' : 'Non')),
+                          DataCell(Text(association.Name)),
+                          DataCell(Text(association.Email)),
+                          DataCell(Text(association.OwnerID)),
+                          DataCell(Text(association.Verified! ? 'Oui' : 'Non')),
                           DataCell(IconButton(
                             icon: const Icon(Icons.visibility),
                             onPressed: () async {
@@ -53,7 +52,7 @@ class ListAssociation extends StatelessWidget {
                             })),
                           DataCell(TextButton(
                             onPressed: () {
-                              showVerificationModal(context, association.id!, BlocProvider.of<AssociationBloc>(context));
+                              showVerificationModal(context, association.ID!, BlocProvider.of<AssociationBloc>(context));
                             },
                             child: const Text('Valider'),
                           )),

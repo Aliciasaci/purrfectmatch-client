@@ -7,6 +7,7 @@ import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../models/user.dart';
+import '../../models/association.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddCat extends StatefulWidget {
@@ -26,6 +27,7 @@ class _AddCatState extends State<AddCat> {
   final TextEditingController _behaviorController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   String? _selectedValue;
+  int? _selectedAssociation;
   bool _sterilized = false;
   bool _reserved = false;
   final List<String> _options = ['male', 'female'];
@@ -33,6 +35,7 @@ class _AddCatState extends State<AddCat> {
   Map<int?, String> raceList = {};
   int? _dropdownValue;
   User? currentUser;
+  Map<int, String> _userAssociations = {};
 
   @override
   void dispose() {
@@ -59,6 +62,22 @@ class _AddCatState extends State<AddCat> {
       setState(() {
         currentUser = authState.user;
       });
+      await _fetchUserAssociations();
+    }
+  }
+
+  Future<void> _fetchUserAssociations() async {
+    if (currentUser != null) {
+      try {
+        final apiService = ApiService();
+        final associations = await apiService.fetchUserAssociations(currentUser!.id!);
+        setState(() {
+          _userAssociations = {for (var assoc in associations) assoc.ID!: assoc.Name};
+          _selectedAssociation = null; // Ensure default value is null
+        });
+      } catch (e) {
+        print('Failed to load associations: $e');
+      }
     }
   }
 
@@ -143,6 +162,7 @@ class _AddCatState extends State<AddCat> {
       reserved: _reserved,
       picturesUrl: _selectedFile != null ? [_selectedFile!.name] : [],
       userId: currentUser!.id,
+      PublishedAs: _selectedAssociation != null ? _userAssociations[_selectedAssociation] : '', // New field for association
     );
 
     try {
@@ -179,6 +199,37 @@ class _AddCatState extends State<AddCat> {
     );
   }
 
+  Widget _buildAssociationDropdown() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.orange[100]!,
+        ),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: DropdownButtonFormField<int>(
+        decoration: const InputDecoration(
+          labelText: 'Select Association (optional)',
+          border: InputBorder.none,
+        ),
+        items: _userAssociations.entries.map((entry) {
+          return DropdownMenuItem<int>(
+            value: entry.key,
+            child: Text(entry.value),
+          );
+        }).toList(),
+        value: _selectedAssociation,
+        onChanged: (int? newValue) {
+          setState(() {
+            _selectedAssociation = newValue;
+          });
+        },
+        isExpanded: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,7 +256,6 @@ class _AddCatState extends State<AddCat> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 10),
                       const SizedBox(height: 10),
                       if (_selectedFile != null)
                         Center(
@@ -302,6 +352,8 @@ class _AddCatState extends State<AddCat> {
                           isExpanded: true,
                         ),
                       ),
+                      const SizedBox(height: 10),
+                      _buildAssociationDropdown(),
                       const SizedBox(height: 10),
                       SwitchListTile(
                         title: const Text('Sterilized'),

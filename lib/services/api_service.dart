@@ -320,14 +320,14 @@ class ApiService {
     request.headers['Content-Type'] = 'multipart/form-data';
 
     // Add JSON fields
-    request.fields['name'] = association.name;
-    request.fields['addressRue'] = association.addressRue;
-    request.fields['cp'] = association.cp;
-    request.fields['ville'] = association.ville;
-    request.fields['phone'] = association.phone;
-    request.fields['email'] = association.email;
-    request.fields['ownerId'] = association.ownerId;
-    request.fields['members'] = jsonEncode(association.members);
+    request.fields['name'] = association.Name;
+    request.fields['addressRue'] = association.AddressRue;
+    request.fields['cp'] = association.Cp;
+    request.fields['ville'] = association.Ville;
+    request.fields['phone'] = association.Phone;
+    request.fields['email'] = association.Email;
+    request.fields['ownerId'] = association.OwnerID;
+    request.fields['Members'] = jsonEncode(association.Members);
 
     // Add the file
     request.files.add(
@@ -353,14 +353,29 @@ class ApiService {
 
   Future<void> updateAssociation(Association association, PlatformFile? selectedFile) async {
     final token = AuthService.authToken;
-    final Uri uri = Uri.parse('$baseUrl/associations/${association.id}');
+    final Uri uri = Uri.parse('$baseUrl/associations/${association.ID}');
     final request = http.MultipartRequest('PUT', uri)
       ..headers['Authorization'] = 'Bearer $token';
 
-    association.toJson().forEach((key, value) {
-      if (value != null) {
-        request.fields[key] = value.toString();
+    // Convert association to JSON and filter out empty lists and null values
+    final filteredData = association.toJson();
+    final nonEmptyData = <String, String>{};
+
+    filteredData.forEach((key, value) {
+      if (value is List) {
+        if (value.isNotEmpty) {
+          nonEmptyData[key] = value.join(','); // Format the list correctly
+        }
+      } else if (value != null) {
+        nonEmptyData[key] = value.toString();
       }
+    });
+
+    // Afficher l'objet association avant de l'envoyer
+    print('Filtered association data: $nonEmptyData');
+
+    nonEmptyData.forEach((key, value) {
+      request.fields[key] = value;
     });
 
     if (selectedFile != null && selectedFile.path != null) {
@@ -377,12 +392,15 @@ class ApiService {
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
 
+    print(response.statusCode);
     if (response.statusCode != 200) {
       throw Exception('Failed to update association: $responseString');
     }
   }
 
   Future<List<Association>> fetchUserAssociations(String userId) async {
+
+    print("ici");
     final token = AuthService.authToken;
     final response = await http.get(
       Uri.parse('$baseUrl/users/$userId/associations'),
@@ -391,6 +409,7 @@ class ApiService {
       },
     );
 
+    print("-------------------->");
     print(jsonDecode(response.body));
     if (response.statusCode == 200) {
       List<dynamic> associationsJson = jsonDecode(response.body);
