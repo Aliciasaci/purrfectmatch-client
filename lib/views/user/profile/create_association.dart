@@ -90,7 +90,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: label,
+          labelText: '$label *',
           border: InputBorder.none,
         ),
         validator: (value) {

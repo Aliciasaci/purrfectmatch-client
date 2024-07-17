@@ -11,7 +11,7 @@ class LanguageSwitcher extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (localeProvider.locale == const Locale('en')) {
+        if (localeProvider.locale == const Locale('fr')) {
           localeProvider.setLocale(const Locale('fr'));
         } else {
           localeProvider.setLocale(const Locale('en'));

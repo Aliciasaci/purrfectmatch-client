@@ -175,7 +175,7 @@ class _AddAnnonceState extends State<AddAnnonce> {
                         children: [
                           buildTextFormField(
                             controller: _titleController,
-                            labelText: "Titre de l'annonce",
+                            labelText: "Titre de l'annonce *",
                             icon: Icons.title,
                           ),
                           const SizedBox(height: 15),
@@ -192,8 +192,9 @@ class _AddAnnonceState extends State<AddAnnonce> {
                                 child: Text(cat.name),
                               );
                             }).toList(),
-                            labelText: "Sélectionner un chat",
+                            labelText: "Sélectionner un chat *",
                             value: _selectedCat,
+
                           ),
                           const SizedBox(height: 15),
                           SizedBox(

@@ -138,7 +138,6 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
       });
       List<String> validMembers = _members.where((memberId) => memberId.isNotEmpty).toList();
 
-      print(validMembers);
       Association updatedAssociation = widget.association.copyWith(
         name: _nameController.text,
         addressRue: _addressRueController.text,
@@ -146,19 +145,16 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
         ville: _villeController.text,
         phone: _phoneController.text,
         Email: _emailController.text,
-        members: validMembers.isNotEmpty ? validMembers : null, // Using valid IDs if not empty
+        members: validMembers.isNotEmpty ? validMembers : null,
         kbisFile: _selectedFile?.path,
       );
-
-      // Afficher l'objet association avant de l'envoyer
-      print('Updated association: ${updatedAssociation.toJson()}');
 
       try {
         await _apiService.updateAssociation(updatedAssociation, _selectedFile);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Association updated successfully')),
         );
-        Navigator.pop(context, true); // Notify that updates were made
+        // Do not redirect, just show success message
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update association: $e')),

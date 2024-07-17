@@ -267,11 +267,11 @@ class _AddCatState extends State<AddCat> {
                           ),
                         ),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_nameController, 'Name'),
+                      _buildTextFormField(_nameController, 'Name*'),
                       const SizedBox(height: 10),
                       _buildTextFormField(
                         _birthDateController,
-                        'Birth Date',
+                        'Birth Date*',
                         readOnly: true,
                         onTap: () => _selectDate(context, _birthDateController),
                         suffixIcon: const Icon(Icons.calendar_today),
@@ -287,7 +287,7 @@ class _AddCatState extends State<AddCat> {
                       const SizedBox(height: 10),
                       _buildTextFormField(_lastVaccineNameController, 'Last Vaccine Name'),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_colorController, 'Color'),
+                      _buildTextFormField(_colorController, 'Color*'),
                       const SizedBox(height: 10),
                       _buildTextFormField(_behaviorController, 'Behavior'),
                       const SizedBox(height: 10),
@@ -301,7 +301,7 @@ class _AddCatState extends State<AddCat> {
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButtonFormField<int>(
                           decoration: const InputDecoration(
-                            labelText: 'Race',
+                            labelText: 'Race*',
                             border: InputBorder.none,
                           ),
                           items: raceList.entries.map((entry) {
@@ -334,7 +334,7 @@ class _AddCatState extends State<AddCat> {
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButtonFormField<String>(
                           decoration: const InputDecoration(
-                            labelText: 'Select Gender',
+                            labelText: 'Select Gender*',
                             border: InputBorder.none,
                           ),
                           value: _selectedValue,
@@ -356,7 +356,7 @@ class _AddCatState extends State<AddCat> {
                       _buildAssociationDropdown(),
                       const SizedBox(height: 10),
                       SwitchListTile(
-                        title: const Text('Sterilized'),
+                        title: const Text('Sterilized*'),
                         value: _sterilized,
                         onChanged: (bool value) {
                           setState(() {
@@ -365,7 +365,7 @@ class _AddCatState extends State<AddCat> {
                         },
                       ),
                       SwitchListTile(
-                        title: const Text('Reserved'),
+                        title: const Text('Reserved*'),
                         value: _reserved,
                         onChanged: (bool value) {
                           setState(() {
@@ -377,7 +377,7 @@ class _AddCatState extends State<AddCat> {
                       ElevatedButton(
                         onPressed: _pickFile,
                         child: Text(
-                          _selectedFile == null ? 'Select Photo' : 'Photo Selected: ${_selectedFile!.name}',
+                          _selectedFile == null ? 'Select Photo*' : 'Photo Selected*: ${_selectedFile!.name}',
                         ),
                       ),
                       const SizedBox(height: 15),

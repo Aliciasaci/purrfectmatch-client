@@ -16,7 +16,7 @@ class AssociationDetailScreen extends StatefulWidget {
   State<AssociationDetailScreen> createState() => _AssociationDetailScreenState();
 }
 
-class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
+class _AssociationDetailScreenState extends State<AssociationDetailScreen> with RouteAware {
   late ApiService _apiService;
   User? _owner;
   User? currentUser;
@@ -35,6 +35,23 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Subscribe to RouteObserver
+    final modalRoute = ModalRoute.of(context);
+    if (modalRoute is PageRoute) {
+      RouteObserver<PageRoute>().subscribe(this, modalRoute);
+    }
+  }
+
+  @override
+  void dispose() {
+    // Unsubscribe from RouteObserver
+    RouteObserver<PageRoute>().unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when this route is popped back to
     _fetchDetails();
   }
 
