@@ -50,17 +50,26 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
         if (userId != null) {
           final newAnnonces = await apiService.fetchUserAnnonces(userId);
 
+          List<Annonce> validAnnonces = [];
           for (var annonce in newAnnonces) {
             if (annonce.CatID != null) {
-              final cat = await apiService.fetchCatByID(annonce.CatID);
-              catsData[annonce.CatID] = cat;
+              try {
+                final cat = await apiService.fetchCatByID(annonce.CatID);
+                catsData[annonce.CatID] = cat;
+                validAnnonces.add(annonce);
+              } catch (e) {
+                // Si le chat n'existe plus, on ne l'ajoute pas à la liste des annonces valides
+                print('Chat does not exist for Annonce ID: ${annonce.ID}');
+              }
+            } else {
+              validAnnonces.add(annonce);
             }
           }
 
           setState(() {
-            userAnnoncesData.addAll(newAnnonces);
+            userAnnoncesData.addAll(validAnnonces);
             _loading = false;
-            _hasMore = newAnnonces.isNotEmpty;
+            _hasMore = validAnnonces.isNotEmpty;
             _page++;
           });
         } else {
@@ -73,6 +82,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
       setState(() {
         _loading = false;
       });
+      print('Failed to load user annonces: $e');
     }
   }
 
@@ -116,7 +126,9 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
         title: Text(AppLocalizations.of(context)!.myAnnouncements),
         backgroundColor: Colors.orange[100],
       ),
-      body: Container(
+      body: _loading
+          ? Center(child: Text("Loading..."))
+          : Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -139,7 +151,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
                   : const SizedBox.shrink();
             }
             final annonce = userAnnoncesData[index];
-            final cat = annonce.CatID != null ? catsData[annonce.CatID] : null;
+            final cat =
+            annonce.CatID != null ? catsData[annonce.CatID] : null;
             return Card(
               margin: const EdgeInsets.all(10),
               color: Colors.white,
@@ -164,7 +177,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditAnnoncePage(annonce: annonce),
+                            builder: (context) =>
+                                EditAnnoncePage(annonce: annonce),
                           ),
                         ).then((value) {
                           if (value == true) {
@@ -193,7 +207,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AnnonceDetailPage(annonce: annonce),
+                      builder: (context) =>
+                          AnnonceDetailPage(annonce: annonce),
                     ),
                   );
                 },

@@ -60,7 +60,7 @@
   "selectPhoto": "Sélectionner une photo",
   "photoSelected": "Photo sélectionnée",
   "send": "Envoyer",
-  "dataSentSuccessfully": "Données envoyées avec succès",
+  "dataSentSuccessfully": "Crée avec succès !r",
   "dataSendError": "Erreur d'envoi des données",
   "storagePermissionDenied": "Permission de stockage refusée",
   "userNotAuthenticated": "Utilisateur non authentifié",
@@ -150,6 +150,13 @@
   "loadingAnnoncesError": "Échec du chargement des annonces",
   "race" : "Race",
   "pleaseSelectPdf" : "Séléctionner un PDF",
-  "selectAssociation" : "Associations selectionnée"
+  "selectAssociation" : "Associations selectionnée",
+  "addCatTitle": "Ajouter un chat",
+  "userNotAuthenticated": "Utilisateur non authentifié",
+  "fillAllRequiredFields": "Veuillez remplir tous les champs obligatoires",
+  "catCreatedSuccess": "Chat créé avec succès !",
+  "errorSendingData": "Erreur lors de l'envoi des données",
+  "selectAssociationOptional": "Sélectionnez une association (facultatif)",
+  "race" : "Race"
 
 }
