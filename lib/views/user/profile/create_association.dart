@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/models/association.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CreateAssociation extends StatefulWidget {
   const CreateAssociation({super.key});
@@ -59,20 +60,20 @@ class _CreateAssociationState extends State<CreateAssociation> {
           await apiService.createAssociation(association, _kbisFilePath!, _kbisFileName!);
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('L\'association a été créée avec succès')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.associationCreatedSuccess)),
           );
           Navigator.pop(context, true);
         } catch (e) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur lors de la création de l\'association: $e')),
+            SnackBar(content: Text('${AppLocalizations.of(context)!.associationCreationError}: $e')),
           );
         }
       }
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir tous les champs et choisir un fichier KBIS')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.fillAllFieldsAndChooseKbisFile)),
       );
     }
   }
@@ -94,7 +95,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Veuillez entrer $label de l\'association';
+            return '${AppLocalizations.of(context)!.fillAllFieldsAndChooseKbisFile} $label';
           }
           return null;
         },
@@ -106,7 +107,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Créer Association'),
+        title: Text(AppLocalizations.of(context)!.createAssociation),
         backgroundColor: Colors.orange[100],
       ),
       body: Container(
@@ -133,28 +134,28 @@ class _CreateAssociationState extends State<CreateAssociation> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'Créer le profil de l\'association',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.createAssociationProfile,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 20),
-                      _buildTextFormField(_nameController, 'Nom'),
+                      _buildTextFormField(_nameController, AppLocalizations.of(context)!.name),
                       const SizedBox(height: 15),
-                      _buildTextFormField(_addressRueController, 'Adresse'),
+                      _buildTextFormField(_addressRueController, AppLocalizations.of(context)!.address),
                       const SizedBox(height: 15),
-                      _buildTextFormField(_cpController, 'Code Postal'),
+                      _buildTextFormField(_cpController, AppLocalizations.of(context)!.postalCode),
                       const SizedBox(height: 15),
-                      _buildTextFormField(_villeController, 'Ville'),
+                      _buildTextFormField(_villeController, AppLocalizations.of(context)!.city),
                       const SizedBox(height: 15),
-                      _buildTextFormField(_phoneController, 'Téléphone'),
+                      _buildTextFormField(_phoneController, AppLocalizations.of(context)!.phone),
                       const SizedBox(height: 15),
-                      _buildTextFormField(_emailController, 'Email'),
+                      _buildTextFormField(_emailController, AppLocalizations.of(context)!.email),
                       const SizedBox(height: 15),
                       Text(
-                        _kbisFileName ?? 'Aucun fichier choisi',
+                        _kbisFileName ?? AppLocalizations.of(context)!.noFileChosen,
                         style: const TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                       const SizedBox(height: 10),
@@ -164,7 +165,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
                           backgroundColor: Colors.orange[100],
                           padding: const EdgeInsets.all(15),
                         ),
-                        child: const Text('Choisir le fichier KBIS'),
+                        child: Text(AppLocalizations.of(context)!.chooseKbisFile),
                       ),
                       const SizedBox(height: 10),
                       SizedBox(
@@ -175,7 +176,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
                             backgroundColor: Colors.orange[100],
                             padding: const EdgeInsets.all(15),
                           ),
-                          child: const Text('Valider'),
+                          child: Text(AppLocalizations.of(context)!.submit),
                         ),
                       ),
                     ],

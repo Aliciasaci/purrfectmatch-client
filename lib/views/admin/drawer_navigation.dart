@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../blocs/auth/auth_bloc.dart';
+import '../login.dart';
 
 class DrawerNavigation extends StatelessWidget {
   const DrawerNavigation({super.key});
@@ -34,6 +38,16 @@ class DrawerNavigation extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/admin/associations');
+            },
+          ),
+          ListTile(
+            title: const Text('Déconnexion'),
+            onTap: () {
+              BlocProvider.of<AuthBloc>(context).add(LogoutRequested());
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
             },
           ),
         ],

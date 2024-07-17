@@ -24,7 +24,7 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
   final TextEditingController _emailController = TextEditingController();
   PlatformFile? _selectedFile;
   late ApiService _apiService;
-  List<String> _members = []; // List of member IDs
+  List<String> _members = [];
   List<User> _validMembers = [];
   List<User> _allUsers = [];
   User? _owner;

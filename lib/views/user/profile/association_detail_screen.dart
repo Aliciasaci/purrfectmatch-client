@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/models/association.dart';
 import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/services/api_service.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'edit_association_screen.dart';
 
 class AssociationDetailScreen extends StatefulWidget {
@@ -59,7 +60,7 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load details: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.failedToLoadDetails)),
       );
       setState(() {
         _isLoading = false;
@@ -91,7 +92,7 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${_owner!.name} (Propriétaire)',
+                '${_owner!.name} (${AppLocalizations.of(context)!.owner})',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(_owner!.email),
@@ -107,10 +108,6 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Membres',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
         const SizedBox(height: 10),
         ..._validMembers.map((member) {
           return Container(
@@ -176,7 +173,7 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
             left: 0,
             right: 0,
             child: AppBar(
-              title: const Text('Détails de l\'Association'),
+              title: Text(AppLocalizations.of(context)!.associationDetailsTitle),
               backgroundColor: Colors.transparent,
               elevation: 0,
               centerTitle: true,
@@ -201,18 +198,18 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Propriétaire',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.owner,
+                              style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 10),
                             _buildOwnerInfo(),
                             const SizedBox(height: 20),
-                            const Text(
-                              'Membres de l\'Association',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.associationMembers,
+                              style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -240,9 +237,9 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
                                         borderRadius: BorderRadius.circular(30),
                                       ),
                                     ),
-                                    child: const Text(
-                                      'Modifier l\'Association',
-                                      style: TextStyle(
+                                    child: Text(
+                                      AppLocalizations.of(context)!.modifyAssociation,
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),

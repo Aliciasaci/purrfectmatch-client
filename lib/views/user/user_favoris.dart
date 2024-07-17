@@ -155,6 +155,7 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => RoomScreen(
+                            roomID: roomsData[favori.AnnonceID]!.id!,
                             room: roomsData[favori.AnnonceID]!,
                           ),
                         ),
