@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/views/user/profile/profile_screen.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../models/user.dart';
+import '../../services/api_service.dart';
+import '../admin/featureflag/blocs/featureflag_bloc.dart';
 import '../annonces_cats_menu.dart';
 import '../bottom_navigation_bar.dart';
 import '../login.dart';
@@ -27,7 +29,10 @@ class _UserHomePageState extends State<UserHomePage> {
     const SwipeCardsWidget(),
     const AnnoncesCatsMenu(),
     const RoomsListScreen(),
-    const ProfileScreen(),
+    BlocProvider<FeatureFlagBloc>(
+      create: (context) => FeatureFlagBloc(apiService: ApiService())..add(LoadFeatureFlags()),
+      child: const ProfileScreen(),
+    ),
   ];
 
   void _onItemTapped(int index) {
@@ -40,7 +45,12 @@ class _UserHomePageState extends State<UserHomePage> {
     BlocProvider.of<AuthBloc>(context).add(LogoutRequested());
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
+      MaterialPageRoute(
+        builder: (context) => BlocProvider<FeatureFlagBloc>(
+          create: (context) => FeatureFlagBloc(apiService: ApiService())..add(LoadFeatureFlags()),
+          child: const LoginPage(),
+        ),
+      ),
     );
   }
 

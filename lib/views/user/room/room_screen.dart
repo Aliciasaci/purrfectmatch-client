@@ -30,8 +30,8 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
-    NotificationManager.instance.setRoomID(widget.roomID);
-    BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.roomID));
+    NotificationManager.instance.setRoomID(widget.room.id!);
+    BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.room.id!));
     final authState = BlocProvider.of<AuthBloc>(context).state;
     if (authState is AuthAuthenticated) {
       _currentUser = authState.user;

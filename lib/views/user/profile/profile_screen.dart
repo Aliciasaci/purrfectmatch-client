@@ -1,13 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/user/profile/profile_menu_widget.dart';
-import 'package:purrfectmatch/views/user/profile/edit_profile_screen.dart';
-import 'package:purrfectmatch/models/user.dart';
+import 'package:purrfectmatch/views/user/profile/settings_screen.dart';
+import 'package:purrfectmatch/views/user/profile/user_associations_screen.dart';
+
 import '../../../blocs/auth/auth_bloc.dart';
+import '../../../models/user.dart';
+import '../../../services/api_service.dart';
+import '../../admin/featureflag/blocs/featureflag_bloc.dart';
 import '../../login.dart';
-import 'settings_screen.dart';
-import 'user_associations_screen.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -21,31 +24,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     BlocProvider.of<AuthBloc>(context).add(LogoutRequested());
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
+      MaterialPageRoute(
+        builder: (context) => BlocProvider<FeatureFlagBloc>(
+          create: (context) => FeatureFlagBloc(apiService: ApiService())..add(LoadFeatureFlags()),
+          child: const LoginPage(),
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        centerTitle: true,
-      ),
-      body: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          if (state is AuthAuthenticated) {
-            ApiService apiService = ApiService();
-            User currentUser = state.user;
-            String profilePictureURL = currentUser.profilePicURL! == "default"
-                ? apiService.serveDefaultProfilePicture()
-                : currentUser.profilePicURL!;
+    return BlocBuilder<FeatureFlagBloc, FeatureFlagState>(
+      builder: (context, featureFlagState) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Profile'),
+            centerTitle: true,
+          ),
+          body: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, authState) {
+              if (authState is AuthAuthenticated) {
+                ApiService apiService = ApiService();
+                User currentUser = authState.user;
+                String profilePictureURL = currentUser.profilePicURL! == "default"
+                    ? apiService.serveDefaultProfilePicture()
+                    : currentUser.profilePicURL!;
 
-            return SingleChildScrollView(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-              child: Column(
-                children: [
+                var widgets = <Widget>[
                   Stack(
                     children: [
                       SizedBox(
@@ -95,26 +101,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   ),
-                  ProfileMenuWidget(
-                    title: "Associations",
-                    icon: Icons.home,
-                    onPress: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
+                ];
+
+                if (featureFlagState is FeatureFlagLoaded) {
+                  final associationEnabled = featureFlagState.featureFlags
+                      .firstWhere((flag) => flag.name == 'Association')
+                      .isEnabled;
+
+                  if (associationEnabled) {
+                    widgets.addAll([
+                      ProfileMenuWidget(
+                        title: "Associations",
+                        icon: Icons.home,
+                        onPress: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
                                 const UserAssociationsScreen()),
-                      );
-                    },
-                  ),
+                          );
+                        },
+                      ),
+                      ProfileMenuWidget(
+                        title: "Créer Association",
+                        icon: Icons.verified,
+                        onPress: () => Navigator.pushNamed(
+                            context, '/user/create-association'),
+                      ),
+                    ]);
+                  }
+                }
+
+                widgets.addAll([
                   const Divider(),
                   const SizedBox(height: 10),
-                  ProfileMenuWidget(
-                    title: "Créer Association",
-                    icon: Icons.verified,
-                    onPress: () => Navigator.pushNamed(
-                        context, '/user/create-association'),
-                  ),
                   ProfileMenuWidget(
                     title: "Se déconnecter",
                     icon: Icons.logout,
@@ -122,14 +142,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     endIcon: false,
                     onPress: () => _logout(context),
                   ),
-                ],
-              ),
-            );
-          } else {
-            return const Center(child: Text('User not authenticated'));
-          }
-        },
-      ),
+                ]);
+
+                return SingleChildScrollView(
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+                  child: Column(children: widgets),
+                );
+              } else {
+                return const Center(child: Text('User not authenticated'));
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }

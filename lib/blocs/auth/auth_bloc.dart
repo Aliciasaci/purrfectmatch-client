@@ -50,8 +50,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onLogoutRequested(
       LogoutRequested event, Emitter<AuthState> emit) async {
-    authService.logout();
-    emit(AuthInitial());
+      authService.logout();
+      emit(AuthInitial());
   }
 
   Future<void> _onUpdateProfileRequested(
