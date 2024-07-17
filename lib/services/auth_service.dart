@@ -10,14 +10,15 @@ import '../models/user.dart';
 import '../notificationManager.dart';
 
 class AuthService {
-  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get baseUrl =>
+      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
   static String? authToken;
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
   static User? currentUser;
 
   Future<void> login(String email, String password) async {
     try {
-        final response = await http.post(
+      final response = await http.post(
         Uri.parse('$baseUrl/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
@@ -44,7 +45,8 @@ class AuthService {
       } else if (response.statusCode == 404) {
         throw AuthException("Connexion refusée. Utilisateur introuvable.");
       } else {
-        throw AuthException('Échec de la connexion avec le code d\'état ${response.statusCode}');
+        throw AuthException(
+            'Échec de la connexion avec le code d\'état ${response.statusCode}');
       }
     } catch (e) {
       if (e is AuthException) {
@@ -55,7 +57,8 @@ class AuthService {
     }
   }
 
-  Future<void> register(String name, String email, String password, String addressRue, String cp, String ville) async {
+  Future<void> register(String name, String email, String password,
+      String addressRue, String cp, String ville) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/register'),
@@ -78,7 +81,8 @@ class AuthService {
         }
         authToken = responseBody['token'];
       } else {
-        throw AuthException('Échec de l\'inscription : code d\'état ${response.statusCode}');
+        throw AuthException(
+            'Échec de l\'inscription : code d\'état ${response.statusCode}');
       }
     } catch (e) {
       if (e is AuthException) {
@@ -91,10 +95,10 @@ class AuthService {
   }
 
   Future<User> getCurrentUser() async {
-    final response = await http.get(Uri.parse('$baseUrl/users/current'),
-        headers: <String, String>{
-          'Authorization': 'Bearer $authToken',
-        });
+    final response = await http
+        .get(Uri.parse('$baseUrl/users/current'), headers: <String, String>{
+      'Authorization': 'Bearer $authToken',
+    });
 
     if (response.statusCode == 200) {
       currentUser = User.fromJson(jsonDecode(response.body));
@@ -110,17 +114,17 @@ class AuthService {
     final response = await http.put(
       Uri.parse('$baseUrl/users/${user.id}'),
       headers: <String, String>{
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: {
+      body: jsonEncode({
         'name': user.name,
         'email': user.email,
         'addressRue': user.addressRue,
         'cp': user.cp,
         'ville': user.ville,
         if (user.password != null) 'password': user.password!,
-      },
+      }),
     );
 
     if (response.statusCode == 200) {
@@ -170,7 +174,6 @@ class AuthService {
     print("Utilisateur déconnecté, token effacé.");
   }
 }
-
 
 class AuthException implements Exception {
   final String message;

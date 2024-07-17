@@ -2,11 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:purrfectmatch/models/association.dart';
 import 'package:purrfectmatch/services/api_service.dart';
-
-import '../../../blocs/auth/auth_bloc.dart';
+import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 
 class CreateAssociation extends StatefulWidget {
   const CreateAssociation({super.key});
@@ -38,31 +36,36 @@ class _CreateAssociationState extends State<CreateAssociation> {
 
   Future<void> _createAssociation() async {
     if (_formKey.currentState!.validate() && _kbisFilePath != null) {
-      String ownerId = '';
+      String OwnerID = '';
       final authState = BlocProvider.of<AuthBloc>(context).state;
       if (authState is AuthAuthenticated) {
-        ownerId = authState.user.id!;
+        OwnerID = authState.user.id!;
         Association association = Association(
-          name: _nameController.text,
-          addressRue: _addressRueController.text,
-          cp: _cpController.text,
-          ville: _villeController.text,
-          phone: _phoneController.text,
-          email: _emailController.text,
+          Name: _nameController.text,
+          AddressRue: _addressRueController.text,
+          Cp: _cpController.text,
+          Ville: _villeController.text,
+          Phone: _phoneController.text,
+          Email: _emailController.text,
           kbisFile: _kbisFilePath!,
-          ownerId: ownerId,
+          OwnerID: OwnerID,
         );
         ApiService apiService = ApiService();
+
+        // Afficher l'objet association dans la console
+        print('Association created: ${association.toJson()}');
+
         try {
           await apiService.createAssociation(association, _kbisFilePath!, _kbisFileName!);
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('L\'association a été créée avec succès')),
           );
+          Navigator.pop(context, true);
         } catch (e) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erreur lors de la création de l\'association')),
+            SnackBar(content: Text('Erreur lors de la création de l\'association: $e')),
           );
         }
       }
@@ -74,97 +77,113 @@ class _CreateAssociationState extends State<CreateAssociation> {
     }
   }
 
+  Widget _buildTextFormField(TextEditingController controller, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.orange[100]!,
+        ),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: InputBorder.none,
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Veuillez entrer $label de l\'association';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Créer Association'),
+        backgroundColor: Colors.orange[100],
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
-          children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nom', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez entrer le nom de l\'association';
-                }
-                return null;
-              },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.orange[100]!, Colors.orange[200]!],
+          ),
+        ),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(20, 40, 20, 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
             ),
-            const SizedBox(height: 15),
-            TextFormField(
-              controller: _addressRueController,
-              decoration: const InputDecoration(labelText: 'Adresse', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez entrer l\'adresse de l\'association';
-                }
-                return null;
-              },
+            child: Padding(
+              padding: const EdgeInsets.all(40),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Créer le profil de l\'association',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      _buildTextFormField(_nameController, 'Nom'),
+                      const SizedBox(height: 15),
+                      _buildTextFormField(_addressRueController, 'Adresse'),
+                      const SizedBox(height: 15),
+                      _buildTextFormField(_cpController, 'Code Postal'),
+                      const SizedBox(height: 15),
+                      _buildTextFormField(_villeController, 'Ville'),
+                      const SizedBox(height: 15),
+                      _buildTextFormField(_phoneController, 'Téléphone'),
+                      const SizedBox(height: 15),
+                      _buildTextFormField(_emailController, 'Email'),
+                      const SizedBox(height: 15),
+                      Text(
+                        _kbisFileName ?? 'Aucun fichier choisi',
+                        style: const TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: _pickKbisFile,
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.orange[100],
+                          padding: const EdgeInsets.all(15),
+                        ),
+                        child: const Text('Choisir le fichier KBIS'),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          onPressed: _createAssociation,
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.orange[100],
+                            padding: const EdgeInsets.all(15),
+                          ),
+                          child: const Text('Valider'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 15),
-            TextFormField(
-              controller: _cpController,
-              decoration: const InputDecoration(labelText: 'Code Postal', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez entrer le code postal de l\'association';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 15),
-            TextFormField(
-              controller: _villeController,
-              decoration: const InputDecoration(labelText: 'Ville', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez entrer la ville de l\'association';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 15),
-            TextFormField(
-              controller: _phoneController,
-              decoration: const InputDecoration(labelText: 'Téléphone', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez entrer le téléphone de l\'association';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 15),
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Veuillez entrer l\'email de l\'association';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 15),
-            Text(
-              _kbisFileName ?? 'Aucun fichier choisi',
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            ElevatedButton(
-              onPressed: _pickKbisFile,
-              child: const Text('Choisir le fichier KBIS'),
-            ),
-            ElevatedButton(
-              onPressed: _createAssociation,
-              child: const Text('Valider'),
-            ),
-          ],
+          ),
         ),
       ),
     );

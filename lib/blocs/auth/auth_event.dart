@@ -1,7 +1,6 @@
 part of 'auth_bloc.dart';
 
 @immutable
-
 abstract class AuthEvent {}
 
 class LoginRequested extends AuthEvent {
@@ -19,4 +18,10 @@ class UpdateProfileRequested extends AuthEvent {
   final User user;
 
   UpdateProfileRequested(this.user);
+}
+
+class UpdateProfilePicRequested extends AuthEvent {
+  final User user;
+
+  UpdateProfilePicRequested(this.user);
 }

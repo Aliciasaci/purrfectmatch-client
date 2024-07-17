@@ -20,7 +20,7 @@ class ProfileMenuWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-    var iconColor = isDark ? primaryColor : darkYellowColor;
+    var iconColor = isDark ? Colors.orange[700] : Colors.orange[200];
 
     return ListTile(
       onTap: onPress,
@@ -28,23 +28,24 @@ class ProfileMenuWidget extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          color: iconColor.withOpacity(0.1)
-        ),
+            borderRadius: BorderRadius.circular(100),
+            color: iconColor!.withOpacity(0.1)),
         child: Icon(icon, color: iconColor),
       ),
-      title: Text(title, style: Theme.of(context).textTheme.bodySmall?.apply(color: textColor)),
-      trailing: endIcon? Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          color: Colors.grey.withOpacity(0.1)
-        ),
-        child: const Icon(Icons.arrow_forward, size: 18.0, color: Colors.grey),
-      ) : null,
+      title: Text(title,
+          style:
+              Theme.of(context).textTheme.bodySmall?.apply(color: textColor)),
+      trailing: endIcon
+          ? Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: Colors.grey.withOpacity(0.1)),
+              child: const Icon(Icons.arrow_forward,
+                  size: 18.0, color: Colors.grey),
+            )
+          : null,
     );
   }
 }
-
-

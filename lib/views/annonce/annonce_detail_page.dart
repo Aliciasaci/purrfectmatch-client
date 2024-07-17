@@ -85,6 +85,22 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
     });
   }
 
+  Widget _buildBubble(String label, String value) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.orange[100]!),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      width: double.infinity, // Make the bubble occupy the full screen width
+      child: Text(
+        '$label: $value',
+        style: const TextStyle(fontSize: 16),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = BlocProvider.of<AuthBloc>(context).state;
@@ -93,21 +109,9 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.annonceDetailsTitle),
-        backgroundColor: Colors.orange[100],
       ),
       body: Stack(
         children: [
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.orange[100]!, Colors.orange[200]!],
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: SingleChildScrollView(
@@ -162,6 +166,19 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                                 color: Colors.orange,
                               ),
                             ),
+                          if (_cat != null &&
+                              _cat!.PublishedAs != null &&
+                              _cat!.PublishedAs!.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              'Proposé à l\'adoption par : ${_cat!.PublishedAs}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 15),
                           if (_isEditing)
                             TextFormField(
@@ -192,62 +209,60 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                Text(
-                                  '${AppLocalizations.of(context)!.name}: ${_cat!.name}',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
+                                _buildBubble(AppLocalizations.of(context)!.name,
+                                    _cat!.name),
                                 const SizedBox(height: 10),
-                                Text(
-                                  '${AppLocalizations.of(context)!.gender}: ${_cat!.sexe}',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
+                                _buildBubble(
+                                    AppLocalizations.of(context)!.gender,
+                                    _cat!.sexe),
                                 const SizedBox(height: 10),
-                                Text(
-                                  '${AppLocalizations.of(context)!.color}: ${_cat!.color}',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
+                                _buildBubble(
+                                    AppLocalizations.of(context)!.color,
+                                    _cat!.color),
                                 const SizedBox(height: 10),
-                                Text(
-                                  '${AppLocalizations.of(context)!.behavior}: ${_cat!.behavior}',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
+                                _buildBubble(
+                                    AppLocalizations.of(context)!.behavior,
+                                    _cat!.behavior),
                                 const SizedBox(height: 20),
                               ],
                             ),
                           if (_cat == null)
-                            Text(
-                                AppLocalizations.of(context)!.noCatInfoAvailable),
-                          if (currentUser != null &&
-                              widget.annonce.UserID == currentUser.id)
-                            SizedBox(
-                              width: double.infinity,
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: TextButton(
-                                      style: TextButton.styleFrom(
-                                        backgroundColor: Colors.orange[100],
-                                        padding: const EdgeInsets.all(15),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CatDetails(cat: _cat!)),
-                                        );
-                                      },
-                                      child: Text(
-                                        AppLocalizations.of(context)!
-                                            .catDetails,
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                      ),
+                            _buildBubble(
+                                AppLocalizations.of(context)!
+                                    .noCatInfoAvailable,
+                                ""),
+                          SizedBox(
+                            width: double.infinity,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.orange[100],
+                                      padding: const EdgeInsets.all(15),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                CatDetails(cat: _cat!)),
+                                      );
+                                    },
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .catDetails,
+                                      style:
+                                      const TextStyle(color: Colors.black),
                                     ),
                                   ),
+                                ),
+                                if (currentUser != null &&
+                                    widget.annonce.UserID == currentUser.id)
                                   const SizedBox(width: 10),
+                                if (currentUser != null &&
+                                    widget.annonce.UserID == currentUser.id)
                                   Expanded(
                                     child: TextButton(
                                       style: TextButton.styleFrom(
@@ -258,14 +273,14 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                                       child: Text(
                                         AppLocalizations.of(context)!
                                             .editAnnonce,
-                                        style: const TextStyle(
-                                            color: Colors.black),
+                                        style:
+                                        const TextStyle(color: Colors.black),
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                              ],
                             ),
+                          ),
                         ],
                       ),
                     ),

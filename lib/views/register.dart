@@ -288,27 +288,6 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-          Positioned(
-            top: 40,
-            right: 20,
-            child: GestureDetector(
-              onTap: () {
-                if (localeProvider.locale == const Locale('en')) {
-                  localeProvider.setLocale(const Locale('fr'));
-                } else {
-                  localeProvider.setLocale(const Locale('en'));
-                }
-              },
-              child: CircleAvatar(
-                radius: 15,
-                backgroundImage: AssetImage(
-                  localeProvider.locale == const Locale('fr')
-                      ? 'assets/images/flag_fr.png'
-                      : 'assets/images/flag_uk.png',
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
