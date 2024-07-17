@@ -14,7 +14,8 @@ import 'filter_modal.dart';
 import 'package:purrfectmatch/views/annonce/annonce_detail_page.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
-  const SwipeCardsWidget({super.key});
+  const SwipeCardsWidget({Key? key}) : super(key: key);
+
   @override
   _SwipeCardsWidgetState createState() => _SwipeCardsWidgetState();
 }
@@ -278,10 +279,16 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                           fontSize: 16,
                                         ),
                                       ),
+                                      WidgetSpan(
+                                        child: Icon(
+                                          Icons.verified,
+                                          color: Colors.blue,
+                                          size: 16,
+                                        ),
+                                      ),
                                       TextSpan(
                                         text: user.name,
                                         style: const TextStyle(
-                                          decoration: TextDecoration.underline,
                                           fontSize: 16,
                                         ),
                                         recognizer: TapGestureRecognizer()
@@ -295,9 +302,11 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                             );
                                           },
                                       ),
-                                      if (cat.PublishedAs != null && cat.PublishedAs!.isNotEmpty) ...[
+                                      if (cat.PublishedAs != null &&
+                                          cat.PublishedAs!.isNotEmpty) ...[
                                         TextSpan(
-                                          text: " et proposé à l'adoption par l'association ",
+                                          text:
+                                          " et proposée à l'adoption par l'association ",
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontStyle: FontStyle.italic,
@@ -421,9 +430,10 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: const Color(0xFFFFB295).withOpacity(0.6),
-                            offset: const Offset(1.1, 4),
-                            blurRadius: 8.0)
+                          color: const Color(0xFFFFB295).withOpacity(0.6),
+                          offset: const Offset(1.1, 4),
+                          blurRadius: 8.0,
+                        )
                       ],
                     ),
                     child: IconButton(

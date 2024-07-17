@@ -158,7 +158,7 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Association updated successfully')),
         );
-        Navigator.pop(context, true);
+        Navigator.pop(context, true); // Notify that updates were made
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update association: $e')),
@@ -224,7 +224,8 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
   }
 
   Widget _buildMembersList() {
-    return Column(
+    return (widget.association.Verified ?? false)
+        ? Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Membres', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -257,6 +258,18 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
           ),
         ),
       ],
+    )
+        : Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.orange[100]!),
+        borderRadius: BorderRadius.circular(40),
+        color: Colors.orange[50],
+      ),
+      child: const Text(
+        'Les membres peuvent être ajoutés uniquement si l\'association est vérifiée.',
+        style: TextStyle(fontSize: 16, color: Colors.red),
+      ),
     );
   }
 

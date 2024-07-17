@@ -32,6 +32,12 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchDetails();
+  }
+
   Future<void> _loadCurrentUser() async {
     final authState = BlocProvider.of<AuthBloc>(context).state;
     if (authState is AuthAuthenticated) {
@@ -42,6 +48,9 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
   }
 
   Future<void> _fetchDetails() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       final owner = await _apiService.fetchUserByID(widget.association.OwnerID);
       List<User> validMembers = [];
@@ -153,6 +162,20 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
     );
   }
 
+  Widget _buildVerificationBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: widget.association.Verified == true ? Colors.green : Colors.red,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        widget.association.Verified == true ? 'Vérifié' : 'Non Vérifié',
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,7 +192,7 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
             height: MediaQuery.of(context).size.height,
           ),
           Positioned(
-            top: MediaQuery.of(context).padding.top,
+            top: MediaQuery.of(context).padding.top - kToolbarHeight / 2,
             left: 0,
             right: 0,
             child: AppBar(
@@ -180,24 +203,40 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
             ),
           ),
           Positioned.fill(
-            top: MediaQuery.of(context).padding.top + kToolbarHeight + 20,
+            top: MediaQuery.of(context).padding.top + kToolbarHeight,
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Card(
                       color: Colors.white,
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    widget.association.Name,
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                _buildVerificationBadge(),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
                             Text(
                               AppLocalizations.of(context)!.owner,
                               style: const TextStyle(
@@ -227,7 +266,11 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
                                           builder: (context) => EditAssociationScreen(
                                               association: widget.association),
                                         ),
-                                      );
+                                      ).then((value) {
+                                        if (value == true) {
+                                          _fetchDetails();
+                                        }
+                                      });
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange[100],
