@@ -87,7 +87,7 @@
   "english" : "English",
   "french" : "French",
   "addCatTitle" : "Insert a title",
-  "myAssociations" : "My associations"
+  "myAssociations" : "My associations",
   "logout": "Logout",
   "createAssociation": "Create Association",
   "associations": "Associations",
