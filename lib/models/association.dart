@@ -1,109 +1,101 @@
-import 'package:purrfectmatch/models/user.dart';
-
 class Association {
-  final int? id;
-  final String name;
-  final String addressRue;
-  final String cp;
-  final String ville;
-  final String phone;
-  final String email;
+  final int? ID;
+  final String Name;
+  final String AddressRue;
+  final String Cp;
+  final String Ville;
+  final String Phone;
+  final String Email;
   final String kbisFile;
-  final String ownerId;
-  // final User? owner;
-  final bool? verified;
+  final String OwnerID;
+  List<String>? Members;
+  final bool? Verified;
   final String? createdAt;
   final String? updatedAt;
 
   Association({
-    this.id,
-    required this.name,
-    required this.addressRue,
-    required this.cp,
-    required this.ville,
-    required this.phone,
-    required this.email,
+    this.ID,
+    required this.Name,
+    required this.AddressRue,
+    required this.Cp,
+    required this.Ville,
+    required this.Phone,
+    required this.Email,
     required this.kbisFile,
-    required this.ownerId,
-    // this.owner,
-    this.verified,
+    required this.OwnerID,
+    this.Members,
+    this.Verified,
     this.createdAt,
     this.updatedAt,
   });
 
   factory Association.fromJson(Map<String, dynamic> json) {
     return Association(
-      id: json['ID'],
-      name: json['Name'] ?? '',
-      addressRue: json['AddressRue'] ?? '',
-      cp: json['Cp'] ?? '',
-      ville: json['Ville'] ?? '',
-      phone: json['Phone'] ?? '',
-      email: json['Email'] ?? '',
+      ID: json['ID'],
+      Name: json['Name'] ?? '',
+      AddressRue: json['AddressRue'] ?? '',
+      Cp: json['Cp'] ?? '',
+      Ville: json['Ville'] ?? '',
+      Phone: json['Phone'] ?? '',
+      Email: json['Email'] ?? '',
       kbisFile: json['KbisFile'] ?? '',
-      ownerId: json['OwnerId'] ?? '',
-      // owner: json['owner'] != null ? User.fromJson(json['owner']) : null,
-      verified: json['Rerified'] ?? false,
-      createdAt: json['CreatedAt'] != null ? DateTime.parse(json['CreatedAt']).toIso8601String() : null,
-      updatedAt: json['UpdatedAt'] != null ? DateTime.parse(json['UpdatedAt']).toIso8601String() : null,
+      OwnerID: json['OwnerID'] ?? '',
+      Members: List<String>.from(json['Members'] ?? []),
+      Verified: json['Verified'] ?? false,
+      createdAt: json['CreatedAt'] ?? '',
+      updatedAt: json['UpdatedAt'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {
-      'name': name,
-      'addressRue': addressRue,
-      'cp': cp,
-      'ville': ville,
-      'phone': phone,
-      'email': email,
+      'name': Name,
+      'addressRue': AddressRue,
+      'cp': Cp,
+      'ville': Ville,
+      'phone': Phone,
+      'Email': Email,
       'kbisFile': kbisFile,
-      'ownerId': ownerId,
-      //'owner': owner?.toJson(),
+      'OwnerID': OwnerID,
+      'members': Members ?? [],
+      'verified': Verified,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
 
-    if (id != null) data['id'] = id;
-    if (verified != null) data['verified'] = verified;
-    if (createdAt != null) data['createdAt'] = createdAt;
-    if (updatedAt != null) data['updatedAt'] = updatedAt;
-
+    if (ID != null) data['id'] = ID;
     return data;
   }
 
   Association copyWith({
-    int? id,
+    int? ID,
     String? name,
     String? addressRue,
     String? cp,
     String? ville,
     String? phone,
-    String? email,
+    String? Email,
     String? kbisFile,
-    String? ownerId,
-    // User? owner,
+    String? OwnerID,
+    List<String>? members,
     bool? verified,
     String? createdAt,
     String? updatedAt,
   }) {
     return Association(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      addressRue: addressRue ?? this.addressRue,
-      cp: cp ?? this.cp,
-      ville: ville ?? this.ville,
-      phone: phone ?? this.phone,
-      email: email ?? this.email,
+      ID: ID ?? this.ID,
+      Name: name ?? this.Name,
+      AddressRue: addressRue ?? this.AddressRue,
+      Cp: cp ?? this.Cp,
+      Ville: ville ?? this.Ville,
+      Phone: phone ?? this.Phone,
+      Email: Email ?? this.Email,
       kbisFile: kbisFile ?? this.kbisFile,
-      ownerId: ownerId ?? this.ownerId,
-      // owner: owner ?? this.owner,
-      verified: verified ?? this.verified,
+      OwnerID: OwnerID ?? this.OwnerID,
+      Members: members ?? this.Members,
+      Verified: verified ?? this.Verified,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
-
-  @override
-  String toString() {
-    return '(Associa)tion { id: $id, name: $name, addressRue: $addressRue, cp: $cp, ville: $ville, phone: $phone, email: $email, kbisFile: $kbisFile, ownerId: $ownerId, verified: $verified, createdAt: $createdAt, updatedAt: $updatedAt }';
   }
 }

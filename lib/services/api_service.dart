@@ -92,7 +92,7 @@ class ApiService {
 
   Future<void> updateCat(Cat cat, PlatformFile? selectedFile) async {
     var request =
-        http.MultipartRequest('PUT', Uri.parse('$baseUrl/cats/${cat.ID}'));
+    http.MultipartRequest('PUT', Uri.parse('$baseUrl/cats/${cat.ID}'));
 
     final token = AuthService.authToken;
     request.headers['Authorization'] = 'Bearer $token';
@@ -314,12 +314,22 @@ class ApiService {
       Association association, String filePath, String fileName) async {
     final token = AuthService.authToken;
     final request =
-        http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+    http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
 
-    association.toJson().forEach((key, value) {
-      request.fields[key] = value.toString();
-    });
+    request.headers['Authorization'] = 'Bearer $token';
+    request.headers['Content-Type'] = 'multipart/form-data';
 
+    // Add JSON fields
+    request.fields['name'] = association.Name;
+    request.fields['addressRue'] = association.AddressRue;
+    request.fields['cp'] = association.Cp;
+    request.fields['ville'] = association.Ville;
+    request.fields['phone'] = association.Phone;
+    request.fields['email'] = association.Email;
+    request.fields['ownerId'] = association.OwnerID;
+    request.fields['Members'] = jsonEncode(association.Members);
+
+    // Add the file
     request.files.add(
       await http.MultipartFile.fromPath(
         'kbisFile',
@@ -329,17 +339,83 @@ class ApiService {
       ),
     );
 
-    request.headers.addAll({
-      'Authorization': 'Bearer $token',
-    });
-
-    var response = await request.send();
+    // Send the request
+    final response = await request.send();
     final responseString = await response.stream.bytesToString();
 
     if (response.statusCode == 201) {
       print('Association created successfully');
     } else {
-      throw Exception('Failed to create association');
+      print('Failed to create association: $responseString');
+      throw Exception('Failed to create association: $responseString');
+    }
+  }
+
+  Future<void> updateAssociation(Association association, PlatformFile? selectedFile) async {
+    final token = AuthService.authToken;
+    final Uri uri = Uri.parse('$baseUrl/associations/${association.ID}');
+    final request = http.MultipartRequest('PUT', uri)
+      ..headers['Authorization'] = 'Bearer $token';
+
+    // Convert association to JSON and filter out empty lists and null values
+    final filteredData = association.toJson();
+    final nonEmptyData = <String, String>{};
+
+    filteredData.forEach((key, value) {
+      if (value is List) {
+        if (value.isNotEmpty) {
+          nonEmptyData[key] = value.join(','); // Format the list correctly
+        }
+      } else if (value != null) {
+        nonEmptyData[key] = value.toString();
+      }
+    });
+
+    // Afficher l'objet association avant de l'envoyer
+    print('Filtered association data: $nonEmptyData');
+
+    nonEmptyData.forEach((key, value) {
+      request.fields[key] = value;
+    });
+
+    if (selectedFile != null && selectedFile.path != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'kbisFile',
+          selectedFile.path!,
+          filename: selectedFile.name,
+          contentType: MediaType('application', 'pdf'),
+        ),
+      );
+    }
+
+    final response = await request.send();
+    final responseString = await response.stream.bytesToString();
+
+    print(response.statusCode);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update association: $responseString');
+    }
+  }
+
+  Future<List<Association>> fetchUserAssociations(String userId) async {
+
+    print("ici");
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/users/$userId/associations'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    print("-------------------->");
+    print(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      List<dynamic> associationsJson = jsonDecode(response.body);
+      return associationsJson.map((json) => Association.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load user associations');
     }
   }
 
@@ -379,43 +455,7 @@ class ApiService {
     }
   }
 
-  Future<List<Association>> fetchUserAssociations(String userId) async {
-    final token = AuthService.authToken;
-    final response = await http.get(
-      Uri.parse('$baseUrl/users/$userId/associations'),
-      headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      List<dynamic> associationsJson = jsonDecode(response.body);
-      return associationsJson
-          .map((json) => Association.fromJson(json))
-          .toList();
-    } else {
-      throw Exception('Failed to load user associations');
-    }
-  }
-
-  Future<void> updateAssociation(Association association) async {
-    final token = AuthService.authToken;
-    final response = await http.put(
-      Uri.parse('$baseUrl/associations/${association.id}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(association.toJson()),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update association');
-    }
-  }
-
-  Future<void> updateAssociationVerifyStatus(
-      int associationId, bool verified) async {
+  Future<void> updateAssociationVerifyStatus(int associationId, bool verified) async {
     final token = AuthService.authToken;
     final response = await http.put(
       Uri.parse('$baseUrl/associations/$associationId/verify'),
@@ -504,7 +544,7 @@ class ApiService {
       String userId, String selectedFilePath, String selectedFileName) async {
     final token = AuthService.authToken;
     var request =
-        http.MultipartRequest('POST', Uri.parse('$baseUrl/profile/picture'));
+    http.MultipartRequest('POST', Uri.parse('$baseUrl/profile/picture'));
 
     request.headers['Authorization'] = 'Bearer $token';
 

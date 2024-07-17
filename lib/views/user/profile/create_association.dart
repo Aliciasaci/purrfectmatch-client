@@ -4,8 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/models/association.dart';
 import 'package:purrfectmatch/services/api_service.dart';
-
-import '../../../blocs/auth/auth_bloc.dart';
+import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 
 class CreateAssociation extends StatefulWidget {
   const CreateAssociation({super.key});
@@ -37,31 +36,36 @@ class _CreateAssociationState extends State<CreateAssociation> {
 
   Future<void> _createAssociation() async {
     if (_formKey.currentState!.validate() && _kbisFilePath != null) {
-      String ownerId = '';
+      String OwnerID = '';
       final authState = BlocProvider.of<AuthBloc>(context).state;
       if (authState is AuthAuthenticated) {
-        ownerId = authState.user.id!;
+        OwnerID = authState.user.id!;
         Association association = Association(
-          name: _nameController.text,
-          addressRue: _addressRueController.text,
-          cp: _cpController.text,
-          ville: _villeController.text,
-          phone: _phoneController.text,
-          email: _emailController.text,
+          Name: _nameController.text,
+          AddressRue: _addressRueController.text,
+          Cp: _cpController.text,
+          Ville: _villeController.text,
+          Phone: _phoneController.text,
+          Email: _emailController.text,
           kbisFile: _kbisFilePath!,
-          ownerId: ownerId,
+          OwnerID: OwnerID,
         );
         ApiService apiService = ApiService();
+
+        // Afficher l'objet association dans la console
+        print('Association created: ${association.toJson()}');
+
         try {
           await apiService.createAssociation(association, _kbisFilePath!, _kbisFileName!);
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('L\'association a été créée avec succès')),
           );
+          Navigator.pop(context, true);
         } catch (e) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erreur lors de la création de l\'association')),
+            SnackBar(content: Text('Erreur lors de la création de l\'association: $e')),
           );
         }
       }
@@ -130,7 +134,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'Create Association Profile',
+                        'Créer le profil de l\'association',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

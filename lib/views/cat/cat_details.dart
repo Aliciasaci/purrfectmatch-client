@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -36,6 +37,49 @@ class CatDetails extends StatelessWidget {
     final authState = BlocProvider.of<AuthBloc>(context).state;
     final currentUser = authState is AuthAuthenticated ? authState.user : null;
 
+    String formattedBirthDate = DateFormat('dd-MM-yyyy').format(DateTime.parse(cat.birthDate));
+    String formattedLastVaccineDate = cat.lastVaccineDate.isNotEmpty ? DateFormat('dd-MM-yyyy').format(DateTime.parse(cat.lastVaccineDate)) : 'N/A';
+
+    Widget buildInfoBubble(String label, String value) {
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.orange[100]!),
+          borderRadius: BorderRadius.circular(40),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        child: Text(
+          '$label: $value',
+          style: const TextStyle(fontSize: 16),
+        ),
+      );
+    }
+
+    Widget buildCheckBubble(String label, bool value) {
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.orange[100]!),
+          borderRadius: BorderRadius.circular(40),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(
+          children: [
+            Text(
+              '$label: ',
+              style: const TextStyle(fontSize: 16),
+            ),
+            Icon(
+              value ? Icons.check_circle : Icons.cancel,
+              color: value ? Colors.green : Colors.red,
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.catDetailsTitle),
@@ -51,6 +95,7 @@ class CatDetails extends StatelessWidget {
         ),
         child: Center(
           child: Container(
+            width: double.infinity,
             margin: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -90,61 +135,28 @@ class CatDetails extends StatelessWidget {
                         color: Colors.orange,
                       ),
                     ),
+                    if (cat.PublishedAs != null && cat.PublishedAs!.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        'Proposé à l\'adoption par l\'association : ${cat.PublishedAs}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.orange,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.birthDate}: ${cat.birthDate}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.age}: ${calculateAge(cat.birthDate)} ans',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.lastVaccineDate}: ${cat.lastVaccineDate}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.lastVaccineName}: ${cat.lastVaccineName}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.color}: ${cat.color}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.behavior}: ${cat.behavior}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.race}: ${cat.raceID}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.description}: ${cat.description}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.gender}: ${cat.sexe}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.sterilized}: ${cat.sterilized ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${AppLocalizations.of(context)!.reserved}: ${cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    buildInfoBubble(AppLocalizations.of(context)!.birthDate, formattedBirthDate),
+                    buildInfoBubble(AppLocalizations.of(context)!.age, '${calculateAge(cat.birthDate)} ans'),
+                    buildInfoBubble(AppLocalizations.of(context)!.lastVaccineDate, formattedLastVaccineDate),
+                    buildInfoBubble(AppLocalizations.of(context)!.lastVaccineName, cat.lastVaccineName),
+                    buildInfoBubble(AppLocalizations.of(context)!.color, cat.color),
+                    buildInfoBubble(AppLocalizations.of(context)!.race, cat.raceID),
+                    buildInfoBubble(AppLocalizations.of(context)!.description, cat.description),
+                    buildInfoBubble(AppLocalizations.of(context)!.gender, cat.sexe),
+                    buildCheckBubble(AppLocalizations.of(context)!.sterilized, cat.sterilized),
+                    buildCheckBubble(AppLocalizations.of(context)!.reserved, cat.reserved),
                     const SizedBox(height: 20),
                     if (currentUser != null && cat.userId == currentUser.id)
                       Align(

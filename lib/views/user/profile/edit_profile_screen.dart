@@ -26,7 +26,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final ApiService apiService = ApiService();
 
   User? _currentUser;
-
   @override
   void initState() {
     super.initState();
