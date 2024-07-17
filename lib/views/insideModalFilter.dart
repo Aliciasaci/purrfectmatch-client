@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../services/api_service.dart';
 
@@ -19,6 +20,8 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
   int? _dropdownValueRace;
   int? _dropdownValueAsso;
   String? _age;
+  String _placeHolderAsso = "";
+  String _placeHolderRace = "";
 
   @override
   void initState() {
@@ -31,10 +34,16 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
     try {
       final apiService = ApiService();
       final newRaces = await apiService.fetchAllRaces();
+      if (newRaces.isEmpty) {
+        setState(() {
+          _placeHolderRace = AppLocalizations.of(context)!.noRaceFoundFilter;
+        });
+      }
       for (var race in newRaces) {
         raceList[race.id] = race.raceName;
       }
       setState(() {
+        _placeHolderRace = AppLocalizations.of(context)!.selectRaceFilter;
         raceList = raceList;
       });
     } catch (e) {
@@ -45,13 +54,21 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
   Future<void> _fetchAssociation() async {
     try {
       final apiService = ApiService();
-          final newAsso = await apiService.fetchAllAssociations();
-      for (var asso in newAsso) {
-        assoList[asso.ID] = asso.Name;
+      final newAsso = await apiService.fetchAllAssociations();
+      print(newAsso);
+      if (newAsso.isEmpty) {
+        setState(() {
+          _placeHolderAsso = AppLocalizations.of(context)!.noAssoFoundFilter;
+        });
+      } else {
+        for (var asso in newAsso) {
+          assoList[asso.ID] = asso.Name;
+        }
+        setState(() {
+          _placeHolderAsso = AppLocalizations.of(context)!.selectAssoFilter;
+          assoList = assoList;
+        });
       }
-      setState(() {
-        assoList = assoList;
-      });
     } catch(e) {
       print('Failed to load associations: $e');
     }
@@ -75,8 +92,8 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Filtres",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+               Text(AppLocalizations.of(context)!.filterLabel,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(
@@ -86,8 +103,8 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Age du chat',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.age,
                     border: InputBorder.none,
                   ),
                   autocorrect: false,
@@ -133,7 +150,7 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                 ],
               ),
               DropdownButton(
-                  hint: const Text('Sélectionner une race'),
+                  hint: Text(_placeHolderRace),
                   items: raceList.entries.map((entry) {
                     return DropdownMenuItem<dynamic>(
                       value: entry.key,
@@ -149,7 +166,7 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                     }
                   }),
               DropdownButton(
-                  hint: const Text('Sélectionner une association'),
+                  hint: Text(_placeHolderAsso),
                   items: assoList.entries.map((entry) {
                     return DropdownMenuItem<dynamic>(
                       value: entry.key,
@@ -169,7 +186,7 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                   backgroundColor: Colors.orange[100],
                   padding: const EdgeInsets.all(15),
                 ),
-                child: const Text('Lancer la recherche'),
+                child: Text(AppLocalizations.of(context)!.filterSearch),
                 onPressed: () => {
                   widget.callback(_age, _catSex, _dropdownValueRace, _dropdownValueAsso),
                   Navigator.pop(context)

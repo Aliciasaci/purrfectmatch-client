@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:purrfectmatch/views/insideModalFilter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FilterModalWidget extends StatelessWidget {
   const FilterModalWidget({super.key, required this.callback});
@@ -17,7 +18,7 @@ class FilterModalWidget extends StatelessWidget {
         );
       },
       icon: const Icon(Icons.filter_alt),
-      label: const Text('Filter'),
+      label: Text(AppLocalizations.of(context)!.filterLabel),
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.fromLTRB(30, 10, 30, 10)
       ),

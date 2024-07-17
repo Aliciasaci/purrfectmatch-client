@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/models/favoris.dart';
@@ -41,9 +42,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       });
       _loadAnnonces();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text("Utilisateur non authentifié"),
-        duration: const Duration(milliseconds: 1500),
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Utilisateur non authentifié"),
+        duration: Duration(milliseconds: 1500),
       ));
     }
   }
@@ -105,18 +106,23 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     try {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
-      final filteredAnnonce =
-      await apiService.fetchCatsByFilters(age, catSex, race, asso);
-      for (var annonce in filteredAnnonce) {
-        annoncesList.add(annonce);
-      }
-      setState(() {
-        _annonceList = annoncesList;
-        _matchEngine = null;
-        _swipeItems.clear();
+      await apiService.fetchCatsByFilters(age, catSex, race, asso)
+      .then((res){
+          for (var annonce in res) {
+            annoncesList.add(annonce);
+          }
+          setState(() {
+            _annonceList = annoncesList;
+            _matchEngine = null;
+            _swipeItems.clear();
+          });
+          displayCats(_annonceList);
       });
-      displayCats(_annonceList);
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(AppLocalizations.of(context)!.noCatFoundFilter),
+        duration: const Duration(milliseconds: 2000),
+      ));
       print('Failed to load cats with filter: $e');
     }
   }
@@ -271,9 +277,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                       RichText(
                                         text: TextSpan(
                                           children: [
-                                            TextSpan(
+                                            const TextSpan(
                                               text: "Mise en ligne par ",
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 color: Colors.white,
                                                 fontStyle: FontStyle.italic,
                                                 fontSize: 16,
@@ -298,9 +304,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                             ),
                                             if (cat.PublishedAs != null &&
                                                 cat.PublishedAs!.isNotEmpty) ...[
-                                              TextSpan(
+                                              const TextSpan(
                                                 text: " et proposé à l'adoption par l'association ",
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.white,
                                                   fontStyle: FontStyle.italic,
                                                   fontSize: 16,

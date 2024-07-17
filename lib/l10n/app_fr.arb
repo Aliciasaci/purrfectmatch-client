@@ -148,5 +148,12 @@
   "addToFavorites": "Ajouté aux favoris",
   "loadingAnnoncesError": "Échec du chargement des annonces",
   "race" : "Race",
-  "pleaseSelectPdf" : "Séléctionner un PDF"
+  "pleaseSelectPdf" : "Séléctionner un PDF",
+  "filterSearch" :  "Rechercher",
+  "filterLabel" : "Filtres",
+  "selectRaceFilter" : "Sélectionner une race",
+  "noRaceFoundFilter" : "Pas de race trouvé",
+  "selectAssoFilter" : "Sélectionner une association",
+  "noAssoFoundFilter" : "Pas d'association trouvé",
+  "noCatFoundFilter" : "Aucun chat ne correspond à la recherche"
 }
