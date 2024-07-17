@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
+import 'package:purrfectmatch/blocs/reports/report_bloc.dart';
 import 'package:purrfectmatch/blocs/room/room_bloc.dart';
 import 'package:purrfectmatch/models/annonce.dart';
+import 'package:purrfectmatch/models/message.dart';
+import 'package:purrfectmatch/models/reason.dart';
+import 'package:purrfectmatch/models/report.dart';
 import 'package:purrfectmatch/models/room.dart';
 import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/services/api_service.dart';
@@ -24,21 +28,65 @@ class _RoomScreenState extends State<RoomScreen> {
   final ScrollController _scrollController = ScrollController();
   final ApiService _apiService = ApiService();
   Annonce? annonce;
+  List<Reason>? reasons;
 
   @override
   void initState() {
     super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
     BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.room.id!));
     final authState = BlocProvider.of<AuthBloc>(context).state;
     if (authState is AuthAuthenticated) {
-      _currentUser = authState.user;
-    }
-    String annonceIDString = widget.room.annonceID.toString();
-    _apiService.fetchAnnonceByID(annonceIDString).then((value) {
       setState(() {
-        annonce = value;
+        _currentUser = authState.user;
       });
-    });
+    }
+
+    String annonceIDString = widget.room.annonceID.toString();
+    final fetchedAnnonce = await _apiService.fetchAnnonceByID(annonceIDString);
+    if (mounted) {
+      setState(() {
+        annonce = fetchedAnnonce;
+      });
+    }
+  }
+
+  Future<void> handleReportMessage(
+      Message message, String currentUserID) async {
+    reasons = await _apiService.getReportReasons();
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Signaler un message'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: reasons!.map((reason) {
+              return ListTile(
+                title: Text(reason.reason),
+                onTap: () {
+                  final report = Report(
+                    messageID: message.id!,
+                    reasonID: reason.id,
+                    reporterUserId: currentUserID,
+                    reportedUserId: message.senderId!,
+                  );
+                  BlocProvider.of<ReportBloc>(context)
+                      .add(CreateReportMessage(report: report));
+                  Navigator.of(dialogContext).pop();
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -46,25 +94,26 @@ class _RoomScreenState extends State<RoomScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          title: Text(widget.room.annonceTitle!),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pop();
-              BlocProvider.of<RoomBloc>(context).add(LoadRooms());
-            },
-          ),
-          actions: [
-            if (annonce != null)
-              IconButton(
-                icon: const Icon(Icons.info),
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => AnnonceDetailPage(annonce: annonce!),
-                  ));
-                },
-              ),
-          ]),
+        title: Text(widget.room.annonceTitle!),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+            BlocProvider.of<RoomBloc>(context).add(LoadRooms());
+          },
+        ),
+        actions: [
+          if (annonce != null)
+            IconButton(
+              icon: const Icon(Icons.info),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => AnnonceDetailPage(annonce: annonce!),
+                ));
+              },
+            ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -78,17 +127,15 @@ class _RoomScreenState extends State<RoomScreen> {
                         _scrollController
                             .jumpTo(_scrollController.position.maxScrollExtent);
                       });
-                      // get the other user from the room context
+
+                      // Get the other user from the room context
                       final otherUserID =
                           widget.room.user1Id == _currentUser!.id!
                               ? widget.room.user2Id
                               : widget.room.user1Id;
 
-                      final getOtherUser =
-                          _apiService.fetchUserByID(otherUserID);
-
                       return FutureBuilder<User>(
-                        future: getOtherUser,
+                        future: _apiService.fetchUserByID(otherUserID),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             final otherUser = snapshot.data!;
@@ -100,6 +147,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                 otherUser.profilePicURL == "default"
                                     ? _apiService.serveDefaultProfilePicture()
                                     : otherUser.profilePicURL;
+
                             return Padding(
                               padding: const EdgeInsets.all(15.0),
                               child: Column(
@@ -118,27 +166,36 @@ class _RoomScreenState extends State<RoomScreen> {
                                               ? CrossAxisAlignment.end
                                               : CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 16),
-                                              decoration: BoxDecoration(
-                                                color: isCurrentUser
-                                                    ? Colors.orange[100]
-                                                    : Colors.grey[200],
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    isCurrentUser
-                                                        ? CrossAxisAlignment.end
-                                                        : CrossAxisAlignment
-                                                            .start,
-                                                children: [
-                                                  Text(message.content!),
-                                                ],
+                                            GestureDetector(
+                                              onLongPress: () {
+                                                if (!isCurrentUser) {
+                                                  handleReportMessage(message,
+                                                      _currentUser!.id!);
+                                                }
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 10,
+                                                        horizontal: 16),
+                                                decoration: BoxDecoration(
+                                                  color: isCurrentUser
+                                                      ? Colors.orange[100]
+                                                      : Colors.grey[200],
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      isCurrentUser
+                                                          ? CrossAxisAlignment
+                                                              .end
+                                                          : CrossAxisAlignment
+                                                              .start,
+                                                  children: [
+                                                    Text(message.content!),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             Row(

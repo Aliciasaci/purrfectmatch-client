@@ -24,7 +24,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
     _fetchAnnonces();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent &&
+              _scrollController.position.maxScrollExtent &&
           !_loading) {
         _fetchAnnonces();
       }
@@ -42,7 +42,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
       for (var annonce in newAnnonces) {
         if (annonce.CatID != null) {
           final cat = await apiService.fetchCatByID(annonce.CatID);
-          catsData[annonce.CatID] = cat;
+          catsData[annonce.CatID!] = cat;
         }
       }
       setState(() {
@@ -100,14 +100,14 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
               child: ListTile(
                 leading: cat != null && cat.picturesUrl.isNotEmpty
                     ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.network(
-                    cat.picturesUrl.first,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                )
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Image.network(
+                          cat.picturesUrl.first,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                      )
                     : const Icon(Icons.image, size: 50),
                 title: Text(
                   annonce.Title,

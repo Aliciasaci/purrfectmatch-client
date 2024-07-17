@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:purrfectmatch/models/reason.dart';
+import 'package:purrfectmatch/models/report.dart';
 import '../models/association.dart';
 import 'package:purrfectmatch/models/message.dart';
 import 'package:purrfectmatch/models/room.dart';
@@ -92,7 +94,7 @@ class ApiService {
 
   Future<void> updateCat(Cat cat, PlatformFile? selectedFile) async {
     var request =
-    http.MultipartRequest('PUT', Uri.parse('$baseUrl/cats/${cat.ID}'));
+        http.MultipartRequest('PUT', Uri.parse('$baseUrl/cats/${cat.ID}'));
 
     final token = AuthService.authToken;
     request.headers['Authorization'] = 'Bearer $token';
@@ -314,7 +316,7 @@ class ApiService {
       Association association, String filePath, String fileName) async {
     final token = AuthService.authToken;
     final request =
-    http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
+        http.MultipartRequest('POST', Uri.parse('$baseUrl/associations'));
 
     request.headers['Authorization'] = 'Bearer $token';
     request.headers['Content-Type'] = 'multipart/form-data';
@@ -351,7 +353,8 @@ class ApiService {
     }
   }
 
-  Future<void> updateAssociation(Association association, PlatformFile? selectedFile) async {
+  Future<void> updateAssociation(
+      Association association, PlatformFile? selectedFile) async {
     final token = AuthService.authToken;
     final Uri uri = Uri.parse('$baseUrl/associations/${association.ID}');
     final request = http.MultipartRequest('PUT', uri)
@@ -413,7 +416,9 @@ class ApiService {
     print(jsonDecode(response.body));
     if (response.statusCode == 200) {
       List<dynamic> associationsJson = jsonDecode(response.body);
-      return associationsJson.map((json) => Association.fromJson(json)).toList();
+      return associationsJson
+          .map((json) => Association.fromJson(json))
+          .toList();
     } else {
       throw Exception('Failed to load user associations');
     }
@@ -455,7 +460,8 @@ class ApiService {
     }
   }
 
-  Future<void> updateAssociationVerifyStatus(int associationId, bool verified) async {
+  Future<void> updateAssociationVerifyStatus(
+      int associationId, bool verified) async {
     final token = AuthService.authToken;
     final response = await http.put(
       Uri.parse('$baseUrl/associations/$associationId/verify'),
@@ -544,7 +550,7 @@ class ApiService {
       String userId, String selectedFilePath, String selectedFileName) async {
     final token = AuthService.authToken;
     var request =
-    http.MultipartRequest('POST', Uri.parse('$baseUrl/profile/picture'));
+        http.MultipartRequest('POST', Uri.parse('$baseUrl/profile/picture'));
 
     request.headers['Authorization'] = 'Bearer $token';
 
@@ -910,11 +916,161 @@ class ApiService {
     }
   }
 
+  // WebSocket methods
   IOWebSocketChannel connectToRoom(int roomID) {
     final token = AuthService.authToken;
     return IOWebSocketChannel.connect(Uri.parse('$wsUrl/ws/$roomID'), headers: {
       'Authorization': 'Bearer $token',
     });
+  }
+
+  IOWebSocketChannel connectToReportStream() {
+    final token = AuthService.authToken;
+    return IOWebSocketChannel.connect(Uri.parse('$wsUrl/reportSocket'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        });
+  }
+
+  // Report methods
+  Future<void> createReportMessage(int messageID, String reporterUserID,
+      String reportedUserID, int reasonID) async {
+    final token = AuthService.authToken;
+    final response = await http.post(
+      Uri.parse('$baseUrl/reports'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'MessageID': messageID,
+        'ReporterUserID': reporterUserID,
+        'ReportedUserID': reportedUserID,
+        'ReasonID': reasonID,
+      }),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create report');
+    }
+  }
+
+  Future<void> createReportAnnonce(int annonceID, String reporterUserID,
+      String reportedUserID, int reasonID) async {
+    final token = AuthService.authToken;
+    final response = await http.post(
+      Uri.parse('$baseUrl/reports'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'AnnonceID': annonceID,
+        'ReporterUserID': reporterUserID,
+        'ReportedUserID': reportedUserID,
+        'ReasonID': reasonID,
+      }),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create report');
+    }
+  }
+
+  Future<List<Report>> getReportedMessages() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/reports/messages'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Report> reports = parsed.map((json) {
+          return Report.fromJson(json);
+        }).toList();
+        return reports;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load reported messages');
+    }
+  }
+
+  Future<List<Report>> getReportedAnnonces() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/reports/annonces'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Report> reports = parsed.map((json) {
+          return Report.fromJson(json);
+        }).toList();
+        return reports;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load reported annonces');
+    }
+  }
+
+  Future<List<Report>> getAllReports() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/reports'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Report> reports = parsed.map((json) {
+          return Report.fromJson(json);
+        }).toList();
+        return reports;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load reports');
+    }
+  }
+
+  Future<List<Reason>> getReportReasons() async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/reasons'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var parsed = jsonDecode(response.body);
+      if (parsed is List<dynamic>) {
+        List<Reason> reasons = parsed.map((json) {
+          return Reason.fromJson(json);
+        }).toList();
+        return reasons;
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load report reasons');
+    }
   }
 
   String serveDefaultProfilePicture() {

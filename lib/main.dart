@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:purrfectmatch/blocs/reports/report_bloc.dart';
 import 'package:purrfectmatch/blocs/room/room_bloc.dart';
+import 'package:purrfectmatch/models/report.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/admin/admin_home_page.dart';
 import 'package:purrfectmatch/views/admin/association/blocs/association_bloc.dart';
@@ -24,8 +26,6 @@ import 'locale_provider.dart';
 import 'package:provider/provider.dart';
 import './views/language_switcher.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
@@ -39,7 +39,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    kIsWeb ? _appLinksDeepLink.initialize() : null; // Initialize deep links when the app starts
+    kIsWeb
+        ? _appLinksDeepLink.initialize()
+        : null; // Initialize deep links when the app starts
 
     return MultiBlocProvider(
       providers: [
@@ -48,6 +50,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<RoomBloc>(
           create: (context) => RoomBloc(apiService: ApiService()),
+        ),
+        BlocProvider<ReportBloc>(
+          create: (context) => ReportBloc(apiService: ApiService()),
         ),
       ],
       child: ChangeNotifierProvider(
@@ -71,9 +76,11 @@ class MyApp extends StatelessWidget {
                   if (state is AuthAuthenticated) {
                     if (state.user.roles.any((role) => role.name == 'ADMIN')) {
                       Navigator.of(context).pushReplacementNamed('/admin');
-                    } else if (state.user.roles.any((role) => role.name == 'USER')) {
+                    } else if (state.user.roles
+                        .any((role) => role.name == 'USER')) {
                       Navigator.of(context).pushReplacementNamed('/user');
-                    } else if (state.user.roles.any((role) => role.name == 'ASSO')) {
+                    } else if (state.user.roles
+                        .any((role) => role.name == 'ASSO')) {
                       Navigator.of(context).pushReplacementNamed('/asso');
                     } else {
                       Navigator.of(context).pushReplacementNamed('/not-found');
@@ -105,24 +112,28 @@ class MyApp extends StatelessWidget {
               routes: {
                 '/admin': (context) => const AdminHomePage(title: ''),
                 '/admin/users': (context) => BlocProvider(
-                  create: (context) =>
-                  CrudUserBloc(apiService: ApiService())..add(LoadUsers()),
-                  child: const CrudUserPage(),
-                ),
+                      create: (context) =>
+                          CrudUserBloc(apiService: ApiService())
+                            ..add(LoadUsers()),
+                      child: const CrudUserPage(),
+                    ),
                 '/admin/races': (context) => BlocProvider(
-                  create: (context) =>
-                  CrudRaceBloc(apiService: ApiService())..add(LoadRaces()),
-                  child: const CrudRacePage(),
-                ),
+                      create: (context) =>
+                          CrudRaceBloc(apiService: ApiService())
+                            ..add(LoadRaces()),
+                      child: const CrudRacePage(),
+                    ),
                 '/admin/associations': (context) => BlocProvider(
-                  create: (context) => AssociationBloc(apiService: ApiService())
-                    ..add(LoadAssociations()),
-                  child: const ListAssociation(),
-                ),
+                      create: (context) =>
+                          AssociationBloc(apiService: ApiService())
+                            ..add(LoadAssociations()),
+                      child: const ListAssociation(),
+                    ),
                 '/not-found': (context) =>
-                const NotFoundPage(title: 'Page not found'),
+                    const NotFoundPage(title: 'Page not found'),
                 '/user': (context) => const UserHomePage(title: ''),
-                '/user/create-association': (context) => const CreateAssociation(),
+                '/user/create-association': (context) =>
+                    const CreateAssociation(),
               },
             );
           },

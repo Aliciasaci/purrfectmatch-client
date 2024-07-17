@@ -27,7 +27,28 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  static String get baseUrl => kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+  static String get baseUrl =>
+      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+
+  Future<void> handleGoogleLogin() async {
+    try {
+      BlocProvider.of<AuthBloc>(context).add(
+        GoogleLoginRequested(),
+      );
+    } on LoginCancelled {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Connexion annulée"),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Erreur inattendue"),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +77,8 @@ class _LoginPageState extends State<LoginPage> {
               );
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text(AppLocalizations.of(context)!.loginSuccessful)),
+                    content:
+                        Text(AppLocalizations.of(context)!.loginSuccessful)),
               );
             }
           }
@@ -96,22 +118,26 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 borderRadius: BorderRadius.circular(40),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
                               child: TextFormField(
                                 controller: _emailController,
                                 decoration: InputDecoration(
                                   icon: Icon(Icons.account_circle_rounded,
                                       color: Colors.orange[100]),
                                   border: InputBorder.none,
-                                  labelText: AppLocalizations.of(context)!.email,
+                                  labelText:
+                                      AppLocalizations.of(context)!.email,
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)!.enterEmail;
+                                    return AppLocalizations.of(context)!
+                                        .enterEmail;
                                   }
                                   if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
                                       .hasMatch(value)) {
-                                    return AppLocalizations.of(context)!.invalidEmail;
+                                    return AppLocalizations.of(context)!
+                                        .invalidEmail;
                                   }
                                   return null;
                                 },
@@ -125,18 +151,22 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 borderRadius: BorderRadius.circular(40),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
                               child: TextFormField(
                                 controller: _passwordController,
                                 decoration: InputDecoration(
-                                  labelText: AppLocalizations.of(context)!.password,
+                                  labelText:
+                                      AppLocalizations.of(context)!.password,
                                   border: InputBorder.none,
-                                  icon: Icon(Icons.lock, color: Colors.orange[100]),
+                                  icon: Icon(Icons.lock,
+                                      color: Colors.orange[100]),
                                 ),
                                 obscureText: true,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)!.enterPassword;
+                                    return AppLocalizations.of(context)!
+                                        .enterPassword;
                                   }
                                   return null;
                                 },
@@ -146,59 +176,61 @@ class _LoginPageState extends State<LoginPage> {
                             _isLoading
                                 ? const CircularProgressIndicator()
                                 : Column(
-                              children: [
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: TextButton(
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.orange[100],
-                                      padding: const EdgeInsets.all(15),
-                                    ),
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        BlocProvider.of<AuthBloc>(context).add(
-                                          LoginRequested(
-                                            email: _emailController.text,
-                                            password:
-                                            _passwordController.text,
+                                    children: [
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: TextButton(
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Colors.orange[100],
+                                            padding: const EdgeInsets.all(15),
                                           ),
-                                        );
-                                      }
-                                    },
-                                    child: Text(AppLocalizations.of(context)!.login),
+                                          onPressed: () {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              BlocProvider.of<AuthBloc>(context)
+                                                  .add(
+                                                LoginRequested(
+                                                  email: _emailController.text,
+                                                  password:
+                                                      _passwordController.text,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .login),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      IconButton(
+                                        onPressed: handleGoogleLogin,
+                                        icon: const CircleAvatar(
+                                          backgroundImage: AssetImage(
+                                              'assets/google_logo.png'),
+                                          radius: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const RegisterPage()),
+                                          );
+                                        },
+                                        child: Text(
+                                          AppLocalizations.of(context)!
+                                              .register,
+                                          style: TextStyle(
+                                            color: Colors.orange[200],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(height: 20),
-                                IconButton(
-                                  onPressed: () {
-                                    BlocProvider.of<AuthBloc>(context).add(
-                                      GoogleLoginRequested(),
-                                    );
-                                  },
-                                  icon: const CircleAvatar(
-                                    backgroundImage: AssetImage('assets/google_logo.png'),
-                                    radius: 20,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                          const RegisterPage()),
-                                    );
-                                  },
-                                  child: Text(
-                                    AppLocalizations.of(context)!.register,
-                                    style: TextStyle(
-                                      color: Colors.orange[200],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
                           ],
                         ),
                       ),

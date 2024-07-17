@@ -29,7 +29,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     _fetchUserAnnonces();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent &&
+              _scrollController.position.maxScrollExtent &&
           !_loading &&
           _hasMore) {
         _fetchUserAnnonces();
@@ -53,7 +53,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
           for (var annonce in newAnnonces) {
             if (annonce.CatID != null) {
               final cat = await apiService.fetchCatByID(annonce.CatID);
-              catsData[annonce.CatID] = cat;
+              catsData[annonce.CatID!] = cat;
             }
           }
 
@@ -80,7 +80,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     try {
       await ApiService().deleteAnnonce(annonceId);
       setState(() {
-        userAnnoncesData.removeWhere((annonce) => annonce.ID.toString() == annonceId);
+        userAnnoncesData
+            .removeWhere((annonce) => annonce.ID.toString() == annonceId);
         _reloadUserAnnonces();
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -88,7 +89,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la suppression de l\'annonce: $e')),
+        SnackBar(
+            content: Text('Erreur lors de la suppression de l\'annonce: $e')),
       );
     }
   }
@@ -132,11 +134,11 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
               return _loading
                   ? const Center(child: CircularProgressIndicator())
                   : !_hasMore
-                  ? const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: Text('No more annonces')),
-              )
-                  : const SizedBox.shrink();
+                      ? const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(child: Text('No more annonces')),
+                        )
+                      : const SizedBox.shrink();
             }
             final annonce = userAnnoncesData[index];
             final cat = annonce.CatID != null ? catsData[annonce.CatID] : null;
@@ -146,11 +148,11 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
               child: ListTile(
                 leading: cat != null && cat.picturesUrl.isNotEmpty
                     ? Image.network(
-                  cat.picturesUrl.first,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                )
+                        cat.picturesUrl.first,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )
                     : const Icon(Icons.image, size: 50, color: Colors.orange),
                 title: Text(annonce.Title),
                 subtitle: Text(
@@ -164,7 +166,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditAnnoncePage(annonce: annonce),
+                            builder: (context) =>
+                                EditAnnoncePage(annonce: annonce),
                           ),
                         ).then((value) {
                           if (value == true) {
