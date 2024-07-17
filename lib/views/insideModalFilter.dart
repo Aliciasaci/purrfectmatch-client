@@ -49,7 +49,6 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
       for (var asso in newAsso) {
         assoList[asso.ID] = asso.Name;
       }
-      print(assoList);
       setState(() {
         assoList = assoList;
       });
