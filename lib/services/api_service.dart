@@ -1009,4 +1009,24 @@ class ApiService {
   String serveDefaultProfilePicture() {
     return '$baseUrl/assets/images/default_picture.png';
   }
+
+  Future<Race> fetchRace(int raceId) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/races/$raceId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+
+print(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> raceJson = jsonDecode(response.body);
+      return Race.fromJson(raceJson);
+    } else {
+      throw Exception('Failed to load race with ID: $raceId');
+    }
+  }
 }
+

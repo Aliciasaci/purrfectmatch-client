@@ -22,11 +22,13 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> with 
   User? currentUser;
   List<User> _validMembers = [];
   bool _isLoading = true;
+  late Association _association;
 
   @override
   void initState() {
     super.initState();
     _apiService = ApiService();
+    _association = widget.association;
     _loadCurrentUser().then((_) {
       _fetchDetails();
     });
@@ -69,9 +71,9 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> with 
       _isLoading = true;
     });
     try {
-      final owner = await _apiService.fetchUserByID(widget.association.OwnerID);
+      final owner = await _apiService.fetchUserByID(_association.OwnerID);
       List<User> validMembers = [];
-      for (String memberId in widget.association.Members ?? []) {
+      for (String memberId in _association.Members ?? []) {
         if (memberId.isNotEmpty) {
           User member = await _apiService.fetchUserByID(memberId);
           if (member.email.isNotEmpty) {
@@ -183,11 +185,11 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> with 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: widget.association.Verified == true ? Colors.green : Colors.red,
+        color: _association.Verified == true ? Colors.green : Colors.red,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        widget.association.Verified == true ? 'Vérifié' : 'Non Vérifié',
+        _association.Verified == true ? 'Vérifié' : 'Non Vérifié',
         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
     );
@@ -243,7 +245,7 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> with 
                               children: [
                                 Expanded(
                                   child: Text(
-                                    widget.association.Name,
+                                    _association.Name,
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
@@ -271,23 +273,27 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> with 
                             ),
                             const SizedBox(height: 10),
                             _buildMembersList(),
-                            if (currentUser?.id == widget.association.OwnerID)
+                            if (currentUser?.id == _association.OwnerID)
                               Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Center(
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
+                                    onPressed: () async {
+                                      final result = await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => EditAssociationScreen(
-                                              association: widget.association),
+                                              association: _association),
                                         ),
-                                      ).then((value) {
-                                        if (value == true) {
-                                          _fetchDetails();
-                                        }
-                                      });
+                                      );
+                                      if (result == true) {
+                                        // Fetch updated details
+                                        final updatedAssociation = await _apiService.fetchAssociationByID(_association.ID.toString());
+                                        setState(() {
+                                          _association = updatedAssociation;
+                                        });
+                                        _fetchDetails();
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange[100],

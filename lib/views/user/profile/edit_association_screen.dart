@@ -28,7 +28,7 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
   List<User> _validMembers = [];
   List<User> _allUsers = [];
   User? _owner;
-  bool _isLoading = false; // Variable to track loading state
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -121,9 +121,16 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
-      setState(() {
-        _selectedFile = result.files.first;
-      });
+      PlatformFile file = result.files.first;
+      if (file.extension == 'pdf') {
+        setState(() {
+          _selectedFile = file;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a PDF file')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No file selected')),
@@ -154,7 +161,7 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Association updated successfully')),
         );
-        // Do not redirect, just show success message
+        Navigator.pop(context, true); // Return to the previous screen and indicate success
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update association: $e')),
@@ -365,15 +372,6 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (_selectedFile != null)
-                                  Center(
-                                    child: Image.file(
-                                      File(_selectedFile!.path!),
-                                      height: 200,
-                                      width: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
                                 const SizedBox(height: 10),
                                 _buildTextFormField(_nameController, 'Nom'),
                                 const SizedBox(height: 10),

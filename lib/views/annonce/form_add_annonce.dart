@@ -38,7 +38,7 @@ class _AddAnnonceState extends State<AddAnnonce> {
           });
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur lors du chargement des chats: $e')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.dataSendError)),
           );
         }
       }
@@ -58,7 +58,7 @@ class _AddAnnonceState extends State<AddAnnonce> {
 
     if (title.isEmpty || description.isEmpty || _selectedCat == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir tous les champs')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseFillAllFields)),
       );
       return;
     }
@@ -70,14 +70,14 @@ class _AddAnnonceState extends State<AddAnnonce> {
     );
 
     try {
-      final createdAnnonce = await ApiService().createAnnonce(annonce);
+      await ApiService().createAnnonce(annonce);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Annonce créée avec succès')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.dataSentSuccessfully)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la création de l\'annonce: $e')),
+        SnackBar(content: Text('${AppLocalizations.of(context)!.dataSendError}: $e')),
       );
     }
   }
@@ -135,7 +135,7 @@ class _AddAnnonceState extends State<AddAnnonce> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ajouter une nouvelle annonce'),
+        title: Text(AppLocalizations.of(context)!.addAnnonceTitle),
         backgroundColor: Colors.orange[100],
       ),
       body: Stack(
@@ -175,13 +175,13 @@ class _AddAnnonceState extends State<AddAnnonce> {
                         children: [
                           buildTextFormField(
                             controller: _titleController,
-                            labelText: "Titre de l'annonce *",
+                            labelText: "${AppLocalizations.of(context)!.annonceTitle} *",
                             icon: Icons.title,
                           ),
                           const SizedBox(height: 15),
                           buildTextFormField(
                             controller: _descriptionController,
-                            labelText: "Description",
+                            labelText: AppLocalizations.of(context)!.description,
                             icon: Icons.description,
                           ),
                           const SizedBox(height: 15),
@@ -192,9 +192,8 @@ class _AddAnnonceState extends State<AddAnnonce> {
                                 child: Text(cat.name),
                               );
                             }).toList(),
-                            labelText: "Sélectionner un chat *",
+                            labelText: "${AppLocalizations.of(context)!.selectCat} *",
                             value: _selectedCat,
-
                           ),
                           const SizedBox(height: 15),
                           SizedBox(
