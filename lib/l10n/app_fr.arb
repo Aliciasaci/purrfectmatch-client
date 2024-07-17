@@ -40,6 +40,7 @@
   "catDetailsTitle": "Détails du chat",
   "birthDate": "Date de naissance",
   "age": "Âge",
+
   "lastVaccineDate": "Date du dernier vaccin",
   "lastVaccineName": "Nom du dernier vaccin",
   "color": "Couleur",
@@ -148,5 +149,7 @@
   "addToFavorites": "Ajouté aux favoris",
   "loadingAnnoncesError": "Échec du chargement des annonces",
   "race" : "Race",
-  "pleaseSelectPdf" : "Séléctionner un PDF"
+  "pleaseSelectPdf" : "Séléctionner un PDF",
+  "selectAssociation" : "Associations selectionnée"
+
 }

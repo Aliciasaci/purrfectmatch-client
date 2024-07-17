@@ -150,5 +150,6 @@
   "addToFavorites": "Added to favorites",
   "loadingAnnoncesError": "Failed to load annonces",
   "race" : "breed",
-  "pleaseSelectPdf" : "Select a PDF file"
+  "pleaseSelectPdf" : "Select a PDF file",
+  "selectAssociation" : "Selected Association"
 }
