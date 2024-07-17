@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
@@ -261,61 +262,86 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                   cat.name,
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 24,
+                                    fontSize: 26,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                const SizedBox(height: 5),
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Mise en ligne par ",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontStyle: FontStyle.italic,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: user.name,
+                                        style: const TextStyle(
+                                          decoration: TextDecoration.underline,
+                                          fontSize: 16,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UserPublicProfile(user: user),
+                                              ),
+                                            );
+                                          },
+                                      ),
+                                      if (cat.PublishedAs != null && cat.PublishedAs!.isNotEmpty) ...[
+                                        TextSpan(
+                                          text: " et proposé à l'adoption par l'association ",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontStyle: FontStyle.italic,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: cat.PublishedAs,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
                                 Text(
                                   "${calculateAge(cat.birthDate)} ans",
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 20,
+                                    fontSize: 18,
                                   ),
                                 ),
                                 Text(
                                   "Sexe: ${cat.sexe}",
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 20,
+                                    fontSize: 18,
                                   ),
                                 ),
                                 Text(
                                   "Race: ${cat.raceID}",
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                UserPublicProfile(user: user)),
-                                      );
-                                    },
-                                    child: Text(
-                                      "Mise en ligne par: ${user.name}",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        decoration: TextDecoration.underline,
-                                        decorationColor: Colors.white,
-                                        decorationThickness: 2,
-                                        height: 1.5, // Add space between text and underline
-                                      ),
-                                    ),
+                                    fontSize: 18,
                                   ),
                                 ),
                                 const Text(
                                   "Disponible",
                                   style: TextStyle(
                                     color: Colors.green,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
                                   ),
                                 ),
                               ],

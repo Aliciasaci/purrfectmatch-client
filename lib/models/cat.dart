@@ -13,6 +13,7 @@ class Cat {
   final bool reserved;
   final List<String> picturesUrl;
   final String? userId;
+  final String? PublishedAs;
 
   Cat({
     this.ID,
@@ -29,6 +30,7 @@ class Cat {
     required this.reserved,
     required this.picturesUrl,
     this.userId,
+    this.PublishedAs
   });
 
   factory Cat.fromJson(Map<String, dynamic> json) {
@@ -47,6 +49,7 @@ class Cat {
       reserved: json['Reserved'],
       picturesUrl: List<String>.from(json['PicturesURL'] ?? []),
       userId: json['UserID'] ?? '',
+        PublishedAs : json['PublishedAs']
     );
   }
 
@@ -65,6 +68,7 @@ class Cat {
       'Reserved': reserved,
       'PicturesURL': picturesUrl,
       'UserID': userId,
+      'PublishedAs' : PublishedAs,
     };
   }
 }

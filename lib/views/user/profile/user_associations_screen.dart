@@ -6,6 +6,7 @@ import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'edit_association_screen.dart';
+import 'association_detail_screen.dart';
 
 class UserAssociationsScreen extends StatefulWidget {
   const UserAssociationsScreen({super.key});
@@ -21,11 +22,18 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
   bool _loading = false;
   bool _hasMore = true;
   int _page = 1;
+  User? currentUser;
 
   @override
   void initState() {
+    print("ici");
     super.initState();
-    _fetchUserAssociations();
+    _loadCurrentUser().then((_) {
+      print(currentUser);
+      if (currentUser != null) {
+        _fetchUserAssociations();
+      }
+    });
     _scrollController.addListener(() {
       if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent &&
           !_loading &&
@@ -35,29 +43,38 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
     });
   }
 
+  Future<void> _loadCurrentUser() async {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    if (authState is AuthAuthenticated) {
+      setState(() {
+        currentUser = authState.user;
+      });
+      print("Utilisateur actuel chargé : ${currentUser?.toJson()}");
+    } else {
+      print("Utilisateur non authentifié");
+    }
+  }
+
   Future<void> _fetchUserAssociations() async {
+    if (currentUser == null) {
+      print("Utilisateur non chargé, annulation de la récupération des associations");
+      return;
+    }
+
     setState(() {
       _loading = true;
     });
 
     try {
-      final authState = BlocProvider.of<AuthBloc>(context).state;
-      if (authState is AuthAuthenticated) {
-        final userId = authState.user.id;
-        if (userId != null) {
-          final newAssociations = await _apiService.fetchUserAssociations(userId);
-          setState(() {
-            _associations.addAll(newAssociations);
-            _loading = false;
-            _hasMore = newAssociations.isNotEmpty;
-            _page++;
-          });
-        } else {
-          setState(() {
-            _loading = false;
-          });
-        }
-      }
+      print("Récupération des associations pour l'utilisateur : ${currentUser!.id}");
+      final newAssociations = await _apiService.fetchUserAssociations(currentUser!.id!);
+
+      setState(() {
+        _associations.addAll(newAssociations);
+        _loading = false;
+        _hasMore = newAssociations.isNotEmpty;
+        _page++;
+      });
     } catch (e) {
       setState(() {
         _loading = false;
@@ -70,7 +87,7 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
     try {
       await _apiService.deleteAssociation(associationId);
       setState(() {
-        _associations.removeWhere((association) => association.id.toString() == associationId);
+        _associations.removeWhere((association) => association.ID.toString() == associationId);
         _reloadUserAssociations();
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,37 +115,59 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
     super.dispose();
   }
 
-  Future<Widget> _buildMemberList(Association association) async {
-    List<Widget> memberWidgets = [];
-    List<String> memberIds = association.members;
-
-    for (String memberId in memberIds) {
-      memberId = memberId.replaceAll(RegExp(r'[\[\]"]'), ''); // Clean up the ID
-      bool isOwner = memberId == association.ownerId;
-      try {
-        User user = await _apiService.fetchUserByID(memberId);
-        memberWidgets.add(
-          ListTile(
-            leading: isOwner
-                ? const Icon(Icons.verified_user, color: Colors.orange)
-                : null,
-            title: Text('${user.name}${isOwner ? ' (Owner)' : ''}'),
-            subtitle: Text(user.email),
-          ),
-        );
-      } catch (e) {
-        memberWidgets.add(
-          ListTile(
-            leading: isOwner
-                ? const Icon(Icons.verified_user, color: Colors.orange)
-                : null,
-            title: Text('ID: $memberId'),
-            subtitle: const Text('Failed to load user details'),
-          ),
-        );
-      }
+  Future<Widget> _buildOwnerInfo(Association association) async {
+    try {
+      User owner = await _apiService.fetchUserByID(association.OwnerID);
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 5,
+              spreadRadius: 1,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.verified_user, color: Colors.orange),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${owner.name} (Propriétaire)'),
+                Text(owner.email),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.orange[100],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.verified_user, color: Colors.orange),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('ID: ${association.OwnerID}'),
+                const Text('Failed to load owner details'),
+              ],
+            ),
+          ],
+        ),
+      );
     }
-    return Column(children: memberWidgets);
   }
 
   @override
@@ -163,90 +202,110 @@ class _UserAssociationsScreenState extends State<UserAssociationsScreen> {
                   : const SizedBox.shrink();
             }
             final association = _associations[index];
-            return Card(
-              margin: const EdgeInsets.all(10),
-              color: Colors.white,
-              child: ListTile(
-                title: Text(
-                  association.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AssociationDetailScreen(association: association),
                   ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Email: ${association.email}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    Text(
-                      'Address: ${association.addressRue}, ${association.cp} ${association.ville}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Membres',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    FutureBuilder<Widget>(
-                      future: _buildMemberList(association),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return ListTile(
-                            title: Text('Error: ${snapshot.error}'),
-                          );
-                        } else {
-                          return snapshot.data ?? Container();
-                        }
-                      },
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                      offset: Offset(0, 3),
                     ),
                   ],
                 ),
-                trailing: Wrap(
-                  spacing: 12, // space between two icons
-                  children: <Widget>[
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.orange),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditAssociationScreen(association: association),
-                          ),
-                        ).then((value) {
-                          if (value == true) {
-                            _reloadUserAssociations();
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        association.Name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Email de contact: ${association.Email}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Adresse de l\'association: ${association.AddressRue}, ${association.Cp} ${association.Ville}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      FutureBuilder<Widget>(
+                        future: _buildOwnerInfo(association),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return ListTile(
+                              title: Text('Error: ${snapshot.error}'),
+                            );
+                          } else {
+                            return snapshot.data ?? Container();
                           }
-                        });
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.orange),
-                      onPressed: () {
-                        if (association.id != null) {
-                          _deleteAssociation(association.id.toString());
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('ID de l\'association invalide'),
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      if (currentUser?.id == association.OwnerID)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.orange),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditAssociationScreen(association: association),
+                                  ),
+                                ).then((value) {
+                                  if (value == true) {
+                                    _reloadUserAssociations();
+                                  }
+                                });
+                              },
                             ),
-                          );
-                        }
-                      },
-                    ),
-                  ],
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.orange),
+                              onPressed: () {
+                                if (association.ID != null) {
+                                  _deleteAssociation(association.ID.toString());
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('ID de l\'association invalide'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               ),
             );

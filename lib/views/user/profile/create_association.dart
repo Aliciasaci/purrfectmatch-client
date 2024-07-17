@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/models/association.dart';
-import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/services/api_service.dart';
-import '../../../blocs/auth/auth_bloc.dart';
+import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 
 class CreateAssociation extends StatefulWidget {
   const CreateAssociation({super.key});
@@ -24,27 +23,6 @@ class _CreateAssociationState extends State<CreateAssociation> {
   final TextEditingController _emailController = TextEditingController();
   String? _kbisFileName;
   String? _kbisFilePath;
-  List<User> _allUsers = [];
-  List<User> _selectedMembers = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchAllUsers();
-  }
-
-  Future<void> _fetchAllUsers() async {
-    try {
-      final users = await ApiService().fetchAllUsers();
-      setState(() {
-        _allUsers = users;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors du chargement des utilisateurs: $e')),
-      );
-    }
-  }
 
   Future<void> _pickKbisFile() async {
     final result = await FilePicker.platform.pickFiles();
@@ -58,22 +36,25 @@ class _CreateAssociationState extends State<CreateAssociation> {
 
   Future<void> _createAssociation() async {
     if (_formKey.currentState!.validate() && _kbisFilePath != null) {
-      String ownerId = '';
+      String OwnerID = '';
       final authState = BlocProvider.of<AuthBloc>(context).state;
       if (authState is AuthAuthenticated) {
-        ownerId = authState.user.id!;
+        OwnerID = authState.user.id!;
         Association association = Association(
-          name: _nameController.text,
-          addressRue: _addressRueController.text,
-          cp: _cpController.text,
-          ville: _villeController.text,
-          phone: _phoneController.text,
-          email: _emailController.text,
+          Name: _nameController.text,
+          AddressRue: _addressRueController.text,
+          Cp: _cpController.text,
+          Ville: _villeController.text,
+          Phone: _phoneController.text,
+          Email: _emailController.text,
           kbisFile: _kbisFilePath!,
-          ownerId: ownerId,
-          members: _selectedMembers.map((user) => user.id!).toList(),
+          OwnerID: OwnerID,
         );
         ApiService apiService = ApiService();
+
+        // Afficher l'objet association dans la console
+        print('Association created: ${association.toJson()}');
+
         try {
           await apiService.createAssociation(association, _kbisFilePath!, _kbisFileName!);
           if (!mounted) return;
@@ -118,54 +99,6 @@ class _CreateAssociationState extends State<CreateAssociation> {
           return null;
         },
       ),
-    );
-  }
-
-  Widget _buildUserSelection() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.orange[100]!,
-        ),
-        borderRadius: BorderRadius.circular(40),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: DropdownButtonFormField<User>(
-        isExpanded: true,
-        decoration: const InputDecoration(
-          labelText: 'Ajouter des membres',
-          border: InputBorder.none,
-        ),
-        items: _allUsers.map((User user) {
-          return DropdownMenuItem<User>(
-            value: user,
-            child: Text(user.name),
-          );
-        }).toList(),
-        onChanged: (User? newUser) {
-          if (newUser != null && !_selectedMembers.contains(newUser)) {
-            setState(() {
-              _selectedMembers.add(newUser);
-            });
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildSelectedMembers() {
-    return Wrap(
-      spacing: 10,
-      children: _selectedMembers.map((User member) {
-        return Chip(
-          label: Text(member.name),
-          onDeleted: () {
-            setState(() {
-              _selectedMembers.remove(member);
-            });
-          },
-        );
-      }).toList(),
     );
   }
 
@@ -233,10 +166,6 @@ class _CreateAssociationState extends State<CreateAssociation> {
                         ),
                         child: const Text('Choisir le fichier KBIS'),
                       ),
-                      const SizedBox(height: 10),
-                      _buildUserSelection(),
-                      const SizedBox(height: 15),
-                      _buildSelectedMembers(),
                       const SizedBox(height: 10),
                       SizedBox(
                         width: double.infinity,
