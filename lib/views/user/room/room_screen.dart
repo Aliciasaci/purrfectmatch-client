@@ -12,6 +12,7 @@ import 'package:purrfectmatch/models/room.dart';
 import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/annonce/annonce_detail_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RoomScreen extends StatefulWidget {
   final Room room;
@@ -54,6 +55,19 @@ class _RoomScreenState extends State<RoomScreen> {
     }
   }
 
+  String getLocalizedReason(BuildContext context, String reasonKey) {
+    switch (reasonKey) {
+      case "inappropriateContent":
+        return AppLocalizations.of(context)!.inappropriateContent;
+      case "spam":
+        return AppLocalizations.of(context)!.spam;
+      case "other":
+        return AppLocalizations.of(context)!.other;
+      default:
+        return "";
+    }
+  }
+
   Future<void> handleReportMessage(
       Message message, String currentUserID) async {
     reasons = await _apiService.getReportReasons();
@@ -64,12 +78,14 @@ class _RoomScreenState extends State<RoomScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('Signaler un message'),
+          title: Text(AppLocalizations.of(context)!.reportMessage),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: reasons!.map((reason) {
+              final translatedReason =
+                  getLocalizedReason(context, reason.reason);
               return ListTile(
-                title: Text(reason.reason),
+                title: Text(translatedReason),
                 onTap: () {
                   final report = Report(
                     messageID: message.id!,
