@@ -52,11 +52,15 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     if (currentUser != null && currentUser!.id != null) {
       try {
         final annonces = await apiService.fetchAllAnnonces();
-        final userFavorites = await apiService.fetchUserFavorites(currentUser!.id!);
-        final favoriteAnnonceIds = userFavorites.map((favoris) => favoris.AnnonceID).toSet();
+        final userFavorites =
+        await apiService.fetchUserFavorites(currentUser!.id!);
+        final favoriteAnnonceIds =
+        userFavorites.map((favoris) => favoris.AnnonceID).toSet();
 
         final filteredAnnonces = annonces
-            .where((annonce) => annonce.UserID != currentUser!.id && !favoriteAnnonceIds.contains(annonce.ID.toString()))
+            .where((annonce) =>
+        annonce.UserID != currentUser!.id &&
+            !favoriteAnnonceIds.contains(annonce.ID.toString()))
             .toList();
 
         for (var annonce in filteredAnnonces) {
@@ -78,13 +82,16 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 superlikeAction: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            AnnonceDetailPage(annonce: annonce)),
                   );
                 },
               ));
             }
           } catch (error) {
-            print("Échec du chargement des données pour l'annonce ${annonce.ID}: $error");
+            print(
+                "Échec du chargement des données pour l'annonce ${annonce.ID}: $error");
           }
         }
 
@@ -100,11 +107,13 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     }
   }
 
-  Future<void> fetchCatsByFilters(String? age, String? catSex, int? race) async {
+  Future<void> fetchCatsByFilters(
+      String? age, String? catSex, int? race) async {
     try {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
-      final filteredAnnonce = await apiService.fetchCatsByFilters(age, catSex, race);
+      final filteredAnnonce =
+      await apiService.fetchCatsByFilters(age, catSex, race);
       for (var annonce in filteredAnnonce) {
         annoncesList.add(annonce);
       }
@@ -138,7 +147,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           superlikeAction: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
+              MaterialPageRoute(
+                  builder: (context) => AnnonceDetailPage(annonce: annonce)),
             );
           },
         ));
@@ -209,165 +219,177 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
               child: _matchEngine == null
                   ? const Center(child: CircularProgressIndicator())
                   : SwipeCards(
-                      matchEngine: _matchEngine!,
-                      itemBuilder: (BuildContext context, int index) {
-                        var item = _swipeItems[index].content as Map;
-                        Annonce annonce = item['annonce'] as Annonce;
-                        Cat cat = item['cat'] as Cat;
-                        User user = item['user'] as User;
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                spreadRadius: 2,
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                matchEngine: _matchEngine!,
+                itemBuilder: (BuildContext context, int index) {
+                  var item = _swipeItems[index].content as Map;
+                  Annonce annonce = item['annonce'] as Annonce;
+                  Cat cat = item['cat'] as Cat;
+                  User user = item['user'] as User;
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: [
+                          Image.network(
+                            cat.picturesUrl.first,
+                            fit: BoxFit.cover,
+                            height: double.infinity,
+                            width: double.infinity,
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Stack(
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.black.withOpacity(0.5),
+                                  Colors.transparent
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
                               children: [
-                                Image.network(
-                                  cat.picturesUrl.first,
-                                  fit: BoxFit.cover,
-                                  height: double.infinity,
-                                  width: double.infinity,
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter,
-                                      colors: [
-                                        Colors.black.withOpacity(0.5),
-                                        Colors.transparent
-                                      ],
-                                    ),
+                                Text(
+                                  cat.name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                const SizedBox(height: 5),
+                                RichText(
+                                  text: TextSpan(
                                     children: [
-                                      Text(
-                                        cat.name,
+                                      TextSpan(
+                                        text: "Mise en ligne par ",
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.italic,
+                                          fontSize: 16,
                                         ),
                                       ),
-                                      const SizedBox(height: 5),
-                                      RichText(
-                                        text: TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: "Mise en ligne par ",
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontStyle: FontStyle.italic,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: user.name,
-                                              style: const TextStyle(
-                                                decoration: TextDecoration.underline,
-                                                fontSize: 16,
-                                              ),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          UserPublicProfile(user: user),
-                                                    ),
-                                                  );
-                                                },
-                                            ),
-                                            if (cat.PublishedAs != null &&
-                                                cat.PublishedAs!.isNotEmpty) ...[
-                                              TextSpan(
-                                                text: " et proposé à l'adoption par l'association ",
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontStyle: FontStyle.italic,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: cat.PublishedAs,
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                              ),
-                                            ],
-                                          ],
+                                      WidgetSpan(
+                                        child: Icon(
+                                          Icons.verified,
+                                          color: Colors.blue,
+                                          size: 16,
                                         ),
                                       ),
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        "${calculateAge(cat.birthDate)} ans",
+                                      TextSpan(
+                                        text: user.name,
                                         style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
+                                          decoration:
+                                          TextDecoration.underline,
+                                          fontSize: 16,
                                         ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UserPublicProfile(
+                                                        user: user),
+                                              ),
+                                            );
+                                          },
                                       ),
-                                      Text(
-                                        "Sexe: ${cat.sexe}",
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
+                                      if (cat.PublishedAs != null &&
+                                          cat.PublishedAs!
+                                              .isNotEmpty) ...[
+                                        TextSpan(
+                                          text:
+                                          " et proposé à l'adoption par l'association ",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontStyle: FontStyle.italic,
+                                            fontSize: 16,
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        "Race: ${cat.raceID}",
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
+                                        TextSpan(
+                                          text: cat.PublishedAs,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontStyle: FontStyle.italic,
+                                          ),
                                         ),
-                                      ),
-                                      const Text(
-                                        "Disponible",
-                                        style: TextStyle(
-                                          color: Colors.green,
-                                          fontSize: 18,
-                                        ),
-                                      ),
+                                      ],
                                     ],
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  "${calculateAge(cat.birthDate)} ans",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                Text(
+                                  "Sexe: ${cat.sexe}",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                Text(
+                                  "Race: ${cat.raceID}",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                const Text(
+                                  "Disponible",
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 18,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        );
-                      },
-                      onStackFinished: () {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text("Pile terminée"),
-                          duration: Duration(milliseconds: 500),
-                        ));
-                      },
-                      itemChanged: (SwipeItem item, int index) {
-                        var itemContent = item.content as Map;
-                        Annonce annonce = itemContent['annonce'] as Annonce;
-                        Cat cat = itemContent['cat'] as Cat;
-                      },
-                      leftSwipeAllowed: true,
-                      rightSwipeAllowed: true,
-                      upSwipeAllowed: true,
-                      fillSpace: true,
+                        ],
+                      ),
                     ),
+                  );
+                },
+                onStackFinished: () {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(const SnackBar(
+                    content: Text("Pile terminée"),
+                    duration: Duration(milliseconds: 500),
+                  ));
+                },
+                itemChanged: (SwipeItem item, int index) {
+                  var itemContent = item.content as Map;
+                  Annonce annonce = itemContent['annonce'] as Annonce;
+                  Cat cat = itemContent['cat'] as Cat;
+                },
+                leftSwipeAllowed: true,
+                rightSwipeAllowed: true,
+                upSwipeAllowed: true,
+                fillSpace: true,
+              ),
             ),
           ),
           SizedBox(
