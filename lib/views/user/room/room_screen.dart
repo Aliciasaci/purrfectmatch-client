@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:purrfectmatch/blocs/auth/auth_bloc.dart';
 import 'package:purrfectmatch/blocs/room/room_bloc.dart';
+import 'package:purrfectmatch/notificationManager.dart';
 import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/room.dart';
 import 'package:purrfectmatch/models/user.dart';
@@ -11,8 +12,9 @@ import 'package:purrfectmatch/views/annonce/annonce_detail_page.dart';
 
 class RoomScreen extends StatefulWidget {
   final Room room;
+  final int roomID;
 
-  const RoomScreen({super.key, required this.room});
+  const RoomScreen({super.key, required this.roomID, required this.room});
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -28,7 +30,8 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.room.id!));
+    NotificationManager.instance.setRoomID(widget.roomID);
+    BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.roomID));
     final authState = BlocProvider.of<AuthBloc>(context).state;
     if (authState is AuthAuthenticated) {
       _currentUser = authState.user;
@@ -50,6 +53,7 @@ class _RoomScreenState extends State<RoomScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
+              NotificationManager.instance.setRoomID(-1);
               Navigator.of(context).pop();
               BlocProvider.of<RoomBloc>(context).add(LoadRooms());
             },
@@ -106,6 +110,18 @@ class _RoomScreenState extends State<RoomScreen> {
                                 children: state.messages.map((message) {
                                   final isCurrentUser =
                                       message.senderId == _currentUser!.id!;
+                                  final isToday =
+                                      message.timestamp!.toLocal().day ==
+                                              DateTime.now().day &&
+                                          message.timestamp!.toLocal().month ==
+                                              DateTime.now().month &&
+                                          message.timestamp!.toLocal().year ==
+                                              DateTime.now().year;
+                                  final formattedTimestamp = isToday
+                                      ? DateFormat("HH:mm")
+                                          .format(message.timestamp!.toLocal())
+                                      : DateFormat("d/MM")
+                                          .format(message.timestamp!.toLocal());
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: Row(
@@ -155,9 +171,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                                   ),
                                                 const SizedBox(width: 5),
                                                 Text(
-                                                  DateFormat("HH:mm").format(
-                                                      message.timestamp!
-                                                          .toLocal()),
+                                                  formattedTimestamp,
                                                   style: const TextStyle(
                                                       fontSize: 8),
                                                 ),
@@ -171,10 +185,15 @@ class _RoomScreenState extends State<RoomScreen> {
                                                   ),
                                                 if (isCurrentUser &&
                                                     message.isRead!)
-                                                  const Icon(
-                                                    Icons.check,
-                                                    size: 15,
-                                                    color: Colors.blue,
+                                                  const Row(
+                                                    children: [
+                                                      SizedBox(width: 5),
+                                                      Icon(
+                                                        Icons.check,
+                                                        size: 15,
+                                                        color: Colors.blue,
+                                                      ),
+                                                    ],
                                                   ),
                                               ],
                                             ),

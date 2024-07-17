@@ -94,7 +94,7 @@ class _AddCatState extends State<AddCat> {
   }
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['png', 'jpeg', 'jpg']);
 
     if (result != null) {
       setState(() {
@@ -133,7 +133,7 @@ class _AddCatState extends State<AddCat> {
       return;
     }
 
-    if (_nameController.text.isEmpty || _birthDateController.text.isEmpty || _colorController.text.isEmpty || _behaviorController.text.isEmpty || _dropdownValue == null || _selectedValue == null) {
+    if (_nameController.text.isEmpty || _birthDateController.text.isEmpty || _colorController.text.isEmpty || _behaviorController.text.isEmpty || _dropdownValue == null || _selectedValue == null || _selectedFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all required fields')),
       );
@@ -177,7 +177,7 @@ class _AddCatState extends State<AddCat> {
     }
   }
 
-  Widget _buildTextFormField(TextEditingController controller, String label, {bool readOnly = false, void Function()? onTap, Icon? suffixIcon}) {
+  Widget _buildTextFormField(TextEditingController controller, String label, {bool readOnly = false, void Function()? onTap, Icon? suffixIcon, bool isRequired = false}) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -191,7 +191,7 @@ class _AddCatState extends State<AddCat> {
         readOnly: readOnly,
         onTap: onTap,
         decoration: InputDecoration(
-          labelText: label,
+          labelText: isRequired ? '$label*' : label,
           border: InputBorder.none,
           suffixIcon: suffixIcon,
         ),
@@ -267,7 +267,7 @@ class _AddCatState extends State<AddCat> {
                           ),
                         ),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_nameController, 'Name'),
+                      _buildTextFormField(_nameController, 'Name', isRequired: true),
                       const SizedBox(height: 10),
                       _buildTextFormField(
                         _birthDateController,
@@ -275,6 +275,7 @@ class _AddCatState extends State<AddCat> {
                         readOnly: true,
                         onTap: () => _selectDate(context, _birthDateController),
                         suffixIcon: const Icon(Icons.calendar_today),
+                        isRequired: true,
                       ),
                       const SizedBox(height: 10),
                       _buildTextFormField(
@@ -287,9 +288,9 @@ class _AddCatState extends State<AddCat> {
                       const SizedBox(height: 10),
                       _buildTextFormField(_lastVaccineNameController, 'Last Vaccine Name'),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_colorController, 'Color'),
+                      _buildTextFormField(_colorController, 'Color', isRequired: true),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_behaviorController, 'Behavior'),
+                      _buildTextFormField(_behaviorController, 'Behavior', isRequired: true),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
@@ -301,7 +302,7 @@ class _AddCatState extends State<AddCat> {
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButtonFormField<int>(
                           decoration: const InputDecoration(
-                            labelText: 'Race',
+                            labelText: 'Race*',
                             border: InputBorder.none,
                           ),
                           items: raceList.entries.map((entry) {
@@ -334,7 +335,7 @@ class _AddCatState extends State<AddCat> {
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButtonFormField<String>(
                           decoration: const InputDecoration(
-                            labelText: 'Select Gender',
+                            labelText: 'Select Gender*',
                             border: InputBorder.none,
                           ),
                           value: _selectedValue,
@@ -356,7 +357,7 @@ class _AddCatState extends State<AddCat> {
                       _buildAssociationDropdown(),
                       const SizedBox(height: 10),
                       SwitchListTile(
-                        title: const Text('Sterilized'),
+                        title: const Text('Sterilized*'),
                         value: _sterilized,
                         onChanged: (bool value) {
                           setState(() {
@@ -365,7 +366,7 @@ class _AddCatState extends State<AddCat> {
                         },
                       ),
                       SwitchListTile(
-                        title: const Text('Reserved'),
+                        title: const Text('Reserved*'),
                         value: _reserved,
                         onChanged: (bool value) {
                           setState(() {
@@ -377,7 +378,7 @@ class _AddCatState extends State<AddCat> {
                       ElevatedButton(
                         onPressed: _pickFile,
                         child: Text(
-                          _selectedFile == null ? 'Select Photo' : 'Photo Selected: ${_selectedFile!.name}',
+                          _selectedFile == null ? 'Select Photo*' : 'Photo Selected*: ${_selectedFile!.name}',
                         ),
                       ),
                       const SizedBox(height: 15),

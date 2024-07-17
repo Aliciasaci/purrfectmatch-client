@@ -25,7 +25,6 @@ class Message {
 
   factory Message.fromJsonLastest(Map<String, dynamic> json) {
     var parsedJson = json['message'];
-    print(parsedJson);
     if (parsedJson == null) {
       return Message(
         id: null,

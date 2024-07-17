@@ -24,11 +24,11 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
   final TextEditingController _emailController = TextEditingController();
   PlatformFile? _selectedFile;
   late ApiService _apiService;
-  List<String> _members = []; // List of member IDs
+  List<String> _members = [];
   List<User> _validMembers = [];
   List<User> _allUsers = [];
   User? _owner;
-  bool _isLoading = false; // Variable to track loading state
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -121,9 +121,16 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
-      setState(() {
-        _selectedFile = result.files.first;
-      });
+      PlatformFile file = result.files.first;
+      if (file.extension == 'pdf') {
+        setState(() {
+          _selectedFile = file;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a PDF file')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No file selected')),
@@ -138,7 +145,6 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
       });
       List<String> validMembers = _members.where((memberId) => memberId.isNotEmpty).toList();
 
-      print(validMembers);
       Association updatedAssociation = widget.association.copyWith(
         name: _nameController.text,
         addressRue: _addressRueController.text,
@@ -146,19 +152,16 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
         ville: _villeController.text,
         phone: _phoneController.text,
         Email: _emailController.text,
-        members: validMembers.isNotEmpty ? validMembers : null, // Using valid IDs if not empty
+        members: validMembers.isNotEmpty ? validMembers : null,
         kbisFile: _selectedFile?.path,
       );
-
-      // Afficher l'objet association avant de l'envoyer
-      print('Updated association: ${updatedAssociation.toJson()}');
 
       try {
         await _apiService.updateAssociation(updatedAssociation, _selectedFile);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Association updated successfully')),
         );
-        Navigator.pop(context, true);
+        Navigator.pop(context, true); // Return to the previous screen and indicate success
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update association: $e')),
@@ -224,7 +227,8 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
   }
 
   Widget _buildMembersList() {
-    return Column(
+    return (widget.association.Verified ?? false)
+        ? Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Membres', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -257,6 +261,18 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
           ),
         ),
       ],
+    )
+        : Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.orange[100]!),
+        borderRadius: BorderRadius.circular(40),
+        color: Colors.orange[50],
+      ),
+      child: const Text(
+        'Les membres peuvent être ajoutés uniquement si l\'association est vérifiée.',
+        style: TextStyle(fontSize: 16, color: Colors.red),
+      ),
     );
   }
 
@@ -356,15 +372,6 @@ class _EditAssociationScreenState extends State<EditAssociationScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (_selectedFile != null)
-                                  Center(
-                                    child: Image.file(
-                                      File(_selectedFile!.path!),
-                                      height: 200,
-                                      width: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
                                 const SizedBox(height: 10),
                                 _buildTextFormField(_nameController, 'Nom'),
                                 const SizedBox(height: 10),

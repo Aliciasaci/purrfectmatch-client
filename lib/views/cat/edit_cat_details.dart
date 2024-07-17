@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
+import '../../models/user.dart';
+import '../../models/association.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditCatDetails extends StatefulWidget {
@@ -32,12 +34,16 @@ class _EditCatDetailsState extends State<EditCatDetails> {
   PlatformFile? _selectedFile;
   Map<int?, String> raceList = {};
   final List<String> _options = ['male', 'female'];
+  int? _selectedAssociation;
+  User? currentUser;
+  Map<int, String> _userAssociations = {};
 
   @override
   void initState() {
     super.initState();
     _populateFields();
     _fetchCatRaces();
+    _loadCurrentUser();
   }
 
   void _populateFields() {
@@ -130,6 +136,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       reserved: _reserved,
       picturesUrl: widget.cat.picturesUrl,
       userId: widget.cat.userId,
+      PublishedAs: _selectedAssociation != null ? _userAssociations[_selectedAssociation] : '', // New field for association
     );
 
     try {
@@ -142,6 +149,31 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.registrationFailed)),
       );
+    }
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    if (authState is AuthAuthenticated) {
+      setState(() {
+        currentUser = authState.user;
+      });
+      await _fetchUserAssociations();
+    }
+  }
+
+  Future<void> _fetchUserAssociations() async {
+    if (currentUser != null) {
+      try {
+        final apiService = ApiService();
+        final associations = await apiService.fetchUserAssociations(currentUser!.id!);
+        setState(() {
+          _userAssociations = {for (var assoc in associations) assoc.ID!: assoc.Name};
+          _selectedAssociation = null; // Ensure default value is null
+        });
+      } catch (e) {
+        print('Failed to load associations: $e');
+      }
     }
   }
 
@@ -163,6 +195,37 @@ class _EditCatDetailsState extends State<EditCatDetails> {
           border: InputBorder.none,
           suffixIcon: suffixIcon,
         ),
+      ),
+    );
+  }
+
+  Widget _buildAssociationDropdown() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.orange[100]!,
+        ),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: DropdownButtonFormField<int>(
+        decoration: const InputDecoration(
+          labelText: 'Select Association (optional)',
+          border: InputBorder.none,
+        ),
+        items: _userAssociations.entries.map((entry) {
+          return DropdownMenuItem<int>(
+            value: entry.key,
+            child: Text(entry.value),
+          );
+        }).toList(),
+        value: _selectedAssociation,
+        onChanged: (int? newValue) {
+          setState(() {
+            _selectedAssociation = newValue;
+          });
+        },
+        isExpanded: true,
       ),
     );
   }
@@ -299,6 +362,8 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                           isExpanded: true,
                         ),
                       ),
+                      const SizedBox(height: 10),
+                      _buildAssociationDropdown(),
                       const SizedBox(height: 10),
                       SwitchListTile(
                         title: const Text('Sterilized'),
