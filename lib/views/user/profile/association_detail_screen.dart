@@ -16,20 +16,45 @@ class AssociationDetailScreen extends StatefulWidget {
   State<AssociationDetailScreen> createState() => _AssociationDetailScreenState();
 }
 
-class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
+class _AssociationDetailScreenState extends State<AssociationDetailScreen> with RouteAware {
   late ApiService _apiService;
   User? _owner;
   User? currentUser;
   List<User> _validMembers = [];
   bool _isLoading = true;
+  late Association _association;
 
   @override
   void initState() {
     super.initState();
     _apiService = ApiService();
+    _association = widget.association;
     _loadCurrentUser().then((_) {
       _fetchDetails();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Subscribe to RouteObserver
+    final modalRoute = ModalRoute.of(context);
+    if (modalRoute is PageRoute) {
+      RouteObserver<PageRoute>().subscribe(this, modalRoute);
+    }
+  }
+
+  @override
+  void dispose() {
+    // Unsubscribe from RouteObserver
+    RouteObserver<PageRoute>().unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when this route is popped back to
+    _fetchDetails();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -42,10 +67,13 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
   }
 
   Future<void> _fetchDetails() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
-      final owner = await _apiService.fetchUserByID(widget.association.OwnerID);
+      final owner = await _apiService.fetchUserByID(_association.OwnerID);
       List<User> validMembers = [];
-      for (String memberId in widget.association.Members ?? []) {
+      for (String memberId in _association.Members ?? []) {
         if (memberId.isNotEmpty) {
           User member = await _apiService.fetchUserByID(memberId);
           if (member.email.isNotEmpty) {
@@ -153,6 +181,20 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
     );
   }
 
+  Widget _buildVerificationBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: _association.Verified == true ? Colors.green : Colors.red,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        _association.Verified == true ? 'Vérifié' : 'Non Vérifié',
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,7 +211,7 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
             height: MediaQuery.of(context).size.height,
           ),
           Positioned(
-            top: MediaQuery.of(context).padding.top,
+            top: MediaQuery.of(context).padding.top - kToolbarHeight / 2,
             left: 0,
             right: 0,
             child: AppBar(
@@ -180,24 +222,40 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
             ),
           ),
           Positioned.fill(
-            top: MediaQuery.of(context).padding.top + kToolbarHeight + 20,
+            top: MediaQuery.of(context).padding.top + kToolbarHeight,
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Card(
                       color: Colors.white,
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    _association.Name,
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                _buildVerificationBadge(),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
                             Text(
                               AppLocalizations.of(context)!.owner,
                               style: const TextStyle(
@@ -215,19 +273,27 @@ class _AssociationDetailScreenState extends State<AssociationDetailScreen> {
                             ),
                             const SizedBox(height: 10),
                             _buildMembersList(),
-                            if (currentUser?.id == widget.association.OwnerID)
+                            if (currentUser?.id == _association.OwnerID)
                               Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Center(
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
+                                    onPressed: () async {
+                                      final result = await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => EditAssociationScreen(
-                                              association: widget.association),
+                                              association: _association),
                                         ),
                                       );
+                                      if (result == true) {
+                                        // Fetch updated details
+                                        final updatedAssociation = await _apiService.fetchAssociationByID(_association.ID.toString());
+                                        setState(() {
+                                          _association = updatedAssociation;
+                                        });
+                                        _fetchDetails();
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange[100],

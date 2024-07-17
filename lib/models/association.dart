@@ -78,7 +78,7 @@ class Association {
     String? kbisFile,
     String? OwnerID,
     List<String>? members,
-    bool? verified,
+    bool? Verified,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -93,7 +93,7 @@ class Association {
       kbisFile: kbisFile ?? this.kbisFile,
       OwnerID: OwnerID ?? this.OwnerID,
       Members: members ?? this.Members,
-      Verified: verified ?? this.Verified,
+      Verified: Verified ?? this.Verified,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

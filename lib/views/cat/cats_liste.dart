@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/cat.dart';
 import '../../models/user.dart';
+import '../../models/race.dart';
 import '../../services/api_service.dart';
 import 'cat_details.dart';
 import 'edit_cat_details.dart';
@@ -19,6 +20,7 @@ class CatsListPage extends StatefulWidget {
 
 class _CatsListPageState extends State<CatsListPage> {
   List<Cat> catsData = [];
+  Map<int?, String> raceNames = {};
   final ScrollController _scrollController = ScrollController();
   bool _loading = false;
   int _page = 1;
@@ -28,6 +30,7 @@ class _CatsListPageState extends State<CatsListPage> {
   void initState() {
     super.initState();
     _loadCurrentUser();
+    _fetchRaces();
     _fetchCats();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -47,6 +50,18 @@ class _CatsListPageState extends State<CatsListPage> {
     }
   }
 
+  Future<void> _fetchRaces() async {
+    try {
+      final apiService = ApiService();
+      final races = await apiService.fetchAllRaces();
+      setState(() {
+        raceNames = {for (var race in races) race.id: race.raceName};
+      });
+    } catch (e) {
+      print('Failed to load races: $e');
+    }
+  }
+
   Future<void> _fetchCats() async {
     setState(() {
       _loading = true;
@@ -60,6 +75,19 @@ class _CatsListPageState extends State<CatsListPage> {
       } else {
         newCats = await apiService.fetchAllCats();
       }
+
+      for (var cat in newCats) {
+        if (cat.raceID != null) {
+          int? raceId = int.tryParse(cat.raceID);
+          if (raceId != null && !raceNames.containsKey(raceId)) {
+            final race = await apiService.fetchRace(raceId);
+            setState(() {
+              raceNames[raceId] = race.raceName;
+            });
+          }
+        }
+      }
+
       setState(() {
         catsData = newCats;
         _loading = false;
@@ -131,6 +159,8 @@ class _CatsListPageState extends State<CatsListPage> {
                   : const SizedBox.shrink();
             }
             final cat = catsData[index];
+            final raceName = raceNames[int.tryParse(cat.raceID)] ?? 'Unknown';
+
             return Card(
               margin: const EdgeInsets.all(10),
               color: Colors.white,
@@ -157,7 +187,7 @@ class _CatsListPageState extends State<CatsListPage> {
                   ),
                 ),
                 subtitle: Text(
-                  '${AppLocalizations.of(context)!.race}: ${cat.raceID}\n'
+                  '${AppLocalizations.of(context)!.race}: $raceName\n'
                       '${AppLocalizations.of(context)!.color}: ${cat.color}\n'
                       '${AppLocalizations.of(context)!.behavior}: ${cat.behavior}\n'
                       '${AppLocalizations.of(context)!.reserved}: ${cat.reserved ? AppLocalizations.of(context)!.yes : AppLocalizations.of(context)!.no}',

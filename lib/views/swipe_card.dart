@@ -14,7 +14,8 @@ import 'filter_modal.dart';
 import 'package:purrfectmatch/views/annonce/annonce_detail_page.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
-  const SwipeCardsWidget({super.key});
+  const SwipeCardsWidget({Key? key}) : super(key: key);
+
   @override
   _SwipeCardsWidgetState createState() => _SwipeCardsWidgetState();
 }
@@ -51,15 +52,11 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     if (currentUser != null && currentUser!.id != null) {
       try {
         final annonces = await apiService.fetchAllAnnonces();
-        final userFavorites =
-            await apiService.fetchUserFavorites(currentUser!.id!);
-        final favoriteAnnonceIds =
-            userFavorites.map((favoris) => favoris.AnnonceID).toSet();
+        final userFavorites = await apiService.fetchUserFavorites(currentUser!.id!);
+        final favoriteAnnonceIds = userFavorites.map((favoris) => favoris.AnnonceID).toSet();
 
         final filteredAnnonces = annonces
-            .where((annonce) =>
-                annonce.UserID != currentUser!.id &&
-                !favoriteAnnonceIds.contains(annonce.ID.toString()))
+            .where((annonce) => annonce.UserID != currentUser!.id && !favoriteAnnonceIds.contains(annonce.ID.toString()))
             .toList();
 
         for (var annonce in filteredAnnonces) {
@@ -81,16 +78,13 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 superlikeAction: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            AnnonceDetailPage(annonce: annonce)),
+                    MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
                   );
                 },
               ));
             }
           } catch (error) {
-            print(
-                "Échec du chargement des données pour l'annonce ${annonce.ID}: $error");
+            print("Échec du chargement des données pour l'annonce ${annonce.ID}: $error");
           }
         }
 
@@ -106,13 +100,11 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     }
   }
 
-  Future<void> fetchCatsByFilters(
-      String? age, String? catSex, int? race) async {
+  Future<void> fetchCatsByFilters(String? age, String? catSex, int? race) async {
     try {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
-      final filteredAnnonce =
-          await apiService.fetchCatsByFilters(age, catSex, race);
+      final filteredAnnonce = await apiService.fetchCatsByFilters(age, catSex, race);
       for (var annonce in filteredAnnonce) {
         annoncesList.add(annonce);
       }
@@ -146,8 +138,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           superlikeAction: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => AnnonceDetailPage(annonce: annonce)),
+              MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
             );
           },
         ));
@@ -289,8 +280,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                             TextSpan(
                                               text: user.name,
                                               style: const TextStyle(
-                                                decoration:
-                                                    TextDecoration.underline,
+                                                decoration: TextDecoration.underline,
                                                 fontSize: 16,
                                               ),
                                               recognizer: TapGestureRecognizer()
@@ -299,18 +289,15 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (context) =>
-                                                          UserPublicProfile(
-                                                              user: user),
+                                                          UserPublicProfile(user: user),
                                                     ),
                                                   );
                                                 },
                                             ),
                                             if (cat.PublishedAs != null &&
-                                                cat.PublishedAs!
-                                                    .isNotEmpty) ...[
+                                                cat.PublishedAs!.isNotEmpty) ...[
                                               TextSpan(
-                                                text:
-                                                    " et proposé à l'adoption par l'association ",
+                                                text: " et proposé à l'adoption par l'association ",
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontStyle: FontStyle.italic,
@@ -366,8 +353,7 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                         );
                       },
                       onStackFinished: () {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content: Text("Pile terminée"),
                           duration: Duration(milliseconds: 500),
                         ));
@@ -435,9 +421,10 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: const Color(0xFFFFB295).withOpacity(0.6),
-                            offset: const Offset(1.1, 4),
-                            blurRadius: 8.0)
+                          color: const Color(0xFFFFB295).withOpacity(0.6),
+                          offset: const Offset(1.1, 4),
+                          blurRadius: 8.0,
+                        )
                       ],
                     ),
                     child: IconButton(

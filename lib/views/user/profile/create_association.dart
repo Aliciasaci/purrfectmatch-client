@@ -28,19 +28,30 @@ class _CreateAssociationState extends State<CreateAssociation> {
   Future<void> _pickKbisFile() async {
     final result = await FilePicker.platform.pickFiles();
     if (result != null) {
-      setState(() {
-        _kbisFileName = result.files.single.name;
-        _kbisFilePath = result.files.single.path;
-      });
+      PlatformFile file = result.files.first;
+      if (file.extension == 'pdf') {
+        setState(() {
+          _kbisFileName = file.name;
+          _kbisFilePath = file.path;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.pleaseSelectPdf)),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.noFileSelected)),
+      );
     }
   }
 
   Future<void> _createAssociation() async {
     if (_formKey.currentState!.validate() && _kbisFilePath != null) {
-      String OwnerID = '';
+      String ownerId = '';
       final authState = BlocProvider.of<AuthBloc>(context).state;
       if (authState is AuthAuthenticated) {
-        OwnerID = authState.user.id!;
+        ownerId = authState.user.id!;
         Association association = Association(
           Name: _nameController.text,
           AddressRue: _addressRueController.text,
@@ -49,12 +60,9 @@ class _CreateAssociationState extends State<CreateAssociation> {
           Phone: _phoneController.text,
           Email: _emailController.text,
           kbisFile: _kbisFilePath!,
-          OwnerID: OwnerID,
+          OwnerID: ownerId,
         );
         ApiService apiService = ApiService();
-
-        // Afficher l'objet association dans la console
-        print('Association created: ${association.toJson()}');
 
         try {
           await apiService.createAssociation(association, _kbisFilePath!, _kbisFileName!);
@@ -78,7 +86,7 @@ class _CreateAssociationState extends State<CreateAssociation> {
     }
   }
 
-  Widget _buildTextFormField(TextEditingController controller, String label) {
+  Widget _buildTextFormField(TextEditingController controller, String label, {String? Function(String?)? validator}) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -90,10 +98,10 @@ class _CreateAssociationState extends State<CreateAssociation> {
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: label,
+          labelText: '$label *',
           border: InputBorder.none,
         ),
-        validator: (value) {
+        validator: validator ?? (value) {
           if (value == null || value.isEmpty) {
             return '${AppLocalizations.of(context)!.fillAllFieldsAndChooseKbisFile} $label';
           }
@@ -101,6 +109,28 @@ class _CreateAssociationState extends State<CreateAssociation> {
         },
       ),
     );
+  }
+
+  String? _emailValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return '${AppLocalizations.of(context)!.fillAllFieldsAndChooseKbisFile} ${AppLocalizations.of(context)!.email}';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    if (!emailRegex.hasMatch(value)) {
+      return AppLocalizations.of(context)!.invalidEmail;
+    }
+    return null;
+  }
+
+  String? _postalCodeValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return '${AppLocalizations.of(context)!.fillAllFieldsAndChooseKbisFile} ${AppLocalizations.of(context)!.postalCode}';
+    }
+    final postalCodeRegex = RegExp(r'^\d{5}$');
+    if (!postalCodeRegex.hasMatch(value)) {
+      return AppLocalizations.of(context)!.invalidPostalCode;
+    }
+    return null;
   }
 
   @override
@@ -146,13 +176,13 @@ class _CreateAssociationState extends State<CreateAssociation> {
                       const SizedBox(height: 15),
                       _buildTextFormField(_addressRueController, AppLocalizations.of(context)!.address),
                       const SizedBox(height: 15),
-                      _buildTextFormField(_cpController, AppLocalizations.of(context)!.postalCode),
+                      _buildTextFormField(_cpController, AppLocalizations.of(context)!.postalCode, validator: _postalCodeValidator),
                       const SizedBox(height: 15),
                       _buildTextFormField(_villeController, AppLocalizations.of(context)!.city),
                       const SizedBox(height: 15),
                       _buildTextFormField(_phoneController, AppLocalizations.of(context)!.phone),
                       const SizedBox(height: 15),
-                      _buildTextFormField(_emailController, AppLocalizations.of(context)!.email),
+                      _buildTextFormField(_emailController, AppLocalizations.of(context)!.email, validator: _emailValidator),
                       const SizedBox(height: 15),
                       Text(
                         _kbisFileName ?? AppLocalizations.of(context)!.noFileChosen,
