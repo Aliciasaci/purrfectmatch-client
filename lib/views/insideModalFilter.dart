@@ -6,7 +6,7 @@ import '../services/api_service.dart';
 
 class InsideModalFilter extends StatefulWidget {
   const InsideModalFilter({super.key, required this.callback});
-  final Future<void> Function(String? age, String? catSex, int? race) callback;
+  final Future<void> Function(String? age, String? catSex, int? race, int? asso) callback;
 
   @override
   State<InsideModalFilter> createState() => _InsideModalFilterState();
@@ -14,14 +14,17 @@ class InsideModalFilter extends StatefulWidget {
 
 class _InsideModalFilterState extends State<InsideModalFilter> {
   Map<int?, String> raceList = {};
+  Map<int?, String> assoList = {};
   String? _catSex = "";
-  int? _dropdownValue;
+  int? _dropdownValueRace;
+  int? _dropdownValueAsso;
   String? _age;
 
   @override
   void initState() {
     super.initState();
     _fetchCatRaces();
+    _fetchAssociation();
   }
 
   Future<void> _fetchCatRaces() async {
@@ -36,6 +39,22 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
       });
     } catch (e) {
       print('Failed to load races: $e');
+    }
+  }
+
+  Future<void> _fetchAssociation() async {
+    try {
+      final apiService = ApiService();
+          final newAsso = await apiService.fetchAllAssociations();
+      for (var asso in newAsso) {
+        assoList[asso.ID] = asso.Name;
+      }
+      print(assoList);
+      setState(() {
+        assoList = assoList;
+      });
+    } catch(e) {
+      print('Failed to load associations: $e');
     }
   }
 
@@ -122,11 +141,27 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                       child: Text(entry.value),
                     );
                   }).toList(),
-                  value: _dropdownValue,
+                  value: _dropdownValueRace,
                   onChanged: (dynamic newValue) {
                     if (newValue != null) {
                       setState(() {
-                        _dropdownValue = newValue;
+                        _dropdownValueRace = newValue;
+                      });
+                    }
+                  }),
+              DropdownButton(
+                  hint: const Text('Sélectionner une association'),
+                  items: assoList.entries.map((entry) {
+                    return DropdownMenuItem<dynamic>(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    );
+                  }).toList(),
+                  value: _dropdownValueAsso,
+                  onChanged: (dynamic newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _dropdownValueAsso = newValue;
                       });
                     }
                   }),
@@ -137,7 +172,7 @@ class _InsideModalFilterState extends State<InsideModalFilter> {
                 ),
                 child: const Text('Lancer la recherche'),
                 onPressed: () => {
-                  widget.callback(_age, _catSex, _dropdownValue),
+                  widget.callback(_age, _catSex, _dropdownValueRace, _dropdownValueAsso),
                   Navigator.pop(context)
                 },
               ),

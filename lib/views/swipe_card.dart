@@ -101,12 +101,12 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   }
 
   Future<void> fetchCatsByFilters(
-      String? age, String? catSex, int? race) async {
+      String? age, String? catSex, int? race, int? asso) async {
     try {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
       final filteredAnnonce =
-      await apiService.fetchCatsByFilters(age, catSex, race);
+      await apiService.fetchCatsByFilters(age, catSex, race, asso);
       for (var annonce in filteredAnnonce) {
         annoncesList.add(annonce);
       }

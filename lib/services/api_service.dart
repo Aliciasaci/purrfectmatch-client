@@ -161,9 +161,9 @@ class ApiService {
     }
   }
 
-  Future<List<Annonce>> fetchCatsByFilters(age, catSex, race) async {
+  Future<List<Annonce>> fetchCatsByFilters(age, catSex, race, asso) async {
     final token = AuthService.authToken;
-    final filters = {"age": age, "raceId": race.toString(), "sexe": catSex};
+    final filters = {"age": age, "raceId": race.toString(), "sexe": catSex, "assoID": asso.toString()};
     final response = await http.get(
       Uri.parse('$baseUrl/cats/').replace(queryParameters: filters),
       headers: <String, String>{

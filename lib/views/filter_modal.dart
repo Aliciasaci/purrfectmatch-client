@@ -3,7 +3,7 @@ import 'package:purrfectmatch/views/insideModalFilter.dart';
 
 class FilterModalWidget extends StatelessWidget {
   const FilterModalWidget({super.key, required this.callback});
-  final Future<void> Function(String?, String?, int?) callback;
+  final Future<void> Function(String?, String?, int?, int?) callback;
 
   @override
   Widget build(BuildContext context) {
