@@ -8,6 +8,9 @@ import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import '../models/user.dart';
 import '../notificationManager.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 
 class AuthService {
   static String get baseUrl =>
@@ -39,7 +42,6 @@ class AuthService {
         if (fcmToken != null) {
           ApiService().createNotificationToken(userId!, fcmToken);
         }
-
       } else if (response.statusCode == 401) {
         throw AuthException("Connexion refusée. Coordonnées invalides.");
       } else if (response.statusCode == 404) {

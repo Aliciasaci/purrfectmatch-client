@@ -4,13 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/models/report.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'report_event.dart';
 part 'report_state.dart';
 
 class ReportBloc extends Bloc<ReportEvent, ReportState> {
   final ApiService apiService;
-  IOWebSocketChannel? _channel;
+  WebSocketChannel? _channel;
   StreamSubscription? _subscription;
 
   ReportBloc({required this.apiService}) : super(ReportInitial()) {
@@ -23,6 +24,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   void initializeWebSocket() {
     _channel = apiService.connectToReportStream();
     _subscription = _channel!.stream.listen((message) {
+      print("listening...");
       final reportJson = jsonDecode(message);
       final report = Report.fromJson(reportJson);
       add(NewReportReceived(report));
@@ -36,7 +38,9 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       final reports = await apiService.getAllReports();
       emit(ReportLoaded(reports));
       initializeWebSocket();
+      print('after initializeWebSocket');
     } catch (e) {
+      print('error: $e');
       emit(ReportError(e.toString()));
     }
   }
@@ -49,7 +53,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         event.report.messageId!,
         event.report.reporterUserId,
         event.report.reportedUserId,
-        event.report.reasonId,
+        event.report.reasonId!,
       );
       emit(ReportCreated());
     } catch (e) {
@@ -62,10 +66,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     emit(ReportLoading());
     try {
       await apiService.createReportAnnonce(
-        event.report.annonce!.ID!,
+        event.report.annonceId!,
         event.report.reporterUserId,
         event.report.reportedUserId,
-        event.report.reasonId,
+        event.report.reasonId!,
       );
       emit(ReportCreated());
     } catch (e) {

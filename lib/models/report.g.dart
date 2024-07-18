@@ -13,7 +13,7 @@ Report _$ReportFromJson(Map<String, dynamic> json) => Report(
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
-      reasonId: (json['reasonId'] as num).toInt(),
+      reasonId: (json['reasonId'] as num?)?.toInt(),
       isHandled: json['isHandled'] as bool?,
       messageId: (json['messageId'] as num?)?.toInt(),
       annonce: json['annonce'] == null

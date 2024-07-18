@@ -9,7 +9,7 @@ class Report {
   final String reporterUserId;
   final String reportedUserId;
   final DateTime? createdAt;
-  final int reasonId;
+  final int? reasonId;
   final bool? isHandled;
   final int? messageId;
   final Annonce? annonce;
@@ -23,7 +23,7 @@ class Report {
     required this.reporterUserId,
     required this.reportedUserId,
     this.createdAt,
-    required this.reasonId,
+    this.reasonId,
     this.isHandled,
     this.messageId,
     this.annonce,

@@ -68,7 +68,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   return Column(
                     children: [
                       _buildReportMessageTable(messageReports),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 200),
                       _buildReportAnnonceTable(annonceReports),
                     ],
                   );
@@ -93,8 +93,29 @@ class _ReportScreenState extends State<ReportScreen> {
         final reported = await apiService.fetchUserByID(report.reportedUserId);
         final translateReason = getLocalizedReason(report.reason!);
         return DataRow(cells: [
-          DataCell(Text(report.annonce!.Title)),
-          DataCell(Text(report.annonce!.Description)),
+          DataCell(Text(report.annonce!.Title, overflow: TextOverflow.ellipsis),
+              onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Text(report.annonce!.Description),
+                );
+              },
+            );
+          }),
+          DataCell(
+              Text(report.annonce!.Description,
+                  overflow: TextOverflow.ellipsis), onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Text(report.annonce!.Description),
+                );
+              },
+            );
+          }),
           DataCell(Text(reporter.name)),
           DataCell(Text(reported.name)),
           DataCell(Text(translateReason)),
@@ -120,20 +141,18 @@ class _ReportScreenState extends State<ReportScreen> {
           return Text('Error: ${snapshot.error}');
         } else {
           return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Titre annonce')),
-                    DataColumn(label: Text('Description annonce')),
-                    DataColumn(label: Text('Reporter')),
-                    DataColumn(label: Text('Reporté')),
-                    DataColumn(label: Text('Raison')),
-                    DataColumn(label: Text('Actions')),
-                  ],
-                  rows: snapshot.data!,
-                ),
+              child: DataTable(
+                columns: const [
+                  DataColumn(label: Text('Titre annonce')),
+                  DataColumn(label: Text('Description annonce')),
+                  DataColumn(label: Text('Reporter')),
+                  DataColumn(label: Text('Reporté')),
+                  DataColumn(label: Text('Raison')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: snapshot.data!,
               ),
             ),
           );
@@ -149,9 +168,22 @@ class _ReportScreenState extends State<ReportScreen> {
         final reported = await apiService.fetchUserByID(report.reportedUserId);
         final translateReason = getLocalizedReason(report.reason!);
         return DataRow(cells: [
+          DataCell(
+            Text(report.message!, overflow: TextOverflow.ellipsis),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content:
+                        Text(report.message!), // Show the full message here
+                  );
+                },
+              );
+            },
+          ),
           DataCell(Text(reporter.name)),
           DataCell(Text(reported.name)),
-          DataCell(Text(report.message!)),
           DataCell(Text(translateReason)),
           DataCell(
             Row(
@@ -172,19 +204,17 @@ class _ReportScreenState extends State<ReportScreen> {
           return Text('Error: ${snapshot.error}');
         } else {
           return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Reporter')),
-                    DataColumn(label: Text('Reporté')),
-                    DataColumn(label: Text('Message')),
-                    DataColumn(label: Text('Raison')),
-                    DataColumn(label: Text('Actions')),
-                  ],
-                  rows: snapshot.data!,
-                ),
+              child: DataTable(
+                columns: const [
+                  DataColumn(label: Text('Message')),
+                  DataColumn(label: Text('Reporter')),
+                  DataColumn(label: Text('Reporté')),
+                  DataColumn(label: Text('Raison')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: snapshot.data!,
               ),
             ),
           );

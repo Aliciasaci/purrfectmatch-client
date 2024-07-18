@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:purrfectmatch/models/reason.dart';
 import 'package:purrfectmatch/models/report.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/association.dart';
 import 'package:purrfectmatch/models/message.dart';
 import 'package:purrfectmatch/models/room.dart';
@@ -1019,12 +1020,11 @@ class ApiService {
     }
   }
 
-  IOWebSocketChannel connectToReportStream() {
-    final token = AuthService.authToken;
-    return IOWebSocketChannel.connect(Uri.parse('$wsUrl/reportSocket'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        });
+  WebSocketChannel connectToReportStream() {
+    //final token = AuthService.authToken;
+    return WebSocketChannel.connect(
+      Uri.parse('$wsUrl/reportSocket'),
+    );
   }
 
   // Report methods

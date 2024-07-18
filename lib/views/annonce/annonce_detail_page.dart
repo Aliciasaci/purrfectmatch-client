@@ -32,6 +32,7 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
     super.initState();
     _populateFields();
     _fetchCatDetails();
+    print(widget.annonce.ID);
   }
 
   void _populateFields() {
@@ -114,7 +115,7 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.reportMessage),
+          title: Text(AppLocalizations.of(context)!.reportAnnouncement),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: reasons.map((reason) {
@@ -128,7 +129,6 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                     reasonId: reason.id,
                     reporterUserId: currentUserID,
                     reportedUserId: annonce.UserID!,
-                    type: 'annonce',
                   );
                   BlocProvider.of<ReportBloc>(context)
                       .add(CreateReportAnnonce(report: report));
@@ -192,14 +192,6 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (widget.annonce.UserID != currentUser?.id)
-                            IconButton(
-                              icon: const Icon(Icons.info, color: Colors.red),
-                              onPressed: () {
-                                handleReportAnnonce(
-                                    widget.annonce, currentUser!.id!);
-                              },
-                            ),
                           _loadingCat
                               ? const Center(child: CircularProgressIndicator())
                               : _cat != null && _cat!.picturesUrl.isNotEmpty
@@ -353,6 +345,21 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
               ),
             ),
           ),
+          if (widget.annonce.UserID != currentUser?.id)
+            Positioned(
+              top: -5,
+              right: 0,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.info,
+                  color: Colors.red,
+                  size: 50,
+                ),
+                onPressed: () {
+                  handleReportAnnonce(widget.annonce, currentUser!.id!);
+                },
+              ),
+            ),
         ],
       ),
     );
