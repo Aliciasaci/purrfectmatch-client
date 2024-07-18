@@ -4,6 +4,7 @@ import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/user/profile/profile_menu_widget.dart';
 import 'package:purrfectmatch/views/user/profile/edit_profile_screen.dart';
 import 'package:purrfectmatch/models/user.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../blocs/auth/auth_bloc.dart';
 import '../../login.dart';
 import 'settings_screen.dart';
@@ -29,7 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(AppLocalizations.of(context)!.profile),
         centerTitle: true,
       ),
       body: BlocBuilder<AuthBloc, AuthState>(
@@ -43,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             return SingleChildScrollView(
               padding:
-                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+              const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
               child: Column(
                 children: [
                   Stack(
@@ -78,14 +79,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         backgroundColor: Colors.orange[100],
                         shape: const StadiumBorder(),
                       ),
-                      child: const Text('Editer mon profil'),
+                      child: Text(AppLocalizations.of(context)!.editProfile),
                     ),
                   ),
                   const SizedBox(height: 10),
                   const Divider(),
                   const SizedBox(height: 10),
                   ProfileMenuWidget(
-                    title: "Réglages",
+                    title: AppLocalizations.of(context)!.settings,
                     icon: Icons.settings,
                     onPress: () {
                       Navigator.push(
@@ -96,27 +97,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   ProfileMenuWidget(
-                    title: "Associations",
+                    title: AppLocalizations.of(context)!.associations,
                     icon: Icons.home,
                     onPress: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                const UserAssociationsScreen()),
+                            const UserAssociationsScreen()),
                       );
                     },
                   ),
                   const Divider(),
                   const SizedBox(height: 10),
                   ProfileMenuWidget(
-                    title: "Créer Association",
+                    title: AppLocalizations.of(context)!.createAssociation,
                     icon: Icons.verified,
                     onPress: () => Navigator.pushNamed(
                         context, '/user/create-association'),
                   ),
                   ProfileMenuWidget(
-                    title: "Se déconnecter",
+                    title: AppLocalizations.of(context)!.logout,
                     icon: Icons.logout,
                     textColor: Colors.red,
                     endIcon: false,
@@ -126,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             );
           } else {
-            return const Center(child: Text('User not authenticated'));
+            return Center(child: Text(AppLocalizations.of(context)!.userNotAuthenticated));
           }
         },
       ),

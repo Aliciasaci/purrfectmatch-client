@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -16,10 +18,12 @@ import 'package:purrfectmatch/views/admin/user/crud_user_page.dart';
 import 'package:purrfectmatch/views/not_found_page.dart';
 import 'package:purrfectmatch/views/user/profile/create_association.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'appAuthLinks.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'blocs/auth/auth_bloc.dart';
+import 'firebase_options.dart';
+import 'notificationManager.dart';
 import 'services/auth_service.dart';
 import 'views/login.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -27,9 +31,25 @@ import 'locale_provider.dart';
 import 'package:provider/provider.dart';
 import './views/language_switcher.dart';
 
-void main() async {
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+
+  if (kDebugMode) {
+    print("Handling a background message: ${message.messageId}");
+    print('Message data: ${message.data}');
+    print('Message notification: ${message.notification?.title}');
+    print('Message notification: ${message.notification?.body}');
+  }
+}
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // TODO: Set up background message handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MyApp());
 }
 
@@ -37,12 +57,15 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
   final AuthService authService = AuthService();
   final DynamicLinkHandler _appLinksDeepLink = DynamicLinkHandler.instance;
+  final NotificationManager _notificationManager = NotificationManager.instance;
 
   @override
   Widget build(BuildContext context) {
     kIsWeb
         ? _appLinksDeepLink.initialize()
         : null; // Initialize deep links when the app starts
+    _notificationManager
+        .initialize(); // Initialize notifications when the app starts
 
     return MultiBlocProvider(
       providers: [
@@ -75,6 +98,7 @@ class MyApp extends StatelessWidget {
               home: BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) {
                   if (state is AuthAuthenticated) {
+                    print(state.user.roles.toString());
                     if (state.user.roles.any((role) => role.name == 'ADMIN')) {
                       Navigator.of(context).pushReplacementNamed('/admin');
                     } else if (state.user.roles

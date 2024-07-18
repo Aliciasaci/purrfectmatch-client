@@ -5,13 +5,16 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:purrfectmatch/services/api_service.dart';
 import '../models/user.dart';
+import '../notificationManager.dart';
 
 class AuthService {
   static String get baseUrl =>
       kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
   static String? authToken;
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  static User? currentUser;
 
   Future<void> login(String email, String password) async {
     try {
@@ -29,6 +32,14 @@ class AuthService {
         }
         authToken = responseBody['token'];
         await getCurrentUser();
+
+        var userId = currentUser!.id;
+        var fcmToken = await NotificationManager.instance.getFCMToken();
+
+        if (fcmToken != null) {
+          ApiService().createNotificationToken(userId!, fcmToken);
+        }
+
       } else if (response.statusCode == 401) {
         throw AuthException("Connexion refusée. Coordonnées invalides.");
       } else if (response.statusCode == 404) {
@@ -90,7 +101,9 @@ class AuthService {
     });
 
     if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
+      currentUser = User.fromJson(jsonDecode(response.body));
+      return currentUser!;
+      // return User.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to fetch current user data');
     }
@@ -122,10 +135,6 @@ class AuthService {
   }
 
   Future<void> handleGoogleSignIn() async {
-    /*final Uri url = Uri.parse('$baseUrl/auth/google');
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }*/
     final url = '$baseUrl/auth/google';
     const callbackUrlScheme = 'purrmatch';
     try {
@@ -141,6 +150,13 @@ class AuthService {
       if (token != null) {
         authToken = token;
         final user = await getCurrentUser();
+        var userId = currentUser!.id;
+        var fcmToken = await NotificationManager.instance.getFCMToken();
+
+        if (fcmToken != null) {
+          ApiService().createNotificationToken(userId!, fcmToken);
+        }
+
         print('Got user: $user');
         if (user == null) {
           throw Exception('Failed to retrieve user data');

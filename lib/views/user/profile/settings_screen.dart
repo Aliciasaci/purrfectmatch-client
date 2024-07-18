@@ -13,7 +13,7 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(AppLocalizations.of(context)!.settings),
         backgroundColor: Colors.orange[100],
         centerTitle: true,
       ),

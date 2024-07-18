@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/models/favoris.dart';
@@ -14,7 +15,8 @@ import 'filter_modal.dart';
 import 'package:purrfectmatch/views/annonce/annonce_detail_page.dart';
 
 class SwipeCardsWidget extends StatefulWidget {
-  const SwipeCardsWidget({super.key});
+  const SwipeCardsWidget({Key? key}) : super(key: key);
+
   @override
   _SwipeCardsWidgetState createState() => _SwipeCardsWidgetState();
 }
@@ -40,9 +42,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       });
       _loadAnnonces();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text("Utilisateur non authentifié"),
-        duration: const Duration(milliseconds: 1500),
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Utilisateur non authentifié"),
+        duration: Duration(milliseconds: 1500),
       ));
     }
   }
@@ -51,11 +53,15 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
     if (currentUser != null && currentUser!.id != null) {
       try {
         final annonces = await apiService.fetchAllAnnonces();
-        final userFavorites = await apiService.fetchUserFavorites(currentUser!.id!);
-        final favoriteAnnonceIds = userFavorites.map((favoris) => favoris.AnnonceID).toSet();
+        final userFavorites =
+        await apiService.fetchUserFavorites(currentUser!.id!);
+        final favoriteAnnonceIds =
+        userFavorites.map((favoris) => favoris.AnnonceID).toSet();
 
         final filteredAnnonces = annonces
-            .where((annonce) => annonce.UserID != currentUser!.id && !favoriteAnnonceIds.contains(annonce.ID))
+            .where((annonce) =>
+        annonce.UserID != currentUser!.id &&
+            !favoriteAnnonceIds.contains(annonce.ID.toString()))
             .toList();
 
         for (var annonce in filteredAnnonces) {
@@ -77,7 +83,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                 superlikeAction: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            AnnonceDetailPage(annonce: annonce)),
                   );
                 },
               ));
@@ -101,22 +109,28 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   }
 
   Future<void> fetchCatsByFilters(
-      String? age, String? catSex, int? race) async {
+      String? age, String? catSex, int? race, int? asso) async {
     try {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
-      final filteredAnnonce =
-      await apiService.fetchCatsByFilters(age, catSex, race);
-      for (var annonce in filteredAnnonce) {
-        annoncesList.add(annonce);
-      }
-      setState(() {
-        _annonceList = annoncesList;
-        _matchEngine = null;
-        _swipeItems.clear();
+      await apiService
+          .fetchCatsByFilters(age, catSex, race, asso)
+          .then((res) {
+        for (var annonce in res) {
+          annoncesList.add(annonce);
+        }
+        setState(() {
+          _annonceList = annoncesList;
+          _matchEngine = null;
+          _swipeItems.clear();
+        });
+        displayCats(_annonceList);
       });
-      displayCats(_annonceList);
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(AppLocalizations.of(context)!.noCatFoundFilter),
+        duration: const Duration(milliseconds: 2000),
+      ));
       print('Failed to load cats with filter: $e');
     }
   }
@@ -140,7 +154,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
           superlikeAction: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AnnonceDetailPage(annonce: annonce)),
+              MaterialPageRoute(
+                  builder: (context) => AnnonceDetailPage(annonce: annonce)),
             );
           },
         ));
@@ -256,7 +271,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                             padding: const EdgeInsets.all(20),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   cat.name,
@@ -270,18 +286,26 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                 RichText(
                                   text: TextSpan(
                                     children: [
-                                      TextSpan(
+                                      const TextSpan(
                                         text: "Mise en ligne par ",
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: Colors.white,
-                                          fontStyle: FontStyle.italic,
                                           fontSize: 16,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                      WidgetSpan(
+                                        child: Icon(
+                                          Icons.verified,
+                                          color: Colors.blue,
+                                          size: 16,
                                         ),
                                       ),
                                       TextSpan(
                                         text: user.name,
                                         style: const TextStyle(
-                                          decoration: TextDecoration.underline,
+                                          decoration:
+                                          TextDecoration.underline,
                                           fontSize: 16,
                                         ),
                                         recognizer: TapGestureRecognizer()
@@ -290,15 +314,18 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    UserPublicProfile(user: user),
+                                                    UserPublicProfile(
+                                                        user: user),
                                               ),
                                             );
                                           },
                                       ),
-                                      if (cat.PublishedAs != null && cat.PublishedAs!.isNotEmpty) ...[
-                                        TextSpan(
-                                          text: " et proposé à l'adoption par l'association ",
-                                          style: const TextStyle(
+                                      if (cat.PublishedAs != null &&
+                                          cat.PublishedAs!.isNotEmpty) ...[
+                                        const TextSpan(
+                                          text:
+                                          " et proposé à l'adoption par l'association ",
+                                          style: TextStyle(
                                             color: Colors.white,
                                             fontStyle: FontStyle.italic,
                                             fontSize: 16,
@@ -353,7 +380,8 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                   );
                 },
                 onStackFinished: () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(const SnackBar(
                     content: Text("Pile terminée"),
                     duration: Duration(milliseconds: 500),
                   ));
@@ -421,9 +449,10 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: const Color(0xFFFFB295).withOpacity(0.6),
-                            offset: const Offset(1.1, 4),
-                            blurRadius: 8.0)
+                          color: const Color(0xFFFFB295).withOpacity(0.6),
+                          offset: const Offset(1.1, 4),
+                          blurRadius: 8.0,
+                        )
                       ],
                     ),
                     child: IconButton(

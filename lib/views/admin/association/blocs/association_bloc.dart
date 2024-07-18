@@ -31,7 +31,7 @@ class AssociationBloc extends Bloc<AssociationEvent, AssociationState> {
       try {
         final updatedAssociations = (state as AssociationLoaded).associations.map((association) {
           if (association.ID == event.associationId) {
-            return association.copyWith(verified: event.verified);
+            return association.copyWith(Verified: event.verified);
           }
           return association;
         }).toList();
