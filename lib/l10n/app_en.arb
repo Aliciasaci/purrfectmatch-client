@@ -155,7 +155,7 @@
   "noRaceFoundFilter" : "No race found",
   "selectAssoFilter" : "Select an association",
   "noAssoFoundFilter" : "No association found",
-  "noCatFoundFilter" : "No cat found"
+  "noCatFoundFilter" : "No cat found",
   "pleaseSelectPdf" : "Select a PDF file",
   "selectAssociation" : "Selected Association",
   "fillAllRequiredFields": "Please fill all required fields",
