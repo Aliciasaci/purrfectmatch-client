@@ -11,7 +11,7 @@ import '../notificationManager.dart';
 
 class AuthService {
   static String get baseUrl =>
-      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+      kIsWeb ? "https://purrfect-match-challenge-dev-3363fe51f9ce.herokuapp.com" : "https://purrfect-match-challenge-dev-3363fe51f9ce.herokuapp.com";
   static String? authToken;
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
   static User? currentUser;
@@ -32,10 +32,15 @@ class AuthService {
         }
         authToken = responseBody['token'];
         await getCurrentUser();
+        print(authToken);
 
         var userId = currentUser!.id;
+        print("logooooonnn");
+        print(userId);
+
         var fcmToken = await NotificationManager.instance.getFCMToken();
 
+        print(fcmToken);
         if (fcmToken != null) {
           ApiService().createNotificationToken(userId!, fcmToken);
         }

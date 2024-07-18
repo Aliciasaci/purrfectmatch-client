@@ -29,6 +29,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthError(message: 'Failed to retrieve user.'));
       }
     } catch (e) {
+      print('------------>');
+      print(e);
       emit(AuthError(message: 'Failed to login.'));
     }
   }
