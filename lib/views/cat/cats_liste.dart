@@ -30,15 +30,7 @@ class _CatsListPageState extends State<CatsListPage> {
   void initState() {
     super.initState();
     _loadCurrentUser();
-    _fetchRaces();
-    _fetchCats();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent &&
-          !_loading) {
-        _fetchCats();
-      }
-    });
+    _fetchData();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -48,6 +40,17 @@ class _CatsListPageState extends State<CatsListPage> {
         currentUser = authState.user;
       });
     }
+  }
+
+  Future<void> _fetchData() async {
+    setState(() {
+      _loading = true;
+    });
+    await _fetchRaces();
+    await _fetchCats();
+    setState(() {
+      _loading = false;
+    });
   }
 
   Future<void> _fetchRaces() async {
@@ -63,10 +66,6 @@ class _CatsListPageState extends State<CatsListPage> {
   }
 
   Future<void> _fetchCats() async {
-    setState(() {
-      _loading = true;
-    });
-
     try {
       final apiService = ApiService();
       List<Cat> newCats;
@@ -89,14 +88,10 @@ class _CatsListPageState extends State<CatsListPage> {
       }
 
       setState(() {
-        catsData = newCats;
-        _loading = false;
+        catsData.addAll(newCats);
         _page++;
       });
     } catch (e) {
-      setState(() {
-        _loading = false;
-      });
       print('Failed to load cats: $e');
     }
   }
@@ -141,7 +136,9 @@ class _CatsListPageState extends State<CatsListPage> {
         title: Text(AppLocalizations.of(context)!.catListTitle),
         backgroundColor: Colors.orange[100],
       ),
-      body: Container(
+      body: _loading
+          ? Center(child: Text("Loading..."))
+          : Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -151,15 +148,11 @@ class _CatsListPageState extends State<CatsListPage> {
         ),
         child: ListView.builder(
           controller: _scrollController,
-          itemCount: catsData.length + 1,
+          itemCount: catsData.length,
           itemBuilder: (context, index) {
-            if (index == catsData.length) {
-              return _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : const SizedBox.shrink();
-            }
             final cat = catsData[index];
-            final raceName = raceNames[int.tryParse(cat.raceID)] ?? 'Unknown';
+            final raceName =
+                raceNames[int.tryParse(cat.raceID)] ?? 'Unknown';
 
             return Card(
               margin: const EdgeInsets.all(10),

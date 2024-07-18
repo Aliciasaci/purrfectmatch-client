@@ -108,7 +108,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       print('File readStream: ${_selectedFile!.readStream != null ? 'Available' : 'Not available'}');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No file selected')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.noFileSelected)),
       );
     }
   }
@@ -209,8 +209,8 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: DropdownButtonFormField<int>(
-        decoration: const InputDecoration(
-          labelText: 'Select Association (optional)',
+        decoration: InputDecoration(
+          labelText: AppLocalizations.of(context)!.selectAssociation,
           border: InputBorder.none,
         ),
         items: _userAssociations.entries.map((entry) {
@@ -277,11 +277,11 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                           ),
                         ),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_nameController, 'Name'),
+                      _buildTextFormField(_nameController, AppLocalizations.of(context)!.name),
                       const SizedBox(height: 10),
                       _buildTextFormField(
                         _birthDateController,
-                        'Birth Date',
+                        AppLocalizations.of(context)!.birthDate,
                         readOnly: true,
                         onTap: () => _selectDate(context, _birthDateController),
                         suffixIcon: const Icon(Icons.calendar_today),
@@ -289,17 +289,17 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       const SizedBox(height: 10),
                       _buildTextFormField(
                         _lastVaccineDateController,
-                        'Last Vaccine Date',
+                        AppLocalizations.of(context)!.lastVaccineDate,
                         readOnly: true,
                         onTap: () => _selectDate(context, _lastVaccineDateController),
                         suffixIcon: const Icon(Icons.calendar_today),
                       ),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_lastVaccineNameController, 'Last Vaccine Name'),
+                      _buildTextFormField(_lastVaccineNameController, AppLocalizations.of(context)!.lastVaccineName),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_colorController, 'Color'),
+                      _buildTextFormField(_colorController, AppLocalizations.of(context)!.color),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_behaviorController, 'Behavior'),
+                      _buildTextFormField(_behaviorController, AppLocalizations.of(context)!.behavior),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
@@ -310,8 +310,8 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButtonFormField<int>(
-                          decoration: const InputDecoration(
-                            labelText: 'Race',
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.race,
                             border: InputBorder.none,
                           ),
                           items: raceList.entries.map((entry) {
@@ -331,7 +331,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       const SizedBox(height: 10),
                       _buildTextFormField(
                         _descriptionController,
-                        'Description',
+                        AppLocalizations.of(context)!.description,
                       ),
                       const SizedBox(height: 10),
                       Container(
@@ -343,8 +343,8 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButtonFormField<String>(
-                          decoration: const InputDecoration(
-                            labelText: 'Select Gender',
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.selectGender,
                             border: InputBorder.none,
                           ),
                           value: _selectedValue,
@@ -366,7 +366,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       _buildAssociationDropdown(),
                       const SizedBox(height: 10),
                       SwitchListTile(
-                        title: const Text('Sterilized'),
+                        title: Text(AppLocalizations.of(context)!.sterilized),
                         value: _sterilized,
                         onChanged: (bool value) {
                           setState(() {
@@ -375,7 +375,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                         },
                       ),
                       SwitchListTile(
-                        title: const Text('Reserved'),
+                        title: Text(AppLocalizations.of(context)!.reserved),
                         value: _reserved,
                         onChanged: (bool value) {
                           setState(() {
@@ -387,7 +387,9 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       ElevatedButton(
                         onPressed: _pickFile,
                         child: Text(
-                          _selectedFile == null ? 'Select Photo' : 'Photo Selected: ${_selectedFile!.name}',
+                          _selectedFile == null
+                              ? AppLocalizations.of(context)!.selectPhoto
+                              : '${AppLocalizations.of(context)!.photoSelected}: ${_selectedFile!.name}',
                         ),
                       ),
                       const SizedBox(height: 15),
@@ -401,7 +403,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                               backgroundColor: Colors.orange[100],
                               padding: const EdgeInsets.all(15),
                             ),
-                            child: const Text('Save Changes'),
+                            child: Text(AppLocalizations.of(context)!.saveChanges),
                           ),
                         ),
                       ),

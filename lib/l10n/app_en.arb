@@ -149,6 +149,12 @@
   "addToFavoritesError": "Failed to add to favorites",
   "addToFavorites": "Added to favorites",
   "loadingAnnoncesError": "Failed to load annonces",
-  "race" : "breed",
-  "pleaseSelectPdf" : "Select a PDF file"
+  "pleaseSelectPdf" : "Select a PDF file",
+  "selectAssociation" : "Selected Association",
+  "fillAllRequiredFields": "Please fill all required fields",
+  "catCreatedSuccess": "Cat created successfully!",
+  "errorSendingData": "Error sending data",
+  "selectAssociationOptional": "Select Association (optional)",
+  "race" : "Race"
+
 }

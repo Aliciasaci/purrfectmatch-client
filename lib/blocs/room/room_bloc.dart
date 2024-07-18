@@ -44,10 +44,10 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
       LoadChatHistory event, Emitter<RoomState> emit) async {
     disconnectCurrentConnection();
     try {
-      final messages = await apiService.getRoomMessages(event.roomID);
+      final messages = await apiService.getRoomMessages(event.roomID!);
       emit(RoomHistoryLoaded(messages: messages));
 
-      _channel = apiService.connectToRoom(event.roomID);
+      _channel = apiService.connectToRoom(event.roomID!);
       if (_channel != null) {
         _messageSubscription = _channel!.stream.listen((message) {
           final messageData = Message.fromJson(json.decode(message));
