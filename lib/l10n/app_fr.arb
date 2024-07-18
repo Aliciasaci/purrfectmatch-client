@@ -150,6 +150,13 @@
   "loadingAnnoncesError": "Échec du chargement des annonces",
   "race" : "Race",
   "pleaseSelectPdf" : "Séléctionner un PDF",
+  "filterSearch" :  "Rechercher",
+  "filterLabel" : "Filtres",
+  "selectRaceFilter" : "Sélectionner une race",
+  "noRaceFoundFilter" : "Pas de race trouvé",
+  "selectAssoFilter" : "Sélectionner une association",
+  "noAssoFoundFilter" : "Pas d'association trouvé",
+  "noCatFoundFilter" : "Aucun chat ne correspond à la recherche"
   "selectAssociation" : "Associations selectionnée",
   "addCatTitle": "Ajouter un chat",
   "userNotAuthenticated": "Utilisateur non authentifié",
@@ -158,5 +165,4 @@
   "errorSendingData": "Erreur lors de l'envoi des données",
   "selectAssociationOptional": "Sélectionnez une association (facultatif)",
   "race" : "Race"
-
 }

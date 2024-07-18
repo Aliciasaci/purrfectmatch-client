@@ -126,7 +126,7 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => RoomScreen(room: room),
+              builder: (context) => RoomScreen(room: room, roomID: room.id!),
             ),
           );
         },

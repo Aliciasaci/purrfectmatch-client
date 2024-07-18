@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:purrfectmatch/services/api_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:purrfectmatch/models/annonce.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/models/favoris.dart';
@@ -41,9 +42,9 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
       });
       _loadAnnonces();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text("Utilisateur non authentifié"),
-        duration: const Duration(milliseconds: 1500),
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Utilisateur non authentifié"),
+        duration: Duration(milliseconds: 1500),
       ));
     }
   }
@@ -108,22 +109,28 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   }
 
   Future<void> fetchCatsByFilters(
-      String? age, String? catSex, int? race) async {
+
+      String? age, String? catSex, int? race, int? asso) async {
     try {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
-      final filteredAnnonce =
-      await apiService.fetchCatsByFilters(age, catSex, race);
-      for (var annonce in filteredAnnonce) {
-        annoncesList.add(annonce);
-      }
-      setState(() {
-        _annonceList = annoncesList;
-        _matchEngine = null;
-        _swipeItems.clear();
+      await apiService.fetchCatsByFilters(age, catSex, race, asso)
+      .then((res){
+          for (var annonce in res) {
+            annoncesList.add(annonce);
+          }
+          setState(() {
+            _annonceList = annoncesList;
+            _matchEngine = null;
+            _swipeItems.clear();
+          });
+          displayCats(_annonceList);
       });
-      displayCats(_annonceList);
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(AppLocalizations.of(context)!.noCatFoundFilter),
+        duration: const Duration(milliseconds: 2000),
+      ));
       print('Failed to load cats with filter: $e');
     }
   }
@@ -283,6 +290,58 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                         text: "Mise en ligne par ",
                                         style: const TextStyle(
                                           color: Colors.white,
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            const TextSpan(
+                                              text: "Mise en ligne par ",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontStyle: FontStyle.italic,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: user.name,
+                                              style: const TextStyle(
+                                                decoration: TextDecoration.underline,
+                                                fontSize: 16,
+                                              ),
+                                              recognizer: TapGestureRecognizer()
+                                                ..onTap = () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          UserPublicProfile(user: user),
+                                                    ),
+                                                  );
+                                                },
+                                            ),
+                                            if (cat.PublishedAs != null &&
+                                                cat.PublishedAs!.isNotEmpty) ...[
+                                              const TextSpan(
+                                                text: " et proposé à l'adoption par l'association ",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: cat.PublishedAs,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
                                           fontStyle: FontStyle.italic,
                                           fontSize: 16,
                                         ),
