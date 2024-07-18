@@ -22,9 +22,9 @@ import 'package:mime/mime.dart';
 
 class ApiService {
   static String get baseUrl =>
-      kIsWeb ? dotenv.env['WEB_BASE_URL']! : dotenv.env['MOBILE_BASE_URL']!;
+      kIsWeb ? "https://purrfect-match-challenge-dev-3363fe51f9ce.herokuapp.com" : "https://purrfect-match-challenge-dev-3363fe51f9ce.herokuapp.com";
   static String get wsUrl =>
-      kIsWeb ? dotenv.env['WEB_WS_URL']! : dotenv.env['MOBILE_WS_URL']!;
+      kIsWeb ? "wss://purrfect-match-challenge-dev-3363fe51f9ce.herokuapp.com" : "wss://purrfect-match-challenge-dev-3363fe51f9ce.herokuapp.com";
 
   // Cat methods
   Future<Cat> fetchCatByID(String? catID) async {

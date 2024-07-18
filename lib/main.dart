@@ -29,6 +29,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'locale_provider.dart';
 import 'package:provider/provider.dart';
 import './views/language_switcher.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -44,7 +46,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void>  main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: "dotenv");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -61,9 +63,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    kIsWeb ? _appLinksDeepLink.initialize() : null; // Initialize deep links when the app starts
-    _notificationManager.initialize(); // Initialize notifications when the app starts
-
+    if (kIsWeb) {
+      _appLinksDeepLink.initialize();
+    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android) {
+      _notificationManager.initialize();
+    }
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
