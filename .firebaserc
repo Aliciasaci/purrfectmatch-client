@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "purr-web",
+    "purr-web": "purr-web"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

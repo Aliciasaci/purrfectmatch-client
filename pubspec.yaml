@@ -59,7 +59,6 @@ flutter:
     - assets/images/flag_fr.png
     - assets/images/flag_uk.png
     - assets/google_logo.png
-    - .env
 
 flutter_native_splash:
   color: "#000000"
