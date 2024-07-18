@@ -12,9 +12,9 @@ import 'package:purrfectmatch/views/annonce/annonce_detail_page.dart';
 
 class RoomScreen extends StatefulWidget {
   final Room room;
-  final int? roomID;
+  final int roomID;
 
-  const RoomScreen({super.key, this.roomID, required this.room});
+  const RoomScreen({super.key, required this.roomID, required this.room});
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -30,7 +30,7 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
-    NotificationManager.instance.setRoomID(widget.roomID!);
+    NotificationManager.instance.setRoomID(widget.roomID);
     BlocProvider.of<RoomBloc>(context).add(LoadChatHistory(widget.roomID));
     final authState = BlocProvider.of<AuthBloc>(context).state;
     if (authState is AuthAuthenticated) {

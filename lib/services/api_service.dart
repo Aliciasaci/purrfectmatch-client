@@ -7,6 +7,7 @@ import 'package:purrfectmatch/models/room.dart';
 import 'package:web_socket_channel/io.dart';
 import '../models/cat.dart';
 import '../models/annonce.dart';
+import '../models/feature_flag.dart';
 import '../models/race.dart';
 import '../models/user.dart';
 import '../models/favoris.dart';
@@ -1008,6 +1009,43 @@ class ApiService {
 
   String serveDefaultProfilePicture() {
     return '$baseUrl/assets/images/default_picture.png';
+  }
+
+  // FEATURE FLAG
+  Future<List<FeatureFlag>> fetchAllFeatureFlags() async {
+    print("ok");
+    final token = AuthService.authToken;
+    print("token: $token");
+    final response = await http.get(
+      Uri.parse('$baseUrl/feature-flags'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> featureFlagsJson = jsonDecode(response.body);
+      return featureFlagsJson.map((json) => FeatureFlag.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load feature flags');
+    }
+  }
+
+  Future<void> updateFeatureFlagStatus(int featureFlagId, bool isEnabled) async {
+    final token = AuthService.authToken;
+    print('isEnabled: $isEnabled');
+    final response = await http.put(
+      Uri.parse('$baseUrl/feature-flags/$featureFlagId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'isEnabled': isEnabled}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update feature flag');
+    }
   }
 
   Future<Race> fetchRace(int raceId) async {

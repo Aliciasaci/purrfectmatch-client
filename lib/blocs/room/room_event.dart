@@ -6,7 +6,7 @@ abstract class RoomEvent {}
 class LoadRooms extends RoomEvent {}
 
 class LoadChatHistory extends RoomEvent {
-  final int? roomID;
+  final int roomID;
 
   LoadChatHistory(this.roomID);
 }
