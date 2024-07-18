@@ -10,6 +10,8 @@ import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/views/admin/admin_home_page.dart';
 import 'package:purrfectmatch/views/admin/association/blocs/association_bloc.dart';
 import 'package:purrfectmatch/views/admin/association/list_association.dart';
+import 'package:purrfectmatch/views/admin/featureflag/blocs/featureflag_bloc.dart';
+import 'package:purrfectmatch/views/admin/featureflag/feature_flag_page.dart';
 import 'package:purrfectmatch/views/admin/race/blocs/crud_race_bloc.dart';
 import 'package:purrfectmatch/views/admin/race/crud_race_page.dart';
 import 'package:purrfectmatch/views/admin/reports/reports_page.dart';
@@ -98,7 +100,6 @@ class MyApp extends StatelessWidget {
               home: BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) {
                   if (state is AuthAuthenticated) {
-                    print(state.user.roles.toString());
                     if (state.user.roles.any((role) => role.name == 'ADMIN')) {
                       Navigator.of(context).pushReplacementNamed('/admin');
                     } else if (state.user.roles
@@ -115,7 +116,12 @@ class MyApp extends StatelessWidget {
                 child: BlocBuilder<AuthBloc, AuthState>(
                   builder: (context, state) {
                     if (state is AuthInitial) {
-                      return const LoginPage();
+                      return BlocProvider<FeatureFlagBloc>(
+                        create: (context) =>
+                            FeatureFlagBloc(apiService: ApiService())
+                              ..add(LoadFeatureFlags()),
+                        child: const LoginPage(),
+                      );
                     } else if (state is AuthLoading) {
                       return const Scaffold(
                         body: Center(
@@ -129,7 +135,12 @@ class MyApp extends StatelessWidget {
                         ),
                       );
                     } else {
-                      return const LoginPage();
+                      return BlocProvider<FeatureFlagBloc>(
+                        create: (context) =>
+                            FeatureFlagBloc(apiService: ApiService())
+                              ..add(LoadFeatureFlags()),
+                        child: const LoginPage(),
+                      );
                     }
                   },
                 ),
@@ -154,6 +165,11 @@ class MyApp extends StatelessWidget {
                             ..add(LoadAssociations()),
                       child: const ListAssociation(),
                     ),
+                '/admin/feature-flags': (context) => BlocProvider(
+                    create: (context) =>
+                        FeatureFlagBloc(apiService: ApiService())
+                          ..add(LoadFeatureFlags()),
+                    child: const FeatureFlagPage()),
                 '/not-found': (context) =>
                     const NotFoundPage(title: 'Page not found'),
                 '/user': (context) => const UserHomePage(title: ''),

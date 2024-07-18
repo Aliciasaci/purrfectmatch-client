@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:purrfectmatch/services/auth_service.dart';
 import 'package:purrfectmatch/views/user/user_home_page.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../blocs/auth/auth_bloc.dart';
+import 'admin/featureflag/blocs/featureflag_bloc.dart';
 import 'register.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -83,163 +83,186 @@ class _LoginPageState extends State<LoginPage> {
             }
           }
         },
-        builder: (context, state) {
-          return Stack(
-            children: [
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: SingleChildScrollView(
+        builder: (context, authState) {
+          return BlocBuilder<FeatureFlagBloc, FeatureFlagState>(
+              builder: (context, featureFlagState) {
+            if (featureFlagState is FeatureFlagLoaded) {
+              final oAuthEnabled = featureFlagState.featureFlags
+                  .firstWhere((flag) => flag.name == 'OAuth')
+                  .isEnabled;
+
+              return Stack(
+                children: [
+                  Center(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Image(
-                              image: AssetImage('assets/paw.png'),
-                              height: 50,
-                              width: 50,
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              AppLocalizations.of(context)!.login,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.orange[100]!,
+                      padding: const EdgeInsets.all(20.0),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Image(
+                                  image: AssetImage('assets/paw.png'),
+                                  height: 50,
+                                  width: 50,
                                 ),
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              child: TextFormField(
-                                controller: _emailController,
-                                decoration: InputDecoration(
-                                  icon: Icon(Icons.account_circle_rounded,
-                                      color: Colors.orange[100]),
-                                  border: InputBorder.none,
-                                  labelText:
-                                      AppLocalizations.of(context)!.email,
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)!
-                                        .enterEmail;
-                                  }
-                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
-                                      .hasMatch(value)) {
-                                    return AppLocalizations.of(context)!
-                                        .invalidEmail;
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.orange[100]!,
-                                ),
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              child: TextFormField(
-                                controller: _passwordController,
-                                decoration: InputDecoration(
-                                  labelText:
-                                      AppLocalizations.of(context)!.password,
-                                  border: InputBorder.none,
-                                  icon: Icon(Icons.lock,
-                                      color: Colors.orange[100]),
-                                ),
-                                obscureText: true,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)!
-                                        .enterPassword;
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            _isLoading
-                                ? const CircularProgressIndicator()
-                                : Column(
-                                    children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: TextButton(
-                                          style: TextButton.styleFrom(
-                                            backgroundColor: Colors.orange[100],
-                                            padding: const EdgeInsets.all(15),
-                                          ),
-                                          onPressed: () {
-                                            if (_formKey.currentState!
-                                                .validate()) {
-                                              BlocProvider.of<AuthBloc>(context)
-                                                  .add(
-                                                LoginRequested(
-                                                  email: _emailController.text,
-                                                  password:
-                                                      _passwordController.text,
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          child: Text(
-                                              AppLocalizations.of(context)!
-                                                  .login),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      IconButton(
-                                        onPressed: handleGoogleLogin,
-                                        icon: const CircleAvatar(
-                                          backgroundImage: AssetImage(
-                                              'assets/google_logo.png'),
-                                          radius: 20,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const RegisterPage()),
-                                          );
-                                        },
-                                        child: Text(
-                                          AppLocalizations.of(context)!
-                                              .register,
-                                          style: TextStyle(
-                                            color: Colors.orange[200],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                const SizedBox(height: 20),
+                                Text(
+                                  AppLocalizations.of(context)!.login,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                          ],
+                                ),
+                                const SizedBox(height: 20),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.orange[100]!,
+                                    ),
+                                    borderRadius: BorderRadius.circular(40),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: TextFormField(
+                                    controller: _emailController,
+                                    decoration: InputDecoration(
+                                      icon: Icon(Icons.account_circle_rounded,
+                                          color: Colors.orange[100]),
+                                      border: InputBorder.none,
+                                      labelText:
+                                          AppLocalizations.of(context)!.email,
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return AppLocalizations.of(context)!
+                                            .enterEmail;
+                                      }
+                                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                          .hasMatch(value)) {
+                                        return AppLocalizations.of(context)!
+                                            .invalidEmail;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.orange[100]!,
+                                    ),
+                                    borderRadius: BorderRadius.circular(40),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: TextFormField(
+                                    controller: _passwordController,
+                                    decoration: InputDecoration(
+                                      labelText: AppLocalizations.of(context)!
+                                          .password,
+                                      border: InputBorder.none,
+                                      icon: Icon(Icons.lock,
+                                          color: Colors.orange[100]),
+                                    ),
+                                    obscureText: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return AppLocalizations.of(context)!
+                                            .enterPassword;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                _isLoading
+                                    ? const CircularProgressIndicator()
+                                    : Column(
+                                        children: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.orange[100],
+                                                padding:
+                                                    const EdgeInsets.all(15),
+                                              ),
+                                              onPressed: () {
+                                                if (_formKey.currentState!
+                                                    .validate()) {
+                                                  BlocProvider.of<AuthBloc>(
+                                                          context)
+                                                      .add(
+                                                    LoginRequested(
+                                                      email:
+                                                          _emailController.text,
+                                                      password:
+                                                          _passwordController
+                                                              .text,
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .login),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          if (oAuthEnabled)
+                                            IconButton(
+                                              onPressed: () {
+                                                BlocProvider.of<AuthBloc>(
+                                                        context)
+                                                    .add(
+                                                  GoogleLoginRequested(),
+                                                );
+                                              },
+                                              icon: const CircleAvatar(
+                                                backgroundImage: AssetImage(
+                                                    'assets/google_logo.png'),
+                                                radius: 20,
+                                              ),
+                                            ),
+                                          const SizedBox(height: 20),
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const RegisterPage()),
+                                              );
+                                            },
+                                            child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .register,
+                                              style: TextStyle(
+                                                color: Colors.orange[200],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          );
+                ],
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          });
         },
       ),
     );

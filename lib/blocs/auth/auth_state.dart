@@ -21,3 +21,5 @@ class AuthError extends AuthState {
 
   AuthError({required this.message});
 }
+
+class AuthLoggedOut extends AuthState {}
