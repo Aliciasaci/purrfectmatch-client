@@ -30,7 +30,7 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
     _fetchUserFavoris();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-              _scrollController.position.maxScrollExtent &&
+          _scrollController.position.maxScrollExtent &&
           !_loading) {
         _fetchUserFavoris();
       }
@@ -55,7 +55,7 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
             annoncesData[favori.AnnonceID] = annonce;
             int annonceIDToInt = int.parse(favori.AnnonceID);
             final room = userRooms.firstWhere(
-              (room) => room.annonceID == annonceIDToInt,
+                  (room) => room.annonceID == annonceIDToInt,
             );
             roomsData[favori.AnnonceID] = room;
           }
@@ -78,11 +78,11 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
     }
   }
 
-  Future<void> _deleteFavori(String favoriId) async {
+  Future<void> _deleteFavori(int favoriteId) async {
     try {
-      await ApiService().deleteAnnonce(favoriId);
+      await ApiService().deleteFavorite(favoriteId);
       setState(() {
-        userFavorisData.removeWhere((favori) => favori.AnnonceID == favoriId);
+        userFavorisData.removeWhere((favori) => favori.ID == favoriteId);
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Favori supprimé avec succès')),
@@ -106,7 +106,9 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.myFavorites),
       ),
-      body: ListView.builder(
+      body: _loading
+          ? Center(child: Text("Loading..."))
+          : ListView.builder(
         controller: _scrollController,
         itemCount: userFavorisData.length + 1,
         itemBuilder: (context, index) {
@@ -123,23 +125,29 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
             child: ListTile(
               leading: annonce != null && annonce.CatID != null
                   ? FutureBuilder<Cat>(
-                      future: ApiService().fetchCatByID(annonce.CatID),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Icon(Icons.error, color: Colors.orange[100]);
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.picturesUrl.isEmpty) {
-                          return Icon(Icons.image, color: Colors.orange[100]);
-                        } else {
-                          return Image.network(snapshot.data!.picturesUrl.first,
-                              width: 50, height: 50, fit: BoxFit.cover);
-                        }
-                      },
-                    )
-                  : Icon(Icons.image, size: 50, color: Colors.orange[100]),
+                future: ApiService().fetchCatByID(annonce.CatID),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Icon(Icons.error,
+                        color: Colors.orange[100]);
+                  } else if (!snapshot.hasData ||
+                      snapshot.data!.picturesUrl.isEmpty) {
+                    return Icon(Icons.image,
+                        color: Colors.orange[100]);
+                  } else {
+                    return Image.network(
+                        snapshot.data!.picturesUrl.first,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover);
+                  }
+                },
+              )
+                  : Icon(Icons.image,
+                  size: 50, color: Colors.orange[100]),
               title: Text(annonce != null
                   ? annonce.Title
                   : 'Annonce ID: ${favori.AnnonceID}'),
@@ -165,7 +173,7 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
                   IconButton(
                     icon: Icon(Icons.delete, color: Colors.orange[100]),
                     onPressed: () {
-                      _deleteFavori(favori.AnnonceID);
+                      _deleteFavori(favori.ID!);
                     },
                   ),
                 ],
@@ -175,7 +183,8 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AnnonceDetailPage(annonce: annonce),
+                      builder: (context) =>
+                          AnnonceDetailPage(annonce: annonce),
                     ),
                   );
                 }

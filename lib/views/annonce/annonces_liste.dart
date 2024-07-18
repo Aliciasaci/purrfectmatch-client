@@ -16,6 +16,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
   Map<String, Cat> catsData = {};
   final ScrollController _scrollController = ScrollController();
   bool _loading = false;
+  bool _hasMore = true;
   int _page = 1;
 
   @override
@@ -25,7 +26,8 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent &&
-          !_loading) {
+          !_loading &&
+          _hasMore) {
         _fetchAnnonces();
       }
     });
@@ -39,15 +41,27 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
     try {
       final apiService = ApiService();
       final newAnnonces = await apiService.fetchAllAnnonces();
+
+      List<Annonce> validAnnonces = [];
       for (var annonce in newAnnonces) {
         if (annonce.CatID != null) {
-          final cat = await apiService.fetchCatByID(annonce.CatID);
-          catsData[annonce.CatID] = cat;
+          try {
+            final cat = await apiService.fetchCatByID(annonce.CatID);
+            catsData[annonce.CatID] = cat;
+            validAnnonces.add(annonce);
+          } catch (e) {
+            // Si le chat n'existe plus, on ne l'ajoute pas à la liste des annonces valides
+            print('Chat does not exist for Annonce ID: ${annonce.ID}');
+          }
+        } else {
+          validAnnonces.add(annonce);
         }
       }
+
       setState(() {
-        annoncesData.addAll(newAnnonces);
+        annoncesData.addAll(validAnnonces);
         _loading = false;
+        _hasMore = validAnnonces.isNotEmpty;
         _page++;
       });
     } catch (e) {
@@ -71,7 +85,9 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
         title: const Text('Liste des Annonces'),
         backgroundColor: Colors.orange[100],
       ),
-      body: Container(
+      body: _loading
+          ? Center(child: Text("Loading..."))
+          : Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -86,10 +102,16 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
             if (index == annoncesData.length) {
               return _loading
                   ? const Center(child: CircularProgressIndicator())
+                  : !_hasMore
+                  ? const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: Text('No more annonces')),
+              )
                   : const SizedBox.shrink();
             }
             final annonce = annoncesData[index];
-            final cat = annonce.CatID != null ? catsData[annonce.CatID] : null;
+            final cat =
+            annonce.CatID != null ? catsData[annonce.CatID] : null;
             return Card(
               margin: const EdgeInsets.all(10),
               color: Colors.white,
@@ -123,12 +145,14 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
                     color: Colors.grey,
                   ),
                 ),
-                trailing: const Icon(Icons.arrow_forward, color: Colors.orange),
+                trailing:
+                const Icon(Icons.arrow_forward, color: Colors.orange),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AnnonceDetailPage(annonce: annonce),
+                      builder: (context) =>
+                          AnnonceDetailPage(annonce: annonce),
                     ),
                   );
                 },

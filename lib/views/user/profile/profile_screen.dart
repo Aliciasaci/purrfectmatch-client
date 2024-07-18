@@ -5,6 +5,9 @@ import 'package:purrfectmatch/views/user/profile/profile_menu_widget.dart';
 import 'package:purrfectmatch/views/user/profile/settings_screen.dart';
 import 'package:purrfectmatch/views/user/profile/user_associations_screen.dart';
 
+import 'package:purrfectmatch/views/user/profile/edit_profile_screen.dart';
+import 'package:purrfectmatch/models/user.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../blocs/auth/auth_bloc.dart';
 import '../../../models/user.dart';
 import '../../../services/api_service.dart';
@@ -39,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context, featureFlagState) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Profile'),
+            title: Text(AppLocalizations.of(context)!.profile),
             centerTitle: true,
           ),
           body: BlocBuilder<AuthBloc, AuthState>(
@@ -84,14 +87,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         backgroundColor: Colors.orange[100],
                         shape: const StadiumBorder(),
                       ),
-                      child: const Text('Editer mon profil'),
+                      child: Text(AppLocalizations.of(context)!.editProfile),
                     ),
                   ),
                   const SizedBox(height: 10),
                   const Divider(),
                   const SizedBox(height: 10),
                   ProfileMenuWidget(
-                    title: "Réglages",
+                    title: AppLocalizations.of(context)!.settings,
                     icon: Icons.settings,
                     onPress: () {
                       Navigator.push(
@@ -111,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (associationEnabled) {
                     widgets.addAll([
                       ProfileMenuWidget(
-                        title: "Associations",
+                        title: AppLocalizations.of(context)!.associations,
                         icon: Icons.home,
                         onPress: () {
                           Navigator.push(
@@ -123,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       ProfileMenuWidget(
-                        title: "Créer Association",
+                        title: AppLocalizations.of(context)!.createAssociation,
                         icon: Icons.verified,
                         onPress: () => Navigator.pushNamed(
                             context, '/user/create-association'),
@@ -136,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const Divider(),
                   const SizedBox(height: 10),
                   ProfileMenuWidget(
-                    title: "Se déconnecter",
+                    title: AppLocalizations.of(context)!.logout,
                     icon: Icons.logout,
                     textColor: Colors.red,
                     endIcon: false,

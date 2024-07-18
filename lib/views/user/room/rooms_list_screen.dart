@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/models/annonce.dart';
+import 'package:intl/intl.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/models/message.dart';
+import 'package:purrfectmatch/models/room.dart';
 import 'package:purrfectmatch/models/user.dart';
 import 'package:purrfectmatch/services/api_service.dart';
 import 'package:purrfectmatch/services/auth_service.dart';
@@ -19,6 +20,8 @@ class RoomsListScreen extends StatefulWidget {
 class _RoomsListScreenState extends State<RoomsListScreen> {
   final ApiService apiService = ApiService();
   final AuthService authService = AuthService();
+  late Future<List<Map<String, dynamic>>> roomsDataFuture;
+
   @override
   void initState() {
     super.initState();
@@ -29,20 +32,106 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
     BlocProvider.of<RoomBloc>(context).add(LoadRooms());
   }
 
-  Future<Map<String, dynamic>> _loadRoomData(
-      String annonceID, int roomID) async {
-    final annonce = await apiService.fetchAnnonceByID(annonceID);
-    final cat = await apiService.fetchCatByID(annonce.CatID.toString());
-    final author = await apiService.fetchUserByID(annonce.UserID);
-    final latestMessage = await apiService.getLatestMessage(roomID);
+  Future<List<Map<String, dynamic>>> _loadAllRoomsData(List<Room> rooms) async {
     final currentUser = await authService.getCurrentUser();
-    return {
-      'annonce': annonce,
-      'cat': cat,
-      'author': author,
-      'latestMessage': latestMessage,
-      'currentUser': currentUser,
-    };
+    return Future.wait(rooms.map((room) async {
+      final annonce =
+          await apiService.fetchAnnonceByID(room.annonceID.toString());
+      final cat = await apiService.fetchCatByID(annonce.CatID.toString());
+      final latestMessage = await apiService.getLatestMessage(room.id!);
+      return {
+        'room': room,
+        'annonce': annonce,
+        'cat': cat,
+        'latestMessage': latestMessage,
+        'currentUser': currentUser,
+      };
+    }));
+  }
+
+  Widget _buildRoomListItem(Map<String, dynamic> data) {
+    final room = data['room'] as Room;
+    final Cat cat = data['cat'];
+    final Message? latestMessage = data['latestMessage'];
+    final User currentUser = data['currentUser'];
+    final messageContent = latestMessage?.content ?? '';
+    final isToday =
+        latestMessage?.timestamp?.toLocal().day == DateTime.now().day &&
+            latestMessage?.timestamp?.toLocal().month == DateTime.now().month &&
+            latestMessage?.timestamp?.toLocal().year == DateTime.now().year;
+
+    final DateTime? localTimestamp = latestMessage?.timestamp?.toLocal();
+    final messageTimestamp = latestMessage == null
+        ? ''
+        : isToday
+            ? localTimestamp != null
+                ? DateFormat("HH:mm").format(localTimestamp)
+                : ''
+            : localTimestamp != null
+                ? DateFormat("dd/MM").format(localTimestamp)
+                : '';
+
+    bool latestMessageIsRead = latestMessage?.isRead ?? true;
+    if (latestMessage?.senderId == currentUser.id) {
+      latestMessageIsRead = true;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: latestMessageIsRead
+            ? null
+            : const LinearGradient(
+                colors: [Color(0xFFFA7D82), Color(0xFFFFB295)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+        boxShadow: latestMessageIsRead
+            ? null
+            : [
+                BoxShadow(
+                    color: const Color(0xFFFFB295).withOpacity(0.6),
+                    offset: const Offset(1.1, 4),
+                    blurRadius: 8.0)
+              ],
+      ),
+      alignment: Alignment.center,
+      height: 70,
+      child: ListTile(
+        leading: ClipOval(
+          child: Image.network(
+            cat.picturesUrl[0],
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
+        ),
+        title: Text(
+            style: const TextStyle(fontWeight: FontWeight.bold),
+            "${room.annonceTitle!} - ${cat.name}"),
+        subtitle: Text(
+          style: TextStyle(
+            color: latestMessageIsRead ? Colors.grey : Colors.white,
+            fontWeight:
+                latestMessageIsRead ? FontWeight.normal : FontWeight.bold,
+          ),
+          messageContent,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: Text(
+          messageTimestamp,
+          style: TextStyle(
+              color: latestMessageIsRead ? Colors.grey : Colors.white,
+              fontSize: 10),
+        ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => RoomScreen(room: room, roomID: room.id!),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -62,92 +151,20 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
                 ),
               );
             }
-            return ListView.builder(
-              itemCount: state.rooms.length,
-              itemBuilder: (context, index) {
-                final room = state.rooms[index];
-                return FutureBuilder<Map<String, dynamic>>(
-                  future: _loadRoomData(room.annonceID.toString(), room.id!),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData) {
-                      final data = snapshot.data!;
-                      final Cat cat = data['cat'];
-                      final User author = data['author'];
-                      final Message? latestMessage = data['latestMessage'];
-                      final User currentUser = data['currentUser'];
-                      final messageContent = latestMessage?.content ?? '';
-                      final messageTimestamp =
-                          latestMessage?.timestamp?.toLocal().toString() ?? '';
-
-                      bool latestMessageIsRead = latestMessage?.isRead ?? true;
-                      if (latestMessage?.senderId == currentUser.id) {
-                        latestMessageIsRead = true;
-                      }
-
-                      return Container(
-                        decoration: BoxDecoration(
-                          gradient: latestMessageIsRead
-                              ? null
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFFEDE7F6),
-                                    Color(0xFFD1C4E9),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                        ),
-                        alignment: Alignment.center,
-                        height: 70,
-                        /*decoration: BoxDecoration(
-                          border: Border(
-                            bottom: const BorderSide(
-                                color: Colors.grey, width: 0.5),
-                            top: index == 0
-                                ? const BorderSide(
-                                    color: Colors.grey, width: 0.5)
-                                : BorderSide.none,
-                          ),
-                        ),*/
-                        child: ListTile(
-                          leading: ClipOval(
-                            child: Image.network(
-                              cat.picturesUrl[0],
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          title: Text("${room.annonceTitle!} - ${cat.name}"),
-                          subtitle: Text(
-                            messageContent,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          trailing: Text(
-                            messageTimestamp,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => RoomScreen(roomID: room.id!, room: room),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    } else {
-                      return const Center(
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-                  },
-                );
+            roomsDataFuture = _loadAllRoomsData(state.rooms);
+            return FutureBuilder<List<Map<String, dynamic>>>(
+              future: roomsDataFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) =>
+                        _buildRoomListItem(snapshot.data![index]),
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
               },
             );
           } else if (state is RoomError) {

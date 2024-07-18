@@ -135,6 +135,41 @@ class ApiService {
 
   Future<void> deleteCat(int catId) async {
     final token = AuthService.authToken;
+
+    // Fetch annonces related to the cat
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/cats/$catId/annonces'),
+        headers: <String, String>{
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> annoncesJson = jsonDecode(response.body);
+        List<Annonce> annonces = annoncesJson.map((json) => Annonce.fromJson(json)).toList();
+
+        // Delete each annonce
+        for (var annonce in annonces) {
+          final deleteAnnonceResponse = await http.delete(
+            Uri.parse('$baseUrl/annonces/${annonce.ID}'),
+            headers: <String, String>{
+              'Authorization': 'Bearer $token',
+            },
+          );
+
+          if (deleteAnnonceResponse.statusCode != 204) {
+            throw Exception('Failed to delete annonce with ID: ${annonce.ID}');
+          }
+        }
+      } else {
+        throw Exception('Failed to load annonces for cat ID: $catId');
+      }
+    } catch (e) {
+      print('Failed to delete annonces for cat: $e');
+    }
+
+    // Delete the cat
     final response = await http.delete(
       Uri.parse('$baseUrl/cats/$catId'),
       headers: <String, String>{
@@ -146,6 +181,21 @@ class ApiService {
       throw Exception('Failed to delete cat');
     }
   }
+
+  Future<void> deleteFavorite(int favoriteID) async {
+    final token = AuthService.authToken;
+    final response = await http.delete(
+      Uri.parse('$baseUrl/favorites/$favoriteID'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete favorite');
+    }
+  }
+
 
   Future<List<Cat>> fetchAllCats() async {
     final token = AuthService.authToken;
@@ -164,9 +214,9 @@ class ApiService {
     }
   }
 
-  Future<List<Annonce>> fetchCatsByFilters(age, catSex, race) async {
+  Future<List<Annonce>> fetchCatsByFilters(age, catSex, race, asso) async {
     final token = AuthService.authToken;
-    final filters = {"age": age, "raceId": race.toString(), "sexe": catSex};
+    final filters = {"age": age, "raceId": race.toString(), "sexe": catSex, "assoID": asso.toString()};
     final response = await http.get(
       Uri.parse('$baseUrl/cats/').replace(queryParameters: filters),
       headers: <String, String>{
@@ -995,6 +1045,25 @@ class ApiService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update feature flag');
+    }
+  }
+
+  Future<Race> fetchRace(int raceId) async {
+    final token = AuthService.authToken;
+    final response = await http.get(
+      Uri.parse('$baseUrl/races/$raceId'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+
+    print(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> raceJson = jsonDecode(response.body);
+      return Race.fromJson(raceJson);
+    } else {
+      throw Exception('Failed to load race with ID: $raceId');
     }
   }
 }

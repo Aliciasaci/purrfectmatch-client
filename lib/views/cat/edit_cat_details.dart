@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
+import '../../models/user.dart';
+import '../../models/association.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditCatDetails extends StatefulWidget {
@@ -32,12 +34,16 @@ class _EditCatDetailsState extends State<EditCatDetails> {
   PlatformFile? _selectedFile;
   Map<int?, String> raceList = {};
   final List<String> _options = ['male', 'female'];
+  int? _selectedAssociation;
+  User? currentUser;
+  Map<int, String> _userAssociations = {};
 
   @override
   void initState() {
     super.initState();
     _populateFields();
     _fetchCatRaces();
+    _loadCurrentUser();
   }
 
   void _populateFields() {
@@ -102,7 +108,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       print('File readStream: ${_selectedFile!.readStream != null ? 'Available' : 'Not available'}');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No file selected')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.noFileSelected)),
       );
     }
   }
@@ -130,6 +136,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       reserved: _reserved,
       picturesUrl: widget.cat.picturesUrl,
       userId: widget.cat.userId,
+      PublishedAs: _selectedAssociation != null ? _userAssociations[_selectedAssociation] : '', // New field for association
     );
 
     try {
@@ -142,6 +149,31 @@ class _EditCatDetailsState extends State<EditCatDetails> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.registrationFailed)),
       );
+    }
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final authState = BlocProvider.of<AuthBloc>(context).state;
+    if (authState is AuthAuthenticated) {
+      setState(() {
+        currentUser = authState.user;
+      });
+      await _fetchUserAssociations();
+    }
+  }
+
+  Future<void> _fetchUserAssociations() async {
+    if (currentUser != null) {
+      try {
+        final apiService = ApiService();
+        final associations = await apiService.fetchUserAssociations(currentUser!.id!);
+        setState(() {
+          _userAssociations = {for (var assoc in associations) assoc.ID!: assoc.Name};
+          _selectedAssociation = null; // Ensure default value is null
+        });
+      } catch (e) {
+        print('Failed to load associations: $e');
+      }
     }
   }
 
@@ -163,6 +195,37 @@ class _EditCatDetailsState extends State<EditCatDetails> {
           border: InputBorder.none,
           suffixIcon: suffixIcon,
         ),
+      ),
+    );
+  }
+
+  Widget _buildAssociationDropdown() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.orange[100]!,
+        ),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: DropdownButtonFormField<int>(
+        decoration: InputDecoration(
+          labelText: AppLocalizations.of(context)!.selectAssociation,
+          border: InputBorder.none,
+        ),
+        items: _userAssociations.entries.map((entry) {
+          return DropdownMenuItem<int>(
+            value: entry.key,
+            child: Text(entry.value),
+          );
+        }).toList(),
+        value: _selectedAssociation,
+        onChanged: (int? newValue) {
+          setState(() {
+            _selectedAssociation = newValue;
+          });
+        },
+        isExpanded: true,
       ),
     );
   }
@@ -214,11 +277,11 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                           ),
                         ),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_nameController, 'Name'),
+                      _buildTextFormField(_nameController, AppLocalizations.of(context)!.name),
                       const SizedBox(height: 10),
                       _buildTextFormField(
                         _birthDateController,
-                        'Birth Date',
+                        AppLocalizations.of(context)!.birthDate,
                         readOnly: true,
                         onTap: () => _selectDate(context, _birthDateController),
                         suffixIcon: const Icon(Icons.calendar_today),
@@ -226,17 +289,17 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       const SizedBox(height: 10),
                       _buildTextFormField(
                         _lastVaccineDateController,
-                        'Last Vaccine Date',
+                        AppLocalizations.of(context)!.lastVaccineDate,
                         readOnly: true,
                         onTap: () => _selectDate(context, _lastVaccineDateController),
                         suffixIcon: const Icon(Icons.calendar_today),
                       ),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_lastVaccineNameController, 'Last Vaccine Name'),
+                      _buildTextFormField(_lastVaccineNameController, AppLocalizations.of(context)!.lastVaccineName),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_colorController, 'Color'),
+                      _buildTextFormField(_colorController, AppLocalizations.of(context)!.color),
                       const SizedBox(height: 10),
-                      _buildTextFormField(_behaviorController, 'Behavior'),
+                      _buildTextFormField(_behaviorController, AppLocalizations.of(context)!.behavior),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
@@ -247,8 +310,8 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButtonFormField<int>(
-                          decoration: const InputDecoration(
-                            labelText: 'Race',
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.race,
                             border: InputBorder.none,
                           ),
                           items: raceList.entries.map((entry) {
@@ -268,7 +331,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       const SizedBox(height: 10),
                       _buildTextFormField(
                         _descriptionController,
-                        'Description',
+                        AppLocalizations.of(context)!.description,
                       ),
                       const SizedBox(height: 10),
                       Container(
@@ -280,8 +343,8 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButtonFormField<String>(
-                          decoration: const InputDecoration(
-                            labelText: 'Select Gender',
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.selectGender,
                             border: InputBorder.none,
                           ),
                           value: _selectedValue,
@@ -300,8 +363,10 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                         ),
                       ),
                       const SizedBox(height: 10),
+                      _buildAssociationDropdown(),
+                      const SizedBox(height: 10),
                       SwitchListTile(
-                        title: const Text('Sterilized'),
+                        title: Text(AppLocalizations.of(context)!.sterilized),
                         value: _sterilized,
                         onChanged: (bool value) {
                           setState(() {
@@ -310,7 +375,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                         },
                       ),
                       SwitchListTile(
-                        title: const Text('Reserved'),
+                        title: Text(AppLocalizations.of(context)!.reserved),
                         value: _reserved,
                         onChanged: (bool value) {
                           setState(() {
@@ -322,7 +387,9 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                       ElevatedButton(
                         onPressed: _pickFile,
                         child: Text(
-                          _selectedFile == null ? 'Select Photo' : 'Photo Selected: ${_selectedFile!.name}',
+                          _selectedFile == null
+                              ? AppLocalizations.of(context)!.selectPhoto
+                              : '${AppLocalizations.of(context)!.photoSelected}: ${_selectedFile!.name}',
                         ),
                       ),
                       const SizedBox(height: 15),
@@ -336,7 +403,7 @@ class _EditCatDetailsState extends State<EditCatDetails> {
                               backgroundColor: Colors.orange[100],
                               padding: const EdgeInsets.all(15),
                             ),
-                            child: const Text('Save Changes'),
+                            child: Text(AppLocalizations.of(context)!.saveChanges),
                           ),
                         ),
                       ),
