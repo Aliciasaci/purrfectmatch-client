@@ -47,7 +47,7 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
         if (annonce.CatID != null) {
           try {
             final cat = await apiService.fetchCatByID(annonce.CatID);
-            catsData[annonce.CatID] = cat;
+            catsData[annonce.CatID!] = cat;
             validAnnonces.add(annonce);
           } catch (e) {
             // Si le chat n'existe plus, on ne l'ajoute pas à la liste des annonces valides
