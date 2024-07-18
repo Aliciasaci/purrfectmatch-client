@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:purrfectmatch/blocs/reports/report_bloc.dart';
+import 'package:purrfectmatch/models/report.dart';
 import '../../models/annonce.dart';
 import '../../models/cat.dart';
 import '../../services/api_service.dart';
@@ -85,6 +87,61 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
     });
   }
 
+  String getLocalizedReason(BuildContext context, String reasonKey) {
+    switch (reasonKey) {
+      case "inappropriateContent":
+        return AppLocalizations.of(context)!.inappropriateContent;
+      case "spam":
+        return AppLocalizations.of(context)!.spam;
+      case "other":
+        return AppLocalizations.of(context)!.other;
+      case "harassment":
+        return AppLocalizations.of(context)!.harassment;
+      case "illegalContent":
+        return AppLocalizations.of(context)!.illegalContent;
+      default:
+        return "";
+    }
+  }
+
+  Future<void> handleReportAnnonce(
+      Annonce annonce, String currentUserID) async {
+    final reasons = await ApiService().getReportReasons();
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.reportMessage),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: reasons.map((reason) {
+              final translatedReason =
+                  getLocalizedReason(context, reason.reason);
+              return ListTile(
+                title: Text(translatedReason),
+                onTap: () {
+                  final report = Report(
+                    annonceId: annonce.ID!,
+                    reasonId: reason.id,
+                    reporterUserId: currentUserID,
+                    reportedUserId: annonce.UserID!,
+                    type: 'annonce',
+                  );
+                  BlocProvider.of<ReportBloc>(context)
+                      .add(CreateReportAnnonce(report: report));
+                  Navigator.of(dialogContext).pop();
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildBubble(String label, String value) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
@@ -135,19 +192,27 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (widget.annonce.UserID != currentUser?.id)
+                            IconButton(
+                              icon: const Icon(Icons.info, color: Colors.red),
+                              onPressed: () {
+                                handleReportAnnonce(
+                                    widget.annonce, currentUser!.id!);
+                              },
+                            ),
                           _loadingCat
                               ? const Center(child: CircularProgressIndicator())
                               : _cat != null && _cat!.picturesUrl.isNotEmpty
-                              ? Image.network(
-                            _cat!.picturesUrl.first,
-                            height: 300,
-                            fit: BoxFit.cover,
-                          )
-                              : Container(
-                            height: 300,
-                            color: Colors.grey,
-                            child: const Icon(Icons.image, size: 100),
-                          ),
+                                  ? Image.network(
+                                      _cat!.picturesUrl.first,
+                                      height: 300,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(
+                                      height: 300,
+                                      color: Colors.grey,
+                                      child: const Icon(Icons.image, size: 100),
+                                    ),
                           const SizedBox(height: 20),
                           if (_isEditing)
                             TextFormField(
@@ -185,7 +250,7 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                               controller: _descriptionController,
                               decoration: InputDecoration(
                                 labelText:
-                                AppLocalizations.of(context)!.description,
+                                    AppLocalizations.of(context)!.description,
                                 border: const OutlineInputBorder(),
                               ),
                               maxLines: null,
@@ -251,10 +316,9 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                                       );
                                     },
                                     child: Text(
-                                      AppLocalizations.of(context)!
-                                          .catDetails,
+                                      AppLocalizations.of(context)!.catDetails,
                                       style:
-                                      const TextStyle(color: Colors.black),
+                                          const TextStyle(color: Colors.black),
                                     ),
                                   ),
                                 ),
@@ -273,8 +337,8 @@ class _AnnonceDetailPageState extends State<AnnonceDetailPage> {
                                       child: Text(
                                         AppLocalizations.of(context)!
                                             .editAnnonce,
-                                        style:
-                                        const TextStyle(color: Colors.black),
+                                        style: const TextStyle(
+                                            color: Colors.black),
                                       ),
                                     ),
                                   ),

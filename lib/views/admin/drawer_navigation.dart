@@ -36,6 +36,13 @@ class DrawerNavigation extends StatelessWidget {
               Navigator.pushNamed(context, '/admin/associations');
             },
           ),
+          ListTile(
+            title: const Text('Gestion des reports'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/admin/reports');
+            },
+          )
         ],
       ),
     );

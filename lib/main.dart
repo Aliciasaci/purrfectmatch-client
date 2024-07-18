@@ -10,6 +10,7 @@ import 'package:purrfectmatch/views/admin/association/blocs/association_bloc.dar
 import 'package:purrfectmatch/views/admin/association/list_association.dart';
 import 'package:purrfectmatch/views/admin/race/blocs/crud_race_bloc.dart';
 import 'package:purrfectmatch/views/admin/race/crud_race_page.dart';
+import 'package:purrfectmatch/views/admin/reports/reports_page.dart';
 import 'package:purrfectmatch/views/admin/user/blocs/crud_user_bloc.dart';
 import 'package:purrfectmatch/views/admin/user/crud_user_page.dart';
 import 'package:purrfectmatch/views/not_found_page.dart';
@@ -134,6 +135,7 @@ class MyApp extends StatelessWidget {
                 '/user': (context) => const UserHomePage(title: ''),
                 '/user/create-association': (context) =>
                     const CreateAssociation(),
+                '/admin/reports': (context) => const ReportScreen(),
               },
             );
           },

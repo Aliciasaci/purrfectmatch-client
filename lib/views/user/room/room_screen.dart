@@ -63,6 +63,10 @@ class _RoomScreenState extends State<RoomScreen> {
         return AppLocalizations.of(context)!.spam;
       case "other":
         return AppLocalizations.of(context)!.other;
+      case "illegalContent":
+        return AppLocalizations.of(context)!.illegalContent;
+      case "harassment":
+        return AppLocalizations.of(context)!.harassment;
       default:
         return "";
     }
@@ -88,8 +92,8 @@ class _RoomScreenState extends State<RoomScreen> {
                 title: Text(translatedReason),
                 onTap: () {
                   final report = Report(
-                    messageID: message.id!,
-                    reasonID: reason.id,
+                    messageId: message.id!,
+                    reasonId: reason.id,
                     reporterUserId: currentUserID,
                     reportedUserId: message.senderId!,
                   );

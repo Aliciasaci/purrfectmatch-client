@@ -402,7 +402,6 @@ class ApiService {
   }
 
   Future<List<Association>> fetchUserAssociations(String userId) async {
-
     print("ici");
     final token = AuthService.authToken;
     final response = await http.get(
@@ -943,10 +942,10 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        'MessageID': messageID,
-        'ReporterUserID': reporterUserID,
-        'ReportedUserID': reportedUserID,
-        'ReasonID': reasonID,
+        'messageId': messageID,
+        'reporterUserId': reporterUserID,
+        'reportedUserId': reportedUserID,
+        'reasonId': reasonID,
       }),
     );
 
@@ -959,16 +958,16 @@ class ApiService {
       String reportedUserID, int reasonID) async {
     final token = AuthService.authToken;
     final response = await http.post(
-      Uri.parse('$baseUrl/reports'),
+      Uri.parse('$baseUrl/reportAnnonce'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        'AnnonceID': annonceID,
-        'ReporterUserID': reporterUserID,
-        'ReportedUserID': reportedUserID,
-        'ReasonID': reasonID,
+        'annonceId': annonceID,
+        'reporterUserId': reporterUserID,
+        'reportedUserId': reportedUserID,
+        'reasonId': reasonID,
       }),
     );
 

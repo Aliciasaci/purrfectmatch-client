@@ -87,11 +87,14 @@
     "addCatTitle": "Ajouter un chat",
     "myAssociations": "Mes asso",
     "inappropriateContent": "Contenu inapproprié",
+    "illegalContent": "Contenu illégal",
     "spam": "Spam",
     "other": "Autre",
+    "harrassment": "Harcèlement",
     "falseInformation": "Information fausse",
     "reportAMessage": "Signaler un message",
     "reportAnAnnouncement": "Signaler une annonce",
     "discussions": "Conversations",
-    "noDiscussions": "Vous n'avez pas encore de conversations. Likez des annonces pour commencer à discuter !"
+    "noDiscussions": "Vous n'avez pas encore de conversations. Likez des annonces pour commencer à discuter !",
+    "handleReports": "Gérer les signalements"
 }

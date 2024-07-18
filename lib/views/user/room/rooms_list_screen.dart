@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:purrfectmatch/models/annonce.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/models/message.dart';
 import 'package:purrfectmatch/models/user.dart';
@@ -33,13 +33,11 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
       String annonceID, int roomID) async {
     final annonce = await apiService.fetchAnnonceByID(annonceID);
     final cat = await apiService.fetchCatByID(annonce.CatID.toString());
-    final author = await apiService.fetchUserByID(annonce.UserID);
     final latestMessage = await apiService.getLatestMessage(roomID);
     final currentUser = await authService.getCurrentUser();
     return {
       'annonce': annonce,
       'cat': cat,
-      'author': author,
       'latestMessage': latestMessage,
       'currentUser': currentUser,
     };
@@ -49,15 +47,15 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Conversations'),
+        title: Text(AppLocalizations.of(context)!.discussions),
       ),
       body: BlocBuilder<RoomBloc, RoomState>(
         builder: (context, state) {
           if (state is RoomsLoaded) {
             if (state.rooms.isEmpty) {
-              return const Center(
+              return Center(
                 child: Text(
-                  'Vous n\'avez pas encore de conversations. Likez des annonces pour commencer à discuter !',
+                  AppLocalizations.of(context)!.noDiscussions,
                   textAlign: TextAlign.center,
                 ),
               );
@@ -73,7 +71,6 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
                         snapshot.hasData) {
                       final data = snapshot.data!;
                       final Cat cat = data['cat'];
-                      final User author = data['author'];
                       final Message? latestMessage = data['latestMessage'];
                       final User currentUser = data['currentUser'];
                       final messageContent = latestMessage?.content ?? '';

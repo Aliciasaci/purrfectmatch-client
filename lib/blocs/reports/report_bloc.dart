@@ -35,6 +35,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       final reports = await apiService.getAllReports();
       emit(ReportLoaded(reports));
+      initializeWebSocket();
     } catch (e) {
       emit(ReportError(e.toString()));
     }
@@ -45,10 +46,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     emit(ReportLoading());
     try {
       await apiService.createReportMessage(
-        event.report.messageID!,
+        event.report.messageId!,
         event.report.reporterUserId,
         event.report.reportedUserId,
-        event.report.reasonID,
+        event.report.reasonId,
       );
       emit(ReportCreated());
     } catch (e) {
@@ -64,7 +65,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         event.report.annonce!.ID!,
         event.report.reporterUserId,
         event.report.reportedUserId,
-        event.report.reasonID,
+        event.report.reasonId,
       );
       emit(ReportCreated());
     } catch (e) {

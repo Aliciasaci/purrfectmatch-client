@@ -89,11 +89,14 @@
     "addCatTitle": "Insert a title",
     "myAssociations": "Mes associations",
     "inappropriateContent": "Inappropriate content",
+    "illegalContent": "Illegal content",
     "spam": "Spam",
     "other": "Other",
+    "harassment": "Harassment",
     "falseInformation": "False information",
     "reportMessage": "Report a message",
     "reportAnnouncement": "Report an announcement",
     "discussions": "Conversations",
-    "noDiscussions": "You have no discussions, start liking cats to get some!"
+    "noDiscussions": "You have no discussions, start liking cats to get some!",
+    "handleReports": "Handle reports"
 }
