@@ -3,14 +3,14 @@ class Annonce {
   final String Title;
   final String Description;
   final String? UserID;
-  final String CatID;
+  final String? CatID;
 
   Annonce({
     this.ID,
     required this.Title,
     required this.Description,
     this.UserID,
-    required this.CatID,
+    this.CatID,
   });
 
   factory Annonce.fromJson(Map<String, dynamic> json) {

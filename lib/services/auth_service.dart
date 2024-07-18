@@ -39,7 +39,6 @@ class AuthService {
         if (fcmToken != null) {
           ApiService().createNotificationToken(userId!, fcmToken);
         }
-
       } else if (response.statusCode == 401) {
         throw AuthException("Connexion refusée. Coordonnées invalides.");
       } else if (response.statusCode == 404) {
@@ -143,8 +142,7 @@ class AuthService {
           callbackUrlScheme: callbackUrlScheme,
           options: const FlutterWebAuth2Options(
             timeout: 5,
-          )
-      );
+          ));
       print('Got auth result: $result');
       final token = Uri.parse(result).queryParameters['token'];
       print('Got auth token: $token');
@@ -165,7 +163,6 @@ class AuthService {
       }
     } on PlatformException catch (e) {
       print('Got auth error: ${e.message}');
-      throw Exception('Failed to authenticate with Google');
     }
   }
 
