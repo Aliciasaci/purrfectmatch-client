@@ -52,14 +52,14 @@ flutter:
   generate: true
 
   assets:
-      - assets/logo.png
-      - assets/paws.png
-      - assets/paw.png
-      - assets/images/img.png
-      - assets/images/flag_fr.png
-      - assets/images/flag_uk.png
-      - assets/google_logo.png
-      - .env
+    - assets/logo.png
+    - assets/paws.png
+    - assets/paw.png
+    - assets/images/img.png
+    - assets/images/flag_fr.png
+    - assets/images/flag_uk.png
+    - assets/google_logo.png
+    - .env
 
 flutter_native_splash:
   color: "#000000"

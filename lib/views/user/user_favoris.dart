@@ -106,7 +106,9 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.myFavorites),
       ),
-      body: ListView.builder(
+      body: _loading
+          ? Center(child: Text("Loading..."))
+          : ListView.builder(
         controller: _scrollController,
         itemCount: userFavorisData.length + 1,
         itemBuilder: (context, index) {
@@ -129,17 +131,23 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
                       ConnectionState.waiting) {
                     return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
-                    return Icon(Icons.error, color: Colors.orange[100]);
+                    return Icon(Icons.error,
+                        color: Colors.orange[100]);
                   } else if (!snapshot.hasData ||
                       snapshot.data!.picturesUrl.isEmpty) {
-                    return Icon(Icons.image, color: Colors.orange[100]);
+                    return Icon(Icons.image,
+                        color: Colors.orange[100]);
                   } else {
-                    return Image.network(snapshot.data!.picturesUrl.first,
-                        width: 50, height: 50, fit: BoxFit.cover);
+                    return Image.network(
+                        snapshot.data!.picturesUrl.first,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover);
                   }
                 },
               )
-                  : Icon(Icons.image, size: 50, color: Colors.orange[100]),
+                  : Icon(Icons.image,
+                  size: 50, color: Colors.orange[100]),
               title: Text(annonce != null
                   ? annonce.Title
                   : 'Annonce ID: ${favori.AnnonceID}'),
@@ -175,7 +183,8 @@ class _UserFavorisPageState extends State<UserFavorisPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AnnonceDetailPage(annonce: annonce),
+                      builder: (context) =>
+                          AnnonceDetailPage(annonce: annonce),
                     ),
                   );
                 }
