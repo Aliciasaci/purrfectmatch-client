@@ -109,22 +109,22 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
   }
 
   Future<void> fetchCatsByFilters(
-
       String? age, String? catSex, int? race, int? asso) async {
     try {
       final apiService = ApiService();
       final List<Annonce> annoncesList = [];
-      await apiService.fetchCatsByFilters(age, catSex, race, asso)
-      .then((res){
-          for (var annonce in res) {
-            annoncesList.add(annonce);
-          }
-          setState(() {
-            _annonceList = annoncesList;
-            _matchEngine = null;
-            _swipeItems.clear();
-          });
-          displayCats(_annonceList);
+      await apiService
+          .fetchCatsByFilters(age, catSex, race, asso)
+          .then((res) {
+        for (var annonce in res) {
+          annoncesList.add(annonce);
+        }
+        setState(() {
+          _annonceList = annoncesList;
+          _matchEngine = null;
+          _swipeItems.clear();
+        });
+        displayCats(_annonceList);
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -286,64 +286,12 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                 RichText(
                                   text: TextSpan(
                                     children: [
-                                      TextSpan(
+                                      const TextSpan(
                                         text: "Mise en ligne par ",
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      RichText(
-                                        text: TextSpan(
-                                          children: [
-                                            const TextSpan(
-                                              text: "Mise en ligne par ",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontStyle: FontStyle.italic,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: user.name,
-                                              style: const TextStyle(
-                                                decoration: TextDecoration.underline,
-                                                fontSize: 16,
-                                              ),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          UserPublicProfile(user: user),
-                                                    ),
-                                                  );
-                                                },
-                                            ),
-                                            if (cat.PublishedAs != null &&
-                                                cat.PublishedAs!.isNotEmpty) ...[
-                                              const TextSpan(
-                                                text: " et proposé à l'adoption par l'association ",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontStyle: FontStyle.italic,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: cat.PublishedAs,
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                              ),
-                                            ],
-                                          ],
-                                          fontStyle: FontStyle.italic,
                                           fontSize: 16,
+                                          fontStyle: FontStyle.italic,
                                         ),
                                       ),
                                       WidgetSpan(
@@ -373,12 +321,11 @@ class _SwipeCardsWidgetState extends State<SwipeCardsWidget> {
                                           },
                                       ),
                                       if (cat.PublishedAs != null &&
-                                          cat.PublishedAs!
-                                              .isNotEmpty) ...[
-                                        TextSpan(
+                                          cat.PublishedAs!.isNotEmpty) ...[
+                                        const TextSpan(
                                           text:
                                           " et proposé à l'adoption par l'association ",
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             color: Colors.white,
                                             fontStyle: FontStyle.italic,
                                             fontSize: 16,

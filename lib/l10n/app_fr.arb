@@ -156,7 +156,7 @@
   "noRaceFoundFilter" : "Pas de race trouvé",
   "selectAssoFilter" : "Sélectionner une association",
   "noAssoFoundFilter" : "Pas d'association trouvé",
-  "noCatFoundFilter" : "Aucun chat ne correspond à la recherche"
+  "noCatFoundFilter" : "Aucun chat ne correspond à la recherche",
   "selectAssociation" : "Associations selectionnée",
   "addCatTitle": "Ajouter un chat",
   "userNotAuthenticated": "Utilisateur non authentifié",
