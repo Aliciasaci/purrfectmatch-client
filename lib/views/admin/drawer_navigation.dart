@@ -43,6 +43,13 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
+            title: const Text('Gestion des reports'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/admin/reports');
+            },
+          ),
+          ListTile(
             title: const Text('Feature Flags'),
             onTap: () {
               Navigator.pop(context);
@@ -57,7 +64,9 @@ class DrawerNavigation extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => BlocProvider<FeatureFlagBloc>(
-                    create: (context) => FeatureFlagBloc(apiService: ApiService())..add(LoadFeatureFlags()),
+                    create: (context) =>
+                        FeatureFlagBloc(apiService: ApiService())
+                          ..add(LoadFeatureFlags()),
                     child: const LoginPage(),
                   ),
                 ),

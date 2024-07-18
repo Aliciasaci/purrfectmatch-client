@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:purrfectmatch/models/cat.dart';
 import 'package:purrfectmatch/models/message.dart';
 import 'package:purrfectmatch/models/room.dart';
@@ -138,15 +139,15 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Conversations'),
+        title: Text(AppLocalizations.of(context)!.discussions),
       ),
       body: BlocBuilder<RoomBloc, RoomState>(
         builder: (context, state) {
           if (state is RoomsLoaded) {
             if (state.rooms.isEmpty) {
-              return const Center(
+              return Center(
                 child: Text(
-                  'Vous n\'avez pas encore de conversations. Likez des annonces pour commencer à discuter !',
+                  AppLocalizations.of(context)!.noDiscussions,
                   textAlign: TextAlign.center,
                 ),
               );

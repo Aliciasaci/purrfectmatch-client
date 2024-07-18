@@ -29,7 +29,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     _fetchUserAnnonces();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent &&
+              _scrollController.position.maxScrollExtent &&
           !_loading &&
           _hasMore) {
         _fetchUserAnnonces();
@@ -55,7 +55,7 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
             if (annonce.CatID != null) {
               try {
                 final cat = await apiService.fetchCatByID(annonce.CatID);
-                catsData[annonce.CatID] = cat;
+                catsData[annonce.CatID!] = cat;
                 validAnnonces.add(annonce);
               } catch (e) {
                 // Si le chat n'existe plus, on ne l'ajoute pas à la liste des annonces valides
@@ -90,7 +90,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
     try {
       await ApiService().deleteAnnonce(annonceId);
       setState(() {
-        userAnnoncesData.removeWhere((annonce) => annonce.ID.toString() == annonceId);
+        userAnnoncesData
+            .removeWhere((annonce) => annonce.ID.toString() == annonceId);
         _reloadUserAnnonces();
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +99,8 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la suppression de l\'annonce: $e')),
+        SnackBar(
+            content: Text('Erreur lors de la suppression de l\'annonce: $e')),
       );
     }
   }
@@ -129,94 +131,96 @@ class _UserAnnoncesPageState extends State<UserAnnoncesPage> {
       body: _loading
           ? Center(child: Text("Loading..."))
           : Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.orange[100]!, Colors.orange[200]!],
-          ),
-        ),
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: userAnnoncesData.length + 1,
-          itemBuilder: (context, index) {
-            if (index == userAnnoncesData.length) {
-              return _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : !_hasMore
-                  ? const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: Text('No more annonces')),
-              )
-                  : const SizedBox.shrink();
-            }
-            final annonce = userAnnoncesData[index];
-            final cat =
-            annonce.CatID != null ? catsData[annonce.CatID] : null;
-            return Card(
-              margin: const EdgeInsets.all(10),
-              color: Colors.white,
-              child: ListTile(
-                leading: cat != null && cat.picturesUrl.isNotEmpty
-                    ? Image.network(
-                  cat.picturesUrl.first,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                )
-                    : const Icon(Icons.image, size: 50, color: Colors.orange),
-                title: Text(annonce.Title),
-                subtitle: Text(
-                  'Description: ${annonce.Description}\nChat: ${cat?.name ?? 'Unknown'}',
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.orange[100]!, Colors.orange[200]!],
                 ),
-                trailing: Wrap(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.orange),
-                      onPressed: () {
+              ),
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: userAnnoncesData.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == userAnnoncesData.length) {
+                    return _loading
+                        ? const Center(child: CircularProgressIndicator())
+                        : !_hasMore
+                            ? const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Center(child: Text('No more annonces')),
+                              )
+                            : const SizedBox.shrink();
+                  }
+                  final annonce = userAnnoncesData[index];
+                  final cat =
+                      annonce.CatID != null ? catsData[annonce.CatID] : null;
+                  return Card(
+                    margin: const EdgeInsets.all(10),
+                    color: Colors.white,
+                    child: ListTile(
+                      leading: cat != null && cat.picturesUrl.isNotEmpty
+                          ? Image.network(
+                              cat.picturesUrl.first,
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            )
+                          : const Icon(Icons.image,
+                              size: 50, color: Colors.orange),
+                      title: Text(annonce.Title),
+                      subtitle: Text(
+                        'Description: ${annonce.Description}\nChat: ${cat?.name ?? 'Unknown'}',
+                      ),
+                      trailing: Wrap(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.orange),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditAnnoncePage(annonce: annonce),
+                                ),
+                              ).then((value) {
+                                if (value == true) {
+                                  _reloadUserAnnonces();
+                                }
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon:
+                                const Icon(Icons.delete, color: Colors.orange),
+                            onPressed: () {
+                              if (annonce.ID != null) {
+                                _deleteAnnonce(annonce.ID.toString());
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('ID de l\'annonce invalide'),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                EditAnnoncePage(annonce: annonce),
+                                AnnonceDetailPage(annonce: annonce),
                           ),
-                        ).then((value) {
-                          if (value == true) {
-                            _reloadUserAnnonces();
-                          }
-                        });
+                        );
                       },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.orange),
-                      onPressed: () {
-                        if (annonce.ID != null) {
-                          _deleteAnnonce(annonce.ID.toString());
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('ID de l\'annonce invalide'),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          AnnonceDetailPage(annonce: annonce),
                     ),
                   );
                 },
               ),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }

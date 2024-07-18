@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import '../../models/user.dart';
@@ -46,7 +47,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthError(message: 'Failed to retrieve user.'));
       }
     } catch (e) {
-      emit(AuthError(message: 'Failed to authenticate with Google.'));
+      emit(LoginCancelled());
     }
   }
 
