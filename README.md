@@ -1,16 +1,37 @@
-# purrfectmatch
+# Rendu Challenge groupe 4 
 
-A new Flutter project.
+1. [Membres](#membres)
+   - Alicia SACI
+   - Awa BAH
+   - Mai-thi TRANS DIEP
+   - Melvin REDUREAU
 
-## Getting Started
+2. [Fonctionnalités et répartition](#fonctionnalités-et-répartition)
+   - 1. Fonctionnalité Swipe des chats avec mise en favoris, détails des annonces et des chats - Front et Back (Alicia)
+   - 2. Ajout, modification, suppression des chats et annonces - Front et Back (Alicia)
+   - 3. Ajout association - Front et Back (Alicia, Mai-thi)
+   - 4. Ajout des membres d'une association + modification des membres (Alicia)
+   - 5. Swagger + log (Melvin)
+   - 6. Chat + room de conversation (temps réel) (Awa)
+   - 7. Set up du serveur + des modals de base (Awa)
+   - 8. Tests unitaires (Melvin et Awa)
+   - 9. Filtre sur les annonces (Melvin)
+   - 10. Panneau Admin (gestion des utilisateurs, feature flipping, validation d'association) - Front et Back (Mai-thi)
+   - 11. Mise en production du serveur (Awa)
+   - 12. Mise en production du flutter web (Tout le monde)
+   - 13. UI/UX de l'application front (tout le monde) chacun a fait l'UI/UX de sa fonctionnalité
+   - 14. Chacun de nous a fait les fonctions back de ses fonctionnalités pour la plupart.
 
-This project is a starting point for a Flutter application.
+3. [Lien de production Flutter web](#lien-de-production-flutter-web)
+   - [https://purr-web.web.app/](https://purr-web.web.app/)
 
-A few resources to get you started if this is your first Flutter project:
+4. [Se connecter à l'admin Web](#se-connecter-à-ladmin-web)
+   - Email : admin@gmail.com
+   - Password : adminpassword
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+5. [Se connecter à l'application mobile](#se-connecter-à-lapplication-mobile)
+   - Email : user1@gmail.com
+   - Password : password
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+   - Email : user2@gmail.com
+   - Password : password
