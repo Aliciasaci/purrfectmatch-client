@@ -23,6 +23,7 @@
    - Authentification avec OAuth Google (Mai Thi)
    - Notification push tchat et validation d'association (Mai Thi)
    - Profil utilisateur (Mai Thi, Awa)
+   - Multilangue (Alicia)
    
    - Mise en production du serveur (Awa)
    - Mise en production du flutter web (Tout le monde)
