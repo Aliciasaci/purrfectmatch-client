@@ -8,9 +8,11 @@
 
 2. [Fonctionnalités et répartition](#fonctionnalités-et-répartition)
    - Fonctionnalité Swipe des chats avec mise en favoris, détails des annonces et des chats - Front et Back (Alicia)
-   - Ajout, modification, suppression des chats et annonces - Front et Back (Alicia)
+   - Ajout, modification, suppression des chats  - Front et Back (Alicia)
+   - Ajout, modification, supression des annonces - Front et back(Alicia)
    - Ajout association - Front et Back (Mai-thi)
    - Ajout des membres d'une association + modification des membres + UX page (Alicia)
+   - login et register (front Alicia, back Awa)
    - Swagger + log (Melvin)
    - Chat + room de conversation (temps réel) (Awa)
    - Set up du serveur + des models de base (Awa)
